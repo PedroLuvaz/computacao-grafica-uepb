@@ -634,6 +634,7 @@ document.getElementById('clear-btn').addEventListener('click', () => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     drawFixedAxes();
     updateObjectInfo();
+    drawOctants();
     transformationHistory = [];
     document.getElementById('transformation-history').innerHTML = "Nenhuma transformação aplicada.";
 });
