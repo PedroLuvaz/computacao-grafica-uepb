@@ -72,7 +72,6 @@ canvas {
 }
 
 .input-row input {
-    flex: 1;
     padding: 5px;
     border: 1px solid #ddd;
     border-radius: 3px;
@@ -134,11 +133,11 @@ button:hover {
 }
 
 #credits1 {
-    bottom: 20px;
+    bottom: 3px;
 }
 
 #credits2 {
-    bottom: -5px;
+    bottom: -17px;
 }
 
 #back {
@@ -148,7 +147,7 @@ button:hover {
     padding: 5px;
     transition: 0.3s; /* Suaviza a transição */
     position: fixed;
-    top: 5%;
+    top: 2%;
     user-select: none;
 }
 
@@ -253,4 +252,14 @@ button:hover {
     background-color: #555;
     color: white;
     text-decoration: none;
+}
+
+#object-size {
+    width: 100px;
+    margin-left: auto;
+}
+
+#rotation-angle {
+    width: 100px;
+    margin-left: auto;
 }

@@ -270,6 +270,8 @@ document.getElementById('apply-rotation').addEventListener('click', () => {
             break;
         case 'z':
             objectRotationZ += angle;
+            document.getElementById('view-rot-z').value = objectRotationZ;
+            document.getElementById('view-rot-z-value').textContent = objectRotationZ + '°';
             break;
     }
     
@@ -355,7 +357,7 @@ function projectPoint(x, y, z, applyObjectRotation = true) {
 // Função para desenhar eixos fixos
 function drawFixedAxes() {
     const center = { x: canvas.width / 2, y: canvas.height / 2 };
-    const length = 100 * (zoom / 100);
+    const length = 1655 * (zoom / 100);
     
     // Eixo X (vermelho)
     const xEnd = projectPoint(length, 0, 0, false);
@@ -372,67 +374,11 @@ function drawFixedAxes() {
     // Rótulos dos eixos
     ctx.font = '12px Arial';
     ctx.fillStyle = 'red';
-    ctx.fillText('X', xEnd.x + 15, xEnd.y);
+    //ctx.fillText('X', xEnd.x + 15, xEnd.y);
     ctx.fillStyle = 'green';
-    ctx.fillText('Y', yEnd.x, yEnd.y - 15);
+    //ctx.fillText('Y', yEnd.x, yEnd.y - 15);
     ctx.fillStyle = 'blue';
-    ctx.fillText('Z', zEnd.x - 15, zEnd.y);
-}
-
-// Função para desenhar os 8 octantes
-function drawOctants() {
-    // Define o tamanho dos octantes com base no tamanho do canvas
-    const sizeX = canvas.width / 2;
-    const sizeY = canvas.height / 2;
-    const sizeZ = Math.min(sizeX, sizeY); // Para manter a proporção no eixo Z
-
-    // Define os 8 vértices do cubo que representa os octantes
-    const vertices = [
-        projectPoint(sizeX, sizeY, sizeZ, false),      // Octante 1
-        projectPoint(-sizeX, sizeY, sizeZ, false),     // Octante 2
-        projectPoint(-sizeX, -sizeY, sizeZ, false),    // Octante 3
-        projectPoint(sizeX, -sizeY, sizeZ, false),     // Octante 4
-        projectPoint(sizeX, sizeY, -sizeZ, false),     // Octante 5
-        projectPoint(-sizeX, sizeY, -sizeZ, false),    // Octante 6
-        projectPoint(-sizeX, -sizeY, -sizeZ, false),   // Octante 7
-        projectPoint(sizeX, -sizeY, -sizeZ, false)     // Octante 8
-    ];
-
-    // Arestas que conectam os vértices (formando um cubo)
-    const edges = [
-        [0, 1], [1, 2], [2, 3], [3, 0], // Face frontal (octantes 1-4)
-        [4, 5], [5, 6], [6, 7], [7, 4], // Face traseira (octantes 5-8)
-        [0, 4], [1, 5], [2, 6], [3, 7]  // Arestas laterais
-    ];
-
-    // Desenha todas as arestas do cubo
-    ctx.strokeStyle = 'rgba(100, 100, 100, 0.3)';
-    edges.forEach(edge => {
-        const v1 = vertices[edge[0]];
-        const v2 = vertices[edge[1]];
-        drawLineDDA(v1.x, v1.y, v2.x, v2.y, 'rgba(100, 100, 100, 0.3)');
-    });
-
-    // Desenha rótulos dos octantes
-    ctx.font = 'bold 14px Arial';
-    ctx.fillStyle = '#333';
-
-    // Posições dos rótulos dentro de cada octante
-    const labelPositions = [
-        projectPoint(sizeX / 2, sizeY / 2, sizeZ / 2, false),      // Octante 1
-        projectPoint(-sizeX / 2, sizeY / 2, sizeZ / 2, false),     // Octante 2
-        projectPoint(-sizeX / 2, -sizeY / 2, sizeZ / 2, false),    // Octante 3
-        projectPoint(sizeX / 2, -sizeY / 2, sizeZ / 2, false),     // Octante 4
-        projectPoint(sizeX / 2, sizeY / 2, -sizeZ / 2, false),     // Octante 5
-        projectPoint(-sizeX / 2, sizeY / 2, -sizeZ / 2, false),    // Octante 6
-        projectPoint(-sizeX / 2, -sizeY / 2, -sizeZ / 2, false),   // Octante 7
-        projectPoint(sizeX / 2, -sizeY / 2, -sizeZ / 2, false)     // Octante 8
-    ];
-
-    // Desenha os números dos octantes
-    labelPositions.forEach((pos, index) => {
-        ctx.fillText((index + 1).toString(), pos.x - 5, pos.y + 5);
-    });
+    //ctx.fillText('Z', zEnd.x - 15, zEnd.y);
 }
 
 // Função para desenhar o objeto 3D
@@ -569,8 +515,10 @@ document.getElementById('generate-object-btn').addEventListener('click', () => {
     
     document.getElementById('view-rot-x').value = 0;
     document.getElementById('view-rot-y').value = 0;
+    document.getElementById('view-rot-z').value = 0;
     document.getElementById('view-rot-x-value').textContent = '0°';
     document.getElementById('view-rot-y-value').textContent = '0°';
+    document.getElementById('view-rot-z-value').textContent = '0°';
     
     objectVertices = currentObject.vertices.map(v => [...v]);
     objectEdges = currentObject.edges;
@@ -586,6 +534,12 @@ document.getElementById('view-rot-x').addEventListener('input', (e) => {
 document.getElementById('view-rot-y').addEventListener('input', (e) => {
     objectRotationY = parseInt(e.target.value);
     document.getElementById('view-rot-y-value').textContent = objectRotationY + '°';
+    drawObject();
+});
+
+document.getElementById('view-rot-z').addEventListener('input', (e) => {
+    objectRotationZ = parseInt(e.target.value);
+    document.getElementById('view-rot-z-value').textContent = objectRotationZ + '°';
     drawObject();
 });
 
@@ -625,8 +579,10 @@ document.getElementById('clear-btn').addEventListener('click', () => {
     
     document.getElementById('view-rot-x').value = 0;
     document.getElementById('view-rot-y').value = 0;
+    document.getElementById('view-rot-z').value = 0;
     document.getElementById('view-rot-x-value').textContent = '0°';
     document.getElementById('view-rot-y-value').textContent = '0°';
+    document.getElementById('view-rot-z-value').textContent = '0°';
     document.getElementById('view-zoom').value = 100;
     document.getElementById('view-zoom-value').textContent = '100%';
     
