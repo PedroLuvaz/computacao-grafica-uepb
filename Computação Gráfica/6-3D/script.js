@@ -283,46 +283,17 @@ document.getElementById('apply-rotation').addEventListener('click', () => {
 // Funções para criar objetos 3D
 function createCube(size) {
     const half = size / 2;
+
+    // Vértices ajustados para ter como base o modelo que você passou
     const vertices = [
-        [-half, -half, -half], [half, -half, -half],
-        [half, half, -half], [-half, half, -half],
-        [-half, -half, half], [half, -half, half],
-        [half, half, half], [-half, half, half]
-    ];
-
-    const edges = [
-        [0, 1], [1, 2], [2, 3], [3, 0], // Face inferior
-        [4, 5], [5, 6], [6, 7], [7, 4], // Face superior
-        [0, 4], [1, 5], [2, 6], [3, 7]  // Arestas laterais
-    ];
-
-    return { vertices, edges };
-}
-
-function createPyramid(size) {
-    const half = size / 2;
-    const vertices = [
-        [-half, -half, -half], [half, -half, -half],
-        [half, -half, half], [-half, -half, half],
-        [0, half, 0]  // Topo
-    ];
-
-    const edges = [
-        [0, 1], [1, 2], [2, 3], [3, 0], // Base
-        [0, 4], [1, 4], [2, 4], [3, 4]   // Arestas para o topo
-    ];
-
-    return { vertices, edges };
-}
-
-function createPrism(size) {
-    const half = size / 2;
-    const smaller = size / 3;
-    const vertices = [
-        [-half, -half, -smaller], [half, -half, -smaller],
-        [half, half, -smaller], [-half, half, -smaller],
-        [-half, -half, smaller], [half, -half, smaller],
-        [half, half, smaller], [-half, half, smaller]
+        [0.0, 0.0, 0.0],      // V1
+        [size, 0.0, 0.0],     // V2
+        [size, size, 0.0],    // V3
+        [0.0, size, 0.0],     // V4
+        [0.0, 0.0, size],     // V5
+        [size, 0.0, size],    // V6
+        [size, size, size],   // V7
+        [0.0, size, size]     // V8
     ];
 
     const edges = [
