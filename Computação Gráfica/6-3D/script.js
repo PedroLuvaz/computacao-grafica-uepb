@@ -210,6 +210,7 @@ document.getElementById('apply-shear').addEventListener('click', () => {
     drawObject();
 });
 
+//Aplicar Reflexão
 document.getElementById('apply-reflection').addEventListener('click', () => {
     if (!currentObject) {
         alert('Gere um objeto primeiro!');
@@ -228,7 +229,7 @@ document.getElementById('apply-reflection').addEventListener('click', () => {
     drawObject();
 });
 
-
+//Aplicar Translação
 document.getElementById('apply-translation').addEventListener('click', () => {
     if (!currentObject) {
         alert('Gere um objeto primeiro!');
@@ -248,6 +249,7 @@ document.getElementById('apply-translation').addEventListener('click', () => {
     drawObject();
 });
 
+//Aplicar Rotação
 document.getElementById('apply-rotation').addEventListener('click', () => {
     if (!currentObject) {
         alert('Gere um objeto primeiro!');
@@ -352,14 +354,32 @@ function drawFixedAxes() {
     //ctx.fillText('Z', zEnd.x - 15, zEnd.y);
 }
 
+// Função para desenhar eixos rotacionados
+function drawRotatedAxes() {
+    const center = { x: canvas.width / 2, y: canvas.height / 2 };
+    const length = 1655 * (zoom / 100);
+
+    // Eixo X (vermelho)
+    const xEnd = projectPoint(length, 0, 0, true); // Aplica rotação
+    drawLineDDA(center.x, center.y, xEnd.x, xEnd.y, 'red');
+
+    // Eixo Y (verde)
+    const yEnd = projectPoint(0, length, 0, true); // Aplica rotação
+    drawLineDDA(center.x, center.y, yEnd.x, yEnd.y, 'green');
+
+    // Eixo Z (azul)
+    const zEnd = projectPoint(0, 0, length, true); // Aplica rotação
+    drawLineDDA(center.x, center.y, zEnd.x, zEnd.y, 'blue');
+}
+
 // Função para desenhar o objeto 3D
 function drawObject() {
     // Limpa o canvas
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Desenha os eixos
-    drawFixedAxes();
+
+    // Desenha os eixos rotacionados
+    drawRotatedAxes();
 
     if (!currentObject) return;
 
@@ -368,10 +388,10 @@ function drawObject() {
     for (const edge of objectEdges) {
         const v1 = objectVertices[edge[0]];
         const v2 = objectVertices[edge[1]];
-        
+
         const p1 = projectPoint(v1[0], v1[1], v1[2]);
         const p2 = projectPoint(v2[0], v2[1], v2[2]);
-        
+
         drawLineDDA(p1.x, p1.y, p2.x, p2.y, '#111');
     }
 
@@ -496,24 +516,25 @@ document.getElementById('generate-object-btn').addEventListener('click', () => {
     drawObject();
 });
 
+//Atualiza a Rotação em X
 document.getElementById('view-rot-x').addEventListener('input', (e) => {
     objectRotationX = parseInt(e.target.value);
     document.getElementById('view-rot-x-value').textContent = objectRotationX + '°';
     drawObject();
 });
-
+//Atualiza a rotação em Y
 document.getElementById('view-rot-y').addEventListener('input', (e) => {
     objectRotationY = parseInt(e.target.value);
     document.getElementById('view-rot-y-value').textContent = objectRotationY + '°';
     drawObject();
 });
-
+//Atualiza a rotação em Z
 document.getElementById('view-rot-z').addEventListener('input', (e) => {
     objectRotationZ = parseInt(e.target.value);
     document.getElementById('view-rot-z-value').textContent = objectRotationZ + '°';
     drawObject();
 });
-
+//Atualiza o zoom
 document.getElementById('view-zoom').addEventListener('input', (e) => {
     zoom = parseInt(e.target.value);
     document.getElementById('view-zoom-value').textContent = zoom + '%';
