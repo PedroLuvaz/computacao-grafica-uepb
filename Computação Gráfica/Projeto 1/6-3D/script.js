@@ -524,25 +524,22 @@ document.getElementById('apply-sequence-btn').addEventListener('click', () => {
 // Funções para criar objetos 3D
 function createCube(size) {
     const half = size / 2;
-
-    // Vértices ajustados para ter como base o modelo que você passou
+    // Vértices centralizados na origem
     const vertices = [
-        [0.0, 0.0, 0.0],      // V1
-        [size, 0.0, 0.0],     // V2
-        [size, size, 0.0],    // V3
-        [0.0, size, 0.0],     // V4
-        [0.0, 0.0, size],     // V5
-        [size, 0.0, size],    // V6
-        [size, size, size],   // V7
-        [0.0, size, size]     // V8
+        [-half, -half, -half], // V1
+        [ half, -half, -half], // V2
+        [ half,  half, -half], // V3
+        [-half,  half, -half], // V4
+        [-half, -half,  half], // V5
+        [ half, -half,  half], // V6
+        [ half,  half,  half], // V7
+        [-half,  half,  half]  // V8
     ];
-
     const edges = [
         [0, 1], [1, 2], [2, 3], [3, 0], // Face inferior
         [4, 5], [5, 6], [6, 7], [7, 4], // Face superior
         [0, 4], [1, 5], [2, 6], [3, 7]  // Arestas laterais
     ];
-
     return { vertices, edges };
 }
 
@@ -621,11 +618,10 @@ function drawRotatedAxes() {
 
 // Função para desenhar o objeto 3D
 function drawObject() {
-    // Limpa o canvas
+    // Limpa o canvas principal
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Desenha os eixos rotacionados
     drawFixedAxes();
 
     if (!currentObject) return;
@@ -635,10 +631,8 @@ function drawObject() {
     for (const edge of objectEdges) {
         const v1 = objectVertices[edge[0]];
         const v2 = objectVertices[edge[1]];
-
         const p1 = projectPoint(v1[0], v1[1], v1[2]);
         const p2 = projectPoint(v2[0], v2[1], v2[2]);
-
         drawLineDDA(p1.x, p1.y, p2.x, p2.y, '#111');
     }
 
@@ -648,8 +642,10 @@ function drawObject() {
         setPixel(p.x, p.y, '#222');
     }
 
-    updateObjectInfo();
-    drawOctants(); // Desenha os octantes
+    updateObjectInfo(); // Atualiza informações do objeto
+
+    drawInWorldWindow(); // Desenha na janela do mundo
+    drawInViewport();    // Desenha na viewport
 }
 
 // Função para atualizar informações do objeto
@@ -855,6 +851,192 @@ document.getElementById('back').addEventListener('click', function(e) {
     e.preventDefault();
     window.location.href = this.getAttribute('href');
 });
+
+//ALGORITMO DE RECORTE
+
+// Códigos de região para o algoritmo de Cohen-Sutherland
+const INSIDE = 0; // 0000
+const LEFT = 1;   // 0001
+const RIGHT = 2;  // 0010
+const BOTTOM = 4; // 0100
+const TOP = 8;    // 1000
+
+function computeRegionCode(x, y, xMin, yMin, xMax, yMax) {
+    let code = INSIDE;
+
+    if (x < xMin) code |= LEFT;
+    else if (x > xMax) code |= RIGHT;
+    if (y < yMin) code |= BOTTOM;
+    else if (y > yMax) code |= TOP;
+
+    return code;
+}
+
+function cohenSutherlandClip(x1, y1, x2, y2, xMin, yMin, xMax, yMax) {
+    let code1 = computeRegionCode(x1, y1, xMin, yMin, xMax, yMax);
+    let code2 = computeRegionCode(x2, y2, xMin, yMin, xMax, yMax);
+    let accept = false;
+
+    while (true) {
+        if ((code1 | code2) === 0) {
+            // Ambos os pontos estão dentro da janela
+            accept = true;
+            break;
+        } else if (code1 & code2) {
+            // Ambos os pontos estão fora da mesma região
+            break;
+        } else {
+            // Pelo menos um ponto está fora
+            let codeOut = code1 !== 0 ? code1 : code2;
+            let x, y;
+
+            if (codeOut & TOP) {
+                x = x1 + ((x2 - x1) * (yMax - y1)) / (y2 - y1);
+                y = yMax;
+            } else if (codeOut & BOTTOM) {
+                x = x1 + ((x2 - x1) * (yMin - y1)) / (y2 - y1);
+                y = yMin;
+            } else if (codeOut & RIGHT) {
+                y = y1 + ((y2 - y1) * (xMax - x1)) / (x2 - x1);
+                x = xMax;
+            } else if (codeOut & LEFT) {
+                y = y1 + ((y2 - y1) * (xMin - x1)) / (x2 - x1);
+                x = xMin;
+            }
+
+            if (codeOut === code1) {
+                x1 = x;
+                y1 = y;
+                code1 = computeRegionCode(x1, y1, xMin, yMin, xMax, yMax);
+            } else {
+                x2 = x;
+                y2 = y;
+                code2 = computeRegionCode(x2, y2, xMin, yMin, xMax, yMax);
+            }
+        }
+    }
+
+    if (accept) {
+        return { x1, y1, x2, y2 };
+    } else {
+        return null;
+    }
+}
+
+//IMPLEMENTAÇÃO DA VIEWPORT E JANELA DO MUNDO
+
+const worldWindowCanvas = document.getElementById('world-window');
+const worldWindowCtx = worldWindowCanvas.getContext('2d');
+
+const viewportCanvas = document.getElementById('viewport');
+const viewportCtx = viewportCanvas.getContext('2d');
+
+//TRANSFORMAÇÃO PARA VIEWPORT
+function transformToViewport(x, y, xMin, yMin, xMax, yMax, vpXMin, vpYMin, vpXMax, vpYMax) {
+    const xViewport = ((x - xMin) / (xMax - xMin)) * (vpXMax - vpXMin) + vpXMin;
+    const yViewport = ((y - yMin) / (yMax - yMin)) * (vpYMax - vpYMin) + vpYMin;
+    return { x: xViewport, y: yViewport };
+}
+
+//Função para desenhar o objeto na janela do mundo
+function drawInWorldWindow() {
+    const size = 300;
+    worldWindowCtx.fillStyle = 'white';
+    worldWindowCtx.fillRect(0, 0, size, size);
+
+    if (!currentObject) return;
+
+    // Define limites da janela do mundo (ex: -100 a 100 em X e Y)
+    const xMin = -100, yMin = -100, xMax = 100, yMax = 100;
+
+    // Função auxiliar para mapear coordenadas do mundo para o canvas
+    function worldToCanvas(x, y) {
+        const cx = ((x - xMin) / (xMax - xMin)) * size;
+        const cy = size - ((y - yMin) / (yMax - yMin)) * size; // Inverte Y
+        return { x: cx, y: cy };
+    }
+
+    // Desenha eixos
+    const center = worldToCanvas(0, 0);
+    worldWindowCtx.strokeStyle = 'red';
+    worldWindowCtx.beginPath();
+    worldWindowCtx.moveTo(0, center.y);
+    worldWindowCtx.lineTo(size, center.y);
+    worldWindowCtx.stroke();
+
+    worldWindowCtx.strokeStyle = 'green';
+    worldWindowCtx.beginPath();
+    worldWindowCtx.moveTo(center.x, 0);
+    worldWindowCtx.lineTo(center.x, size);
+    worldWindowCtx.stroke();
+
+    // Desenha vértices e arestas
+    worldWindowCtx.strokeStyle = '#111';
+    for (const edge of objectEdges) {
+        const v1 = objectVertices[edge[0]];
+        const v2 = objectVertices[edge[1]];
+
+        const p1 = worldToCanvas(v1[0], v1[1]);
+        const p2 = worldToCanvas(v2[0], v2[1]);
+
+        worldWindowCtx.beginPath();
+        worldWindowCtx.moveTo(p1.x, p1.y);
+        worldWindowCtx.lineTo(p2.x, p2.y);
+        worldWindowCtx.stroke();
+    }
+}
+
+// Função para desenhar a viewport o objeto
+function drawInViewport() {
+    const size = 300;
+    viewportCtx.fillStyle = 'white';
+    viewportCtx.fillRect(0, 0, size, size);
+
+    if (!currentObject) return;
+
+    // Limites da janela do mundo (mesmo usados na função anterior)
+    const xMin = -100, yMin = -100, xMax = 100, yMax = 100;
+
+    // Limites da viewport (ajustável visualmente)
+    const vpXMin = 0, vpYMin = 0, vpXMax = size, vpYMax = size;
+
+    // Desenha eixos na viewport
+    const center = transformToViewport(0, 0, xMin, yMin, xMax, yMax, vpXMin, vpYMin, vpXMax, vpYMax);
+    viewportCtx.strokeStyle = 'red';
+    viewportCtx.beginPath();
+    viewportCtx.moveTo(0, center.y);
+    viewportCtx.lineTo(size, center.y);
+    viewportCtx.stroke();
+
+    viewportCtx.strokeStyle = 'green';
+    viewportCtx.beginPath();
+    viewportCtx.moveTo(center.x, 0);
+    viewportCtx.lineTo(center.x, size);
+    viewportCtx.stroke();
+
+    // Desenha arestas com recorte Cohen-Sutherland
+    viewportCtx.strokeStyle = '#111';
+    for (const edge of objectEdges) {
+        const v1 = objectVertices[edge[0]];
+        const v2 = objectVertices[edge[1]];
+
+        const p1 = transformToViewport(v1[0], v1[1], xMin, yMin, xMax, yMax, vpXMin, vpYMin, vpXMax, vpYMax);
+        const p2 = transformToViewport(v2[0], v2[1], xMin, yMin, xMax, yMax, vpXMin, vpYMin, vpXMax, vpYMax);
+
+        const clipped = cohenSutherlandClip(
+            p1.x, p1.y, p2.x, p2.y,
+            vpXMin, vpYMin, vpXMax, vpYMax
+        );
+
+        if (clipped) {
+            viewportCtx.beginPath();
+            viewportCtx.moveTo(clipped.x1, clipped.y1);
+            viewportCtx.lineTo(clipped.x2, clipped.y2);
+            viewportCtx.stroke();
+        }
+    }
+}
+
 
 // Inicialização
 ctx.fillStyle = 'white';
