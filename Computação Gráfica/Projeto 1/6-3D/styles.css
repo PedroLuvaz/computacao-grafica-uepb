@@ -41,6 +41,7 @@ canvas {
     border: 1px solid #333;
     background-color: white;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin: 10px;
 }
 
 .control-group {
@@ -75,6 +76,7 @@ canvas {
     padding: 5px;
     border: 1px solid #ddd;
     border-radius: 3px;
+    flex: 1;
 }
 
 button {
@@ -115,6 +117,8 @@ button:hover {
     background: #f9f9f9;
     border-radius: 3px;
     border: 1px solid #eee;
+    word-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 .vertex-info {
@@ -141,18 +145,18 @@ button:hover {
 }
 
 #back {
-    color: rgb(112, 110, 110); /* Cor do texto */
-    text-decoration: none; /* Remove o sublinhado padrão */
-    font-weight: bold; /* Deixa o texto um pouco mais forte */
+    color: rgb(112, 110, 110);
+    text-decoration: none;
+    font-weight: bold;
     padding: 5px;
-    transition: 0.3s; /* Suaviza a transição */
+    transition: 0.3s;
     position: fixed;
     top: 2%;
     user-select: none;
 }
 
 #back:hover {
-    text-decoration: underline; /* Adiciona sublinhado ao passar o mouse */
+    text-decoration: underline;
 }
 
 .tab-buttons {
@@ -168,6 +172,8 @@ button:hover {
     border: none;
     cursor: pointer;
     font-size: 14px;
+    margin-bottom: 5px;
+    border-radius: 3px;
 }
 
 .tab-button.active {
@@ -211,47 +217,6 @@ button:hover {
     width: 40px;
     text-align: right;
     font-size: 14px;
-}
-
-.axis-label {
-    position: absolute;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-#x-axis-label {
-    color: red;
-}
-
-#y-axis-label {
-    color: green;
-}
-
-#z-axis-label {
-    color: blue;
-}
-
-.back-link {
-    display: inline-block;
-    background-color: #666;
-    color: white;
-    text-decoration: none;
-    padding: 10px 15px;
-    margin-top: 20px;
-    border-radius: 4px;
-    text-align: center;
-    font-size: 14px;
-    transition: background-color 0.3s;
-    width: calc(100% - 30px); /* Ajuste para o padding */
-    margin-left: 15px;
-    margin-right: 15px;
-    box-sizing: border-box;
-}
-
-.back-link:hover {
-    background-color: #555;
-    color: white;
-    text-decoration: none;
 }
 
 #object-size {

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Recorte Cohen-Sutherland</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="sidebar" id="left-bar">
+    <h3>Coordenadas da Janela</h3>
+    <hr>
+    <p id="live-coords">X: -, Y: -</p>
+    <div id="input-div">
+      <div>
+        <label for="input-xmax">Xmax:</label>
+        <input type="number" id="input-xmax" value="450">
+      </div>
+      <div>
+        <label for="input-xmin">Xmin:</label>
+        <input type="number" id="input-xmin" value="150">
+      </div>
+      <div>
+        <label for="input-ymax">Ymax:</label>
+        <input type="number" id="input-ymax" value="300">
+      </div>
+      <div>
+        <label for="input-ymin">Ymin:</label>
+        <input type="number" id="input-ymin" value="100">
+      </div>
+      <button id="set-coordinates-btn">Definir Valores</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="bounds-info">
+      <p>
+        <strong>Xmax:</strong> <span id="xmax">450</span> |
+        <strong>Xmin:</strong> <span id="xmin">150</span> |
+        <strong>Ymax:</strong> <span id="ymax">300</span> |
+        <strong>Ymin:</strong> <span id="ymin">100</span>
+      </p>
+    </div>
+    <canvas id="canvas" width="600" height="400"></canvas>
+    <p id="credits1">Implementado por: Erick Nathan, Pedro Lucas</p>
+    <p id="credits2">Computação Gráfica - Prof. Robson Pequeno de Souza</p>
+    <a id="back" href="../1-Tela Principal/index.html">Voltar ao Início</a>
+  </div>
+
+  <div class="sidebar" id="right-bar">
+    <h3>Adicionar Linha</h3>
+    <hr>
+    <p id="clicked-coords">Clique na tela para adicionar uma linha</p>
+    <div id="input-div">
+      <div>
+        <label for="x1">X1:</label>
+        <input type="number" id="x1" />
+      </div>
+      <div>
+        <label for="y1">Y1:</label>
+        <input type="number" id="y1" />
+      </div>
+      <div>
+        <label for="x2">X2:</label>
+        <input type="number" id="x2" />
+      </div>
+      <div>
+        <label for="y2">Y2:</label>
+        <input type="number" id="y2" />
+      </div>
+      <button id="add-line-btn">Desenhar Linha</button>
+      <button id="reset-btn">Resetar</button> 
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
