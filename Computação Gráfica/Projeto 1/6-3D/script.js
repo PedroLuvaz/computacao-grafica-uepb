@@ -277,37 +277,55 @@ document.getElementById('apply-translation').addEventListener('click', () => {
     drawObject();
 });
 
-//Aplicar Rotação
+//Aplicar rotação
 document.getElementById('apply-rotation').addEventListener('click', () => {
     if (!currentObject) {
         alert('Gere um objeto primeiro!');
         return;
     }
-    
+
     const axis = document.getElementById('rotation-axis').value;
     const angle = parseFloat(document.getElementById('rotation-angle').value) || 0;
-    
+
+    // Ponto fixo (usando vértice 1)
+    const [fx, fy, fz] = objectVertices[0];
+
+    // Matrizes de transformação
+    const translateToOrigin = Matrix3D.translation(-fx, -fy, -fz);
+    const translateBack = Matrix3D.translation(fx, fy, fz);
+
+    let rotationMatrix;
     switch (axis) {
         case 'x':
-            objectRotationX += angle;
-            document.getElementById('view-rot-x').value = objectRotationX;
-            document.getElementById('view-rot-x-value').textContent = objectRotationX + '°';
+            rotationMatrix = Matrix3D.rotationX(angle);
             break;
         case 'y':
-            objectRotationY += angle;
-            document.getElementById('view-rot-y').value = objectRotationY;
-            document.getElementById('view-rot-y-value').textContent = objectRotationY + '°';
+            rotationMatrix = Matrix3D.rotationY(angle);
             break;
         case 'z':
-            objectRotationZ += angle;
-            document.getElementById('view-rot-z').value = objectRotationZ;
-            document.getElementById('view-rot-z-value').textContent = objectRotationZ + '°';
+            rotationMatrix = Matrix3D.rotationZ(angle);
             break;
+        default:
+            alert('Eixo inválido!');
+            return;
     }
-    
-    updateTransformationHistory(`Rotação (Eixo: ${axis.toUpperCase()}, Ângulo: ${angle}°)`);
+
+    // Composição da transformação completa: T^-1 * R * T
+    const compositeMatrix = Matrix3D.multiply(
+        translateBack,
+        Matrix3D.multiply(rotationMatrix, translateToOrigin)
+    );
+
+    // Aplicar a transformação aos vértices
+    objectVertices = objectVertices.map(vertex => {
+        const transformed = Matrix3D.multiplyVector(compositeMatrix, [...vertex, 1]);
+        return [transformed[0], transformed[1], transformed[2]];
+    });
+
+    updateTransformationHistory(`Rotação Real (Eixo: ${axis.toUpperCase()}, Ângulo: ${angle}°)`);
     drawObject();
 });
+
 
 
 // Funções para criar objetos 3D
@@ -527,12 +545,6 @@ document.getElementById('generate-object-btn').addEventListener('click', () => {
     switch (objectType) {
         case 'cube':
             currentObject = createCube(size);
-            break;
-        case 'pyramid':
-            currentObject = createPyramid(size);
-            break;
-        case 'prism':
-            currentObject = createPrism(size);
             break;
     }
     
