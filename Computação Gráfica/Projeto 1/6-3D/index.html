@@ -32,15 +32,15 @@
             <div class="control-group">
                 <h3>Translação</h3>
                 <div class="input-row">
-                    <label>X:</label>
+                    <label style="font-weight: bold;">X:</label>
                     <input type="number" id="tx" value="0">
                 </div>
                 <div class="input-row">
-                    <label>Y:</label>
+                    <label style="font-weight: bold;">Y:</label>
                     <input type="number" id="ty" value="0">
                 </div>
                 <div class="input-row">
-                    <label>Z:</label>
+                    <label style="font-weight: bold;">Z:</label>
                     <input type="number" id="tz" value="0">
                 </div>
                 <button id="apply-translation">Aplicar Translação</button>
@@ -51,7 +51,7 @@
             <div class="control-group">
                 <h3>Rotação</h3>
                 <div class="input-row">
-                    <label>Eixo:</label>
+                    <label style="font-weight: bold;">Eixo:</label>
                     <select id="rotation-axis">
                         <option value="x">X</option>
                         <option value="y">Y</option>
@@ -59,7 +59,7 @@
                     </select>
                 </div>
                 <div class="input-row">
-                    <label>Ângulo:</label>
+                    <label style="font-weight: bold;">Ângulo:</label>
                     <input type="number" id="rotation-angle" value="0">
                 </div>
                 <button id="apply-rotation">Aplicar Rotação</button>
@@ -70,15 +70,15 @@
             <div class="control-group">
                 <h3>Escala</h3>
                 <div class="input-row">
-                    <label>X:</label>
+                    <label style="font-weight: bold;">X:</label>
                     <input type="number" id="sx" value="1" step="0.1">
                 </div>
                 <div class="input-row">
-                    <label>Y:</label>
+                    <label style="font-weight: bold;">Y:</label>
                     <input type="number" id="sy" value="1" step="0.1">
                 </div>
                 <div class="input-row">
-                    <label>Z:</label>
+                    <label style="font-weight: bold;">Z:</label>
                     <input type="number" id="sz" value="1" step="0.1">
                 </div>
                 <button id="apply-scale">Aplicar Escala</button>
@@ -89,15 +89,15 @@
             <div class="control-group">
                 <h3>Cisalhamento</h3>
                 <div class="input-row">
-                    <label>XY:</label>
+                    <label style="font-weight: bold;">XY:</label>
                     <input type="number" id="sh-xy" value="0" step="0.1">
                 </div>
                 <div class="input-row">
-                    <label>XZ:</label>
+                    <label style="font-weight: bold;">XZ:</label>
                     <input type="number" id="sh-xz" value="0" step="0.1">
                 </div>
                 <div class="input-row">
-                    <label>YZ:</label>
+                    <label style="font-weight: bold;">YZ:</label>
                     <input type="number" id="sh-yz" value="0" step="0.1">
                 </div>
                 <button id="apply-shear">Aplicar Cisalhamento</button>
@@ -108,11 +108,11 @@
             <div class="control-group">
                 <h3>Reflexão</h3>
                 <div class="input-row">
-                    <label>Eixo:</label>
+                    <label style="font-weight: bold;">Eixo:</label>
                     <select id="reflection-axis">
-                        <option value="xy">XY</option>
-                        <option value="xz">XZ</option>
-                        <option value="yz">YZ</option>
+                        <option value="xy" style="font-weight: bold;">XY</option>
+                        <option value="xz" style="font-weight: bold;">XZ</option>
+                        <option value="yz" style="font-weight: bold;">YZ</option>
                     </select>
                 </div>
                 <button id="apply-reflection">Aplicar Reflexão</button>
@@ -123,17 +123,17 @@
             <h3>Visualização</h3>
             <div class="slider-container">
                 <label id="color-x">X:</label>
-                <input type="range" id="view-rot-x" min="-180" max="180" value="30">
+                <input type="range" id="view-rot-x" min="-180" max="180" value="0">
                 <span id="view-rot-x-value">0°</span>
             </div>
             <div class="slider-container">
                 <label id="color-y">Y:</label>
-                <input type="range" id="view-rot-y" min="-180" max="180" value="30">
+                <input type="range" id="view-rot-y" min="-180" max="180" value="0">
                 <span id="view-rot-y-value">0°</span>
             </div>
             <div class="slider-container">
                 <label id="color-z">Z:</label>
-                <input type="range" id="view-rot-z" min="-180" max="180" value="30">
+                <input type="range" id="view-rot-z" min="-180" max="180" value="0">
                 <span id="view-rot-z-value">0°</span>
             </div>
             <div class="slider-container">
