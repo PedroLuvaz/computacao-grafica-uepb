@@ -20,6 +20,9 @@ let cameraRotationZ = 0;
 // Histórico de transformações
 let transformationHistory = [];
 
+// Variável para armazenar a sequência de transformações
+let transformationSequence = [];
+
 // Função para desenhar um pixel no canvas
 function setPixel(x, y, color = '#000000') {
     const canvasX = Math.round(x);
@@ -309,6 +312,196 @@ document.getElementById('apply-rotation').addEventListener('click', () => {
     drawObject();
 });
 
+// Atualiza os parâmetros exibidos com base no tipo de transformação selecionado
+document.getElementById('sequence-transformation-type').addEventListener('change', (e) => {
+    const type = e.target.value;
+    const parametersDiv = document.getElementById('sequence-parameters');
+    parametersDiv.innerHTML = ''; // Limpa os parâmetros anteriores
+
+    switch (type) {
+        case 'translation':
+            parametersDiv.innerHTML = `
+                <div class="input-row">
+                    <label>X:</label>
+                    <input type="number" id="seq-tx" value="0">
+                </div>
+                <div class="input-row">
+                    <label>Y:</label>
+                    <input type="number" id="seq-ty" value="0">
+                </div>
+                <div class="input-row">
+                    <label>Z:</label>
+                    <input type="number" id="seq-tz" value="0">
+                </div>`;
+            break;
+        case 'rotation':
+            parametersDiv.innerHTML = `
+                <div class="input-row">
+                    <label>Eixo:</label>
+                    <select id="seq-rotation-axis">
+                        <option value="x">X</option>
+                        <option value="y">Y</option>
+                        <option value="z">Z</option>
+                    </select>
+                </div>
+                <div class="input-row">
+                    <label>Ângulo:</label>
+                    <input type="number" id="seq-rotation-angle" value="0">
+                </div>`;
+            break;
+        case 'scale':
+            parametersDiv.innerHTML = `
+                <div class="input-row">
+                    <label>X:</label>
+                    <input type="number" id="seq-sx" value="1" step="0.1">
+                </div>
+                <div class="input-row">
+                    <label>Y:</label>
+                    <input type="number" id="seq-sy" value="1" step="0.1">
+                </div>
+                <div class="input-row">
+                    <label>Z:</label>
+                    <input type="number" id="seq-sz" value="1" step="0.1">
+                </div>`;
+            break;
+        case 'shear':
+            parametersDiv.innerHTML = `
+                <div class="input-row">
+                    <label>XY:</label>
+                    <input type="number" id="seq-sh-xy" value="0" step="0.1">
+                </div>
+                <div class="input-row">
+                    <label>XZ:</label>
+                    <input type="number" id="seq-sh-xz" value="0" step="0.1">
+                </div>
+                <div class="input-row">
+                    <label>YZ:</label>
+                    <input type="number" id="seq-sh-yz" value="0" step="0.1">
+                </div>`;
+            break;
+        case 'reflection':
+            parametersDiv.innerHTML = `
+                <div class="input-row">
+                    <label>Eixo:</label>
+                    <select id="seq-reflection-axis">
+                        <option value="xy">XY</option>
+                        <option value="xz">XZ</option>
+                        <option value="yz">YZ</option>
+                    </select>
+                </div>`;
+            break;
+    }
+});
+
+// Adiciona a transformação configurada à sequência
+document.getElementById('add-to-sequence-btn').addEventListener('click', () => {
+    const type = document.getElementById('sequence-transformation-type').value;
+    let parameters = {};
+
+    switch (type) {
+        case 'translation':
+            parameters = {
+                tx: parseFloat(document.getElementById('seq-tx').value) || 0,
+                ty: parseFloat(document.getElementById('seq-ty').value) || 0,
+                tz: parseFloat(document.getElementById('seq-tz').value) || 0
+            };
+            break;
+        case 'rotation':
+            parameters = {
+                axis: document.getElementById('seq-rotation-axis').value,
+                angle: parseFloat(document.getElementById('seq-rotation-angle').value) || 0
+            };
+            break;
+        case 'scale':
+            parameters = {
+                sx: parseFloat(document.getElementById('seq-sx').value) || 1,
+                sy: parseFloat(document.getElementById('seq-sy').value) || 1,
+                sz: parseFloat(document.getElementById('seq-sz').value) || 1
+            };
+            break;
+        case 'shear':
+            parameters = {
+                shXY: parseFloat(document.getElementById('seq-sh-xy').value) || 0,
+                shXZ: parseFloat(document.getElementById('seq-sh-xz').value) || 0,
+                shYZ: parseFloat(document.getElementById('seq-sh-yz').value) || 0
+            };
+            break;
+        case 'reflection':
+            parameters = {
+                axis: document.getElementById('seq-reflection-axis').value
+            };
+            break;
+    }
+
+    transformationSequence.push({ type, parameters });
+    updateTransformationHistory(`Adicionado à sequência: ${type} (${JSON.stringify(parameters)})`);
+});
+
+// Aplica a sequência de transformações
+document.getElementById('apply-sequence-btn').addEventListener('click', () => {
+    if (!currentObject) {
+        alert('Gere um objeto primeiro!');
+        return;
+    }
+
+    transformationSequence.forEach(transformation => {
+        const { type, parameters } = transformation;
+
+        switch (type) {
+            case 'translation':
+                const translationMatrix = Matrix3D.translation(parameters.tx, parameters.ty, parameters.tz);
+                objectVertices = objectVertices.map(vertex => {
+                    const transformed = Matrix3D.multiplyVector(translationMatrix, [...vertex, 1]);
+                    return [transformed[0], transformed[1], transformed[2]];
+                });
+                break;
+            case 'rotation':
+                let rotationMatrix;
+                switch (parameters.axis) {
+                    case 'x':
+                        rotationMatrix = Matrix3D.rotationX(parameters.angle);
+                        break;
+                    case 'y':
+                        rotationMatrix = Matrix3D.rotationY(parameters.angle);
+                        break;
+                    case 'z':
+                        rotationMatrix = Matrix3D.rotationZ(parameters.angle);
+                        break;
+                }
+                objectVertices = objectVertices.map(vertex => {
+                    const transformed = Matrix3D.multiplyVector(rotationMatrix, [...vertex, 1]);
+                    return [transformed[0], transformed[1], transformed[2]];
+                });
+                break;
+            case 'scale':
+                const scaleMatrix = Matrix3D.scaling(parameters.sx, parameters.sy, parameters.sz);
+                objectVertices = objectVertices.map(vertex => {
+                    const transformed = Matrix3D.multiplyVector(scaleMatrix, [...vertex, 1]);
+                    return [transformed[0], transformed[1], transformed[2]];
+                });
+                break;
+            case 'shear':
+                const shearMatrix = Matrix3D.shear(parameters.shXY, parameters.shXZ, parameters.shYZ);
+                objectVertices = objectVertices.map(vertex => {
+                    const transformed = Matrix3D.multiplyVector(shearMatrix, [...vertex, 1]);
+                    return [transformed[0], transformed[1], transformed[2]];
+                });
+                break;
+            case 'reflection':
+                const reflectionMatrix = Matrix3D.reflection(parameters.axis);
+                objectVertices = objectVertices.map(vertex => {
+                    const transformed = Matrix3D.multiplyVector(reflectionMatrix, [...vertex, 1]);
+                    return [transformed[0], transformed[1], transformed[2]];
+                });
+                break;
+        }
+
+        updateTransformationHistory(`Aplicado: ${type} (${JSON.stringify(parameters)})`);
+    });
+
+    transformationSequence = []; // Limpa a sequência após aplicar
+    drawObject();
+});
 
 // Funções para criar objetos 3D
 function createCube(size) {
@@ -599,7 +792,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-//Botao Limpar
+// Botão Limpar
 document.getElementById('clear-btn').addEventListener('click', () => {
     currentObject = null;
     objectVertices = [];
@@ -607,7 +800,6 @@ document.getElementById('clear-btn').addEventListener('click', () => {
     objectRotationX = 0;
     objectRotationY = 0;
     objectRotationZ = 0;
-    
     document.getElementById('view-rot-x').value = 0;
     document.getElementById('view-rot-y').value = 0;
     document.getElementById('view-rot-z').value = 0;
@@ -616,15 +808,14 @@ document.getElementById('clear-btn').addEventListener('click', () => {
     document.getElementById('view-rot-z-value').textContent = '0°';
     document.getElementById('view-zoom').value = 100;
     document.getElementById('view-zoom-value').textContent = '100%';
-    
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     drawFixedAxes();
     updateObjectInfo();
-    drawOctants();
     transformationHistory = [];
     document.getElementById('transformation-history').innerHTML = "Nenhuma transformação aplicada.";
 });
+
 
 document.getElementById('reset-view-btn').addEventListener('click', () => {
     cameraRotationX = 0;

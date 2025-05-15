@@ -144,6 +144,25 @@
             <button id="reset-view-btn">Resetar Visualização</button>
         </div>
 
+        <div class="control-group">
+            <h3>Sequência de Transformações</h3>
+            <div class="input-row">
+                <label>Transformação:</label>
+                <select id="sequence-transformation-type">
+                    <option value="translation">Translação</option>
+                    <option value="rotation">Rotação</option>
+                    <option value="scale">Escala</option>
+                    <option value="shear">Cisalhamento</option>
+                    <option value="reflection">Reflexão</option>
+                </select>
+            </div>
+            <div id="sequence-parameters">
+                <!-- Os parâmetros específicos da transformação serão gerados dinamicamente -->
+            </div>
+            <button id="add-to-sequence-btn">Adicionar à Sequência</button>
+            <button id="apply-sequence-btn">Aplicar Sequência</button>
+        </div>
+
         <button id="clear-btn">Limpar Tudo</button>
 
     </div>
