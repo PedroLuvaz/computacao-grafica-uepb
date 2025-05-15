@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transformações Geométricas 3D</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-    <!-- Sidebar Esquerda -->
     <div class="sidebar" id="left-sidebar">
         <div class="control-group">
             <h3>Objeto 3D</h3>
@@ -26,8 +24,8 @@
             <button class="tab-button active" data-tab="translation">Translação</button>
             <button class="tab-button" data-tab="rotation">Rotação</button>
             <button class="tab-button" data-tab="scale">Escala</button>
-            <button class="tab-button" data-tab="shear">Cisalhamento</button>
-            <button class="tab-button" data-tab="reflection">Reflexão</button>
+            <button class="tab-button" data-tab="shear">Cisalhamento</button> <!-- Botão para Cisalhamento -->
+            <button class="tab-button" data-tab="reflection">Reflexão</button> <!-- Botão para Reflexão -->
         </div>
 
         <div class="tab-content active" id="translation-tab">
@@ -120,43 +118,38 @@
                 <button id="apply-reflection">Aplicar Reflexão</button>
             </div>
         </div>
-
-        <div class="control-group">
-            <h3>Sequência de Transformações</h3>
-            <textarea id="transformation-sequence" rows="5"></textarea>
-            <button id="add-to-sequence-btn">Adicionar à Sequência</button>
-            <button id="apply-sequence-btn">Aplicar Sequência</button>
-        </div>
-
+        
         <div class="control-group">
             <h3>Visualização</h3>
             <div class="slider-container">
-                <label>Rot. X:</label>
+                <label id="color-x">X:</label>
                 <input type="range" id="view-rot-x" min="-180" max="180" value="30">
-                <span id="view-rot-x-value">30°</span>
+                <span id="view-rot-x-value">0°</span>
             </div>
             <div class="slider-container">
-                <label>Rot. Y:</label>
+                <label id="color-y">Y:</label>
                 <input type="range" id="view-rot-y" min="-180" max="180" value="30">
-                <span id="view-rot-y-value">30°</span>
+                <span id="view-rot-y-value">0°</span>
             </div>
             <div class="slider-container">
-                <label>Rot. Z:</label>
+                <label id="color-z">Z:</label>
                 <input type="range" id="view-rot-z" min="-180" max="180" value="30">
-                <span id="view-rot-z-value">30°</span>
+                <span id="view-rot-z-value">0°</span>
             </div>
             <div class="slider-container">
-                <label>Zoom:</label>
+                <label id="zoom">Zoom:</label>
                 <input type="range" id="view-zoom" min="50" max="200" value="100">
                 <span id="view-zoom-value">100%</span>
             </div>
+            <button id="reset-view-btn">Resetar Visualização</button>
         </div>
 
         <button id="clear-btn">Limpar Tudo</button>
+
     </div>
 
-    <!-- Área principal com canvas -->
     <div class="main">
+        <br>
         <canvas id="canvas3d" width="600" height="600"></canvas>
         <br>
         <p id="credits1">Implementado por: Erick Nathan, Pedro Lucas</p>
@@ -164,7 +157,6 @@
         <a id="back" href="../1-Tela Principal/index.html">Voltar ao Início</a>
     </div>
 
-    <!-- Sidebar Direita -->
     <div class="sidebar" id="right-sidebar">
         <div class="info-panel">
             <h3>Informações do Objeto</h3>
@@ -185,7 +177,6 @@
         </div>
     </div>
 
-    <!-- Script -->
     <script src="script.js"></script>
 </body>
 </html>

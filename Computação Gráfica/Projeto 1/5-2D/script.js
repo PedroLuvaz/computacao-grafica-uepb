@@ -243,13 +243,13 @@ function aplicarEscalaMatriz() {
     }
 
     // Definir o ponto fixo (50,50)
-    const pontoFixoX = 50;
-    const pontoFixoY = 50;
+    const origemX = quadradoAtual[0].x;
+    const origemY = quadradoAtual[0].y;
 
     // Criar as matrizes de transformação
-    const matrizTranslacaoParaOrigem = criarMatrizTranslacao(-pontoFixoX, -pontoFixoY);
+    const matrizTranslacaoParaOrigem = criarMatrizTranslacao(-origemX, -origemY);
     const matrizEscala = criarMatrizEscala(sx, sy);
-    const matrizTranslacaoDeVolta = criarMatrizTranslacao(pontoFixoX, pontoFixoY);
+    const matrizTranslacaoDeVolta = criarMatrizTranslacao(origemX, origemY);
 
     // Matriz composta: T⁻¹ × Escala × T
     const matrizFinal = multiplicarMatrizes(

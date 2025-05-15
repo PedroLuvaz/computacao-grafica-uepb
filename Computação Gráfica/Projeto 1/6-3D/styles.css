@@ -19,6 +19,25 @@ p, h3, h4 {
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
 }
 
+#color-x {
+    color: red;
+    font-weight: bold;
+}
+
+#color-y {
+    color: green;
+    font-weight: bold;
+}
+
+#color-z {
+    color: blue;
+    font-weight: bold;
+}
+
+#zoom {
+    font-weight: bold;
+}
+
 #left-sidebar {
     order: 1;
 }

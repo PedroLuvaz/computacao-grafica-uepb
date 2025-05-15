@@ -13,20 +13,29 @@ let objectRotationY = 0;
 let objectRotationZ = 0;
 let zoom = 100;
 
+let cameraRotationX = 0;
+let cameraRotationY = 0;
+let cameraRotationZ = 0;
+
 // Histórico de transformações
 let transformationHistory = [];
-
-// Array para armazenar a sequência de transformações
-let transformationSequence = [];
 
 // Função para desenhar um pixel no canvas
 function setPixel(x, y, color = '#000000') {
     const canvasX = Math.round(x);
     const canvasY = Math.round(y);
+    
     if (canvasX >= 0 && canvasX < canvas.width && canvasY >= 0 && canvasY < canvas.height) {
         ctx.fillStyle = color;
         ctx.fillRect(canvasX, canvasY, 1, 1);
     }
+}
+
+function setCameraRotation(x, y, z) {
+    cameraRotationX = x;
+    cameraRotationY = y;
+    cameraRotationZ = z;
+    drawObject();
 }
 
 // Algoritmo DDA para desenhar linhas
@@ -34,11 +43,15 @@ function drawLineDDA(x1, y1, x2, y2, color = '#000000') {
     const dx = x2 - x1;
     const dy = y2 - y1;
     const steps = Math.max(Math.abs(dx), Math.abs(dy));
+    
     const xIncrement = dx / steps;
     const yIncrement = dy / steps;
+    
     let x = x1;
     let y = y1;
+    
     setPixel(x, y, color);
+    
     for (let i = 0; i < steps; i++) {
         x += xIncrement;
         y += yIncrement;
@@ -55,6 +68,7 @@ class Matrix3D {
             [0, 0, 0, 0],
             [0, 0, 0, 0]
         ];
+
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 4; j++) {
                 for (let k = 0; k < 4; k++) {
@@ -167,294 +181,93 @@ class Matrix3D {
     }
 }
 
-// Funções para criar objetos 3D
-function createCube(size) {
-    const half = size / 2;
-    const vertices = [
-        [0.0, 0.0, 0.0],      // V1
-        [size, 0.0, 0.0],     // V2
-        [size, size, 0.0],    // V3
-        [0.0, size, 0.0],     // V4
-        [0.0, 0.0, size],     // V5
-        [size, 0.0, size],    // V6
-        [size, size, size],   // V7
-        [0.0, size, size]     // V8
-    ];
-    const edges = [
-        [0, 1], [1, 2], [2, 3], [3, 0], // Face inferior
-        [4, 5], [5, 6], [6, 7], [7, 4], // Face superior
-        [0, 4], [1, 5], [2, 6], [3, 7]  // Arestas laterais
-    ];
-    return { vertices, edges };
-}
-
-// Função de projeção 3D para 2D
-function projectPoint(x, y, z, applyObjectRotation = true) {
-    let point = [x, y, z, 1];
-    if (applyObjectRotation) {
-        const rotX = Matrix3D.rotationX(objectRotationX);
-        const rotY = Matrix3D.rotationY(objectRotationY);
-        const rotZ = Matrix3D.rotationZ(objectRotationZ);
-        let transform = Matrix3D.multiply(rotY, rotX);
-        transform = Matrix3D.multiply(rotZ, transform);
-        point = Matrix3D.multiplyVector(transform, point);
-    }
-    const f = zoom / 100;
-    const px = (point[0] - point[2]) * f * 0.7071 + canvas.width / 2;
-    const py = (-point[1] + (point[0] + point[2]) * 0.5) * f * 0.7071 + canvas.height / 2;
-    return { x: px, y: py };
-}
-
-
-// Função para desenhar eixos fixos
-function drawFixedAxes() {
-    const center = { x: canvas.width / 2, y: canvas.height / 2 };
-    const length = 1655 * (zoom / 100);
-    const xEnd = projectPoint(length, 0, 0, false);
-    drawLineDDA(center.x, center.y, xEnd.x, xEnd.y, 'red');
-    const yEnd = projectPoint(0, length, 0, false);
-    drawLineDDA(center.x, center.y, yEnd.x, yEnd.y, 'green');
-    const zEnd = projectPoint(0, 0, length, false);
-    drawLineDDA(center.x, center.y, zEnd.x, zEnd.y, 'blue');
-}
-
-// Função para desenhar eixos rotacionados
-function drawRotatedAxes() {
-    const center = { x: canvas.width / 2, y: canvas.height / 2 };
-    const length = 1655 * (zoom / 100);
-    const xEnd = projectPoint(length, 0, 0, true);
-    drawLineDDA(center.x, center.y, xEnd.x, xEnd.y, 'red');
-    const yEnd = projectPoint(0, length, 0, true);
-    drawLineDDA(center.x, center.y, yEnd.x, yEnd.y, 'green');
-    const zEnd = projectPoint(0, 0, length, true);
-    drawLineDDA(center.x, center.y, zEnd.x, zEnd.y, 'blue');
-}
-
-// Função para desenhar o objeto 3D
-function drawObject() {
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    drawRotatedAxes();
-    if (!currentObject) return;
-    for (const edge of objectEdges) {
-        const v1 = objectVertices[edge[0]];
-        const v2 = objectVertices[edge[1]];
-        const p1 = projectPoint(v1[0], v1[1], v1[2]);
-        const p2 = projectPoint(v2[0], v2[1], v2[2]);
-        drawLineDDA(p1.x, p1.y, p2.x, p2.y, '#111');
-    }
-    for (const vertex of objectVertices) {
-        const p = projectPoint(vertex[0], vertex[1], vertex[2]);
-        setPixel(p.x, p.y, '#222');
-    }
-    updateObjectInfo();
-}
-
-// Função para atualizar informações do objeto
-function updateObjectInfo() {
-    const verticesInfo = document.getElementById('vertices-info');
-    const centerInfo = document.getElementById('center-info');
-    const dimensionsInfo = document.getElementById('dimensions-info');
-    const octantInfo = document.getElementById('octant-info');
+// Aplicar Escala
+document.getElementById('apply-scale').addEventListener('click', () => {
     if (!currentObject) {
-        verticesInfo.innerHTML = "Nenhum objeto gerado.";
-        centerInfo.innerHTML = "Nenhum objeto gerado.";
-        dimensionsInfo.innerHTML = "Nenhum objeto gerado.";
-        octantInfo.innerHTML = "Nenhum objeto gerado.";
+        alert('Gere um objeto primeiro!');
         return;
     }
-    let verticesHTML = '';
-    objectVertices.forEach((vertex, index) => {
-        verticesHTML += `<div class="vertex-info">V${index+1}: (${vertex[0].toFixed(1)}, ${vertex[1].toFixed(1)}, ${vertex[2].toFixed(1)})</div>`;
-    });
-    verticesInfo.innerHTML = verticesHTML;
-    let centerX = 0, centerY = 0, centerZ = 0;
-    for (const vertex of objectVertices) {
-        centerX += vertex[0];
-        centerY += vertex[1];
-        centerZ += vertex[2];
-    }
-    centerX /= objectVertices.length;
-    centerY /= objectVertices.length;
-    centerZ /= objectVertices.length;
-    centerInfo.innerHTML = `(${centerX.toFixed(1)}, ${centerY.toFixed(1)}, ${centerZ.toFixed(1)})`;
-    let minX = Infinity, maxX = -Infinity;
-    let minY = Infinity, maxY = -Infinity;
-    let minZ = Infinity, maxZ = -Infinity;
-    for (const vertex of objectVertices) {
-        minX = Math.min(minX, vertex[0]);
-        maxX = Math.max(maxX, vertex[0]);
-        minY = Math.min(minY, vertex[1]);
-        maxY = Math.max(maxY, vertex[1]);
-        minZ = Math.min(minZ, vertex[2]);
-        maxZ = Math.max(maxZ, vertex[2]);
-    }
-    dimensionsInfo.innerHTML = `Largura: ${(maxX-minX).toFixed(1)}<br>Altura: ${(maxY-minY).toFixed(1)}<br>Profundidade: ${(maxZ-minZ).toFixed(1)}`;
-    const octantCount = [0,0,0,0,0,0,0,0,0];
-    objectVertices.forEach(vertex => {
-        const x = vertex[0], y = vertex[1], z = vertex[2];
-        let octant = 0;
-        if (x >= 0 && y >= 0 && z >= 0) octant = 1;
-        else if (x < 0 && y >= 0 && z >= 0) octant = 2;
-        else if (x < 0 && y < 0 && z >= 0) octant = 3;
-        else if (x >= 0 && y < 0 && z >= 0) octant = 4;
-        else if (x >= 0 && y >= 0 && z < 0) octant = 5;
-        else if (x < 0 && y >= 0 && z < 0) octant = 6;
-        else if (x < 0 && y < 0 && z < 0) octant = 7;
-        else if (x >= 0 && y < 0 && z < 0) octant = 8;
-        octantCount[octant]++;
-    });
-    const predominantOctant = octantCount.indexOf(Math.max(...octantCount.slice(1)));
-    octantInfo.innerHTML = predominantOctant > 0 ? `Octante ${predominantOctant}` : "Indeterminado";
-}
 
-// Atualiza o histórico de transformações
-function updateTransformationHistory(transformation) {
-    transformationHistory.push(transformation);
-    const historyElement = document.getElementById('transformation-history');
-    historyElement.innerHTML = transformationHistory.map((t, i) => `<div>${i + 1}. ${t}</div>`).join('');
-}
-
-// Função para adicionar uma transformação à sequência
-function addToSequence(type, params) {
-    transformationSequence.push({ type, params });
-    document.getElementById('transformation-sequence').value = JSON.stringify(transformationSequence, null, 2);
-}
-
-// Event Listeners
-document.getElementById('generate-object-btn').addEventListener('click', () => {
-    const objectType = document.getElementById('object-type-select').value;
-    const size = parseInt(document.getElementById('object-size').value) || 50;
-    switch (objectType) {
-        case 'cube': currentObject = createCube(size); break;
-    }
-    objectRotationX = 0;
-    objectRotationY = 0;
-    objectRotationZ = 0;
-    document.getElementById('view-rot-x').value = 0;
-    document.getElementById('view-rot-y').value = 0;
-    document.getElementById('view-rot-z').value = 0;
-    document.getElementById('view-rot-x-value').textContent = '0°';
-    document.getElementById('view-rot-y-value').textContent = '0°';
-    document.getElementById('view-rot-z-value').textContent = '0°';
-    objectVertices = currentObject.vertices.map(v => [...v]);
-    objectEdges = currentObject.edges;
-    drawObject();
-});
-
-document.getElementById('view-rot-x').addEventListener('input', (e) => {
-    objectRotationX = parseInt(e.target.value);
-    document.getElementById('view-rot-x-value').textContent = objectRotationX + '°';
-    drawObject();
-});
-document.getElementById('view-rot-y').addEventListener('input', (e) => {
-    objectRotationY = parseInt(e.target.value);
-    document.getElementById('view-rot-y-value').textContent = objectRotationY + '°';
-    drawObject();
-});
-document.getElementById('view-rot-z').addEventListener('input', (e) => {
-    objectRotationZ = parseInt(e.target.value);
-    document.getElementById('view-rot-z-value').textContent = objectRotationZ + '°';
-    drawObject();
-});
-document.getElementById('view-zoom').addEventListener('input', (e) => {
-    zoom = parseInt(e.target.value);
-    document.getElementById('view-zoom-value').textContent = zoom + '%';
-    drawObject();
-});
-
-// Alternar entre as abas de transformações
-document.addEventListener("DOMContentLoaded", () => {
-    const tabButtons = document.querySelectorAll(".tab-button");
-    const tabContents = document.querySelectorAll(".tab-content");
-    tabButtons.forEach(button => {
-        button.addEventListener("click", () => {
-            tabButtons.forEach(btn => btn.classList.remove("active"));
-            tabContents.forEach(content => content.classList.remove("active"));
-            button.classList.add("active");
-            const tabId = button.getAttribute("data-tab");
-            document.getElementById(`${tabId}-tab`).classList.add("active");
-        });
-    });
-});
-
-// Botão Limpar
-document.getElementById('clear-btn').addEventListener('click', () => {
-    currentObject = null;
-    objectVertices = [];
-    objectEdges = [];
-    objectRotationX = 0;
-    objectRotationY = 0;
-    objectRotationZ = 0;
-    document.getElementById('view-rot-x').value = 0;
-    document.getElementById('view-rot-y').value = 0;
-    document.getElementById('view-rot-z').value = 0;
-    document.getElementById('view-rot-x-value').textContent = '0°';
-    document.getElementById('view-rot-y-value').textContent = '0°';
-    document.getElementById('view-rot-z-value').textContent = '0°';
-    document.getElementById('view-zoom').value = 100;
-    document.getElementById('view-zoom-value').textContent = '100%';
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    drawFixedAxes();
-    updateObjectInfo();
-    transformationHistory = [];
-    document.getElementById('transformation-history').innerHTML = "Nenhuma transformação aplicada.";
-});
-
-// Navegação - Voltar ao Início
-document.getElementById('back').addEventListener('click', function(e) {
-    e.preventDefault();
-    window.location.href = this.getAttribute('href');
-});
-
-
-// Aplicar transformações
-document.getElementById('apply-scale').addEventListener('click', () => {
-    if (!currentObject) return alert('Gere um objeto primeiro!');
     const sx = parseFloat(document.getElementById('sx').value) || 1;
     const sy = parseFloat(document.getElementById('sy').value) || 1;
     const sz = parseFloat(document.getElementById('sz').value) || 1;
-    const scalingMatrix = Matrix3D.scaling(sx, sy, sz);
+
+    // Ponto fixo: vértice 1 (xyz)
+    const [px, py, pz] = objectVertices[0];
+
+    // Matrizes: translação para origem, escala, volta para posição original
+    const toOrigin = Matrix3D.translation(-px, -py, -pz);
+    const scale = Matrix3D.scaling(sx, sy, sz);
+    const backToPosition = Matrix3D.translation(px, py, pz);
+
+    // Composição: T⁻¹ * S * T
+    const transform = Matrix3D.multiply(
+        backToPosition,
+        Matrix3D.multiply(scale, toOrigin)
+    );
+
+    // Aplicar transformação composta a cada vértice
     objectVertices = objectVertices.map(vertex => {
-        const transformed = Matrix3D.multiplyVector(scalingMatrix, [...vertex, 1]);
+        const transformed = Matrix3D.multiplyVector(transform, [...vertex, 1]);
         return [transformed[0], transformed[1], transformed[2]];
     });
-    updateTransformationHistory(`Escala (SX: ${sx}, SY: ${sy}, SZ: ${sz})`);
+
+    updateTransformationHistory(`Escala (SX: ${sx}, SY: ${sy}, SZ: ${sz}) em torno do vértice 1`);
     drawObject();
 });
 
+
+// Aplicar Cisalhamento
 document.getElementById('apply-shear').addEventListener('click', () => {
-    if (!currentObject) return alert('Gere um objeto primeiro!');
+    if (!currentObject) {
+        alert('Gere um objeto primeiro!');
+        return;
+    }
+
     const shXY = parseFloat(document.getElementById('sh-xy').value) || 0;
     const shXZ = parseFloat(document.getElementById('sh-xz').value) || 0;
     const shYZ = parseFloat(document.getElementById('sh-yz').value) || 0;
+
     const shearMatrix = Matrix3D.shear(shXY, shXZ, shYZ);
     objectVertices = objectVertices.map(vertex => {
         const transformed = Matrix3D.multiplyVector(shearMatrix, [...vertex, 1]);
         return [transformed[0], transformed[1], transformed[2]];
     });
+
     updateTransformationHistory(`Cisalhamento (XY: ${shXY}, XZ: ${shXZ}, YZ: ${shYZ})`);
     drawObject();
 });
 
+//Aplicar Reflexão
 document.getElementById('apply-reflection').addEventListener('click', () => {
-    if (!currentObject) return alert('Gere um objeto primeiro!');
+    if (!currentObject) {
+        alert('Gere um objeto primeiro!');
+        return;
+    }
+
     const axis = document.getElementById('reflection-axis').value;
     const reflectionMatrix = Matrix3D.reflection(axis);
+
     objectVertices = objectVertices.map(vertex => {
         const transformed = Matrix3D.multiplyVector(reflectionMatrix, [...vertex, 1]);
         return [transformed[0], transformed[1], transformed[2]];
     });
+
     updateTransformationHistory(`Reflexão no plano ${axis.toUpperCase()}`);
     drawObject();
 });
 
+//Aplicar Translação
 document.getElementById('apply-translation').addEventListener('click', () => {
-    if (!currentObject) return alert('Gere um objeto primeiro!');
+    if (!currentObject) {
+        alert('Gere um objeto primeiro!');
+        return;
+    }
+    
     const tx = parseFloat(document.getElementById('tx').value) || 0;
     const ty = parseFloat(document.getElementById('ty').value) || 0;
     const tz = parseFloat(document.getElementById('tz').value) || 0;
+    
     const translationMatrix = Matrix3D.translation(tx, ty, tz);
     objectVertices = objectVertices.map(vertex => {
         const transformed = Matrix3D.multiplyVector(translationMatrix, [...vertex, 1]);
@@ -464,10 +277,16 @@ document.getElementById('apply-translation').addEventListener('click', () => {
     drawObject();
 });
 
+//Aplicar Rotação
 document.getElementById('apply-rotation').addEventListener('click', () => {
-    if (!currentObject) return alert('Gere um objeto primeiro!');
+    if (!currentObject) {
+        alert('Gere um objeto primeiro!');
+        return;
+    }
+    
     const axis = document.getElementById('rotation-axis').value;
     const angle = parseFloat(document.getElementById('rotation-angle').value) || 0;
+    
     switch (axis) {
         case 'x':
             objectRotationX += angle;
@@ -485,122 +304,358 @@ document.getElementById('apply-rotation').addEventListener('click', () => {
             document.getElementById('view-rot-z-value').textContent = objectRotationZ + '°';
             break;
     }
+    
     updateTransformationHistory(`Rotação (Eixo: ${axis.toUpperCase()}, Ângulo: ${angle}°)`);
     drawObject();
 });
 
-// Função para aplicar uma sequência de transformações
-function applyTransformationSequence(sequence) {
-    if (!currentObject) {
-        alert('Gere um objeto primeiro!');
-        return;
-    }
 
-    sequence.forEach(transformation => {
-        const { type, params } = transformation;
+// Funções para criar objetos 3D
+function createCube(size) {
+    const half = size / 2;
 
-        switch (type) {
-            case 'translation':
-                const translationMatrix = Matrix3D.translation(params.tx, params.ty, params.tz);
-                objectVertices = objectVertices.map(vertex => {
-                    const transformed = Matrix3D.multiplyVector(translationMatrix, [...vertex, 1]);
-                    return [transformed[0], transformed[1], transformed[2]];
-                });
-                updateTransformationHistory(`Translação (TX: ${params.tx}, TY: ${params.ty}, TZ: ${params.tz})`);
-                break;
+    // Vértices ajustados para ter como base o modelo que você passou
+    const vertices = [
+        [0.0, 0.0, 0.0],      // V1
+        [size, 0.0, 0.0],     // V2
+        [size, size, 0.0],    // V3
+        [0.0, size, 0.0],     // V4
+        [0.0, 0.0, size],     // V5
+        [size, 0.0, size],    // V6
+        [size, size, size],   // V7
+        [0.0, size, size]     // V8
+    ];
 
-            case 'scaling':
-                const scalingMatrix = Matrix3D.scaling(params.sx, params.sy, params.sz);
-                objectVertices = objectVertices.map(vertex => {
-                    const transformed = Matrix3D.multiplyVector(scalingMatrix, [...vertex, 1]);
-                    return [transformed[0], transformed[1], transformed[2]];
-                });
-                updateTransformationHistory(`Escala (SX: ${params.sx}, SY: ${params.sy}, SZ: ${params.sz})`);
-                break;
+    const edges = [
+        [0, 1], [1, 2], [2, 3], [3, 0], // Face inferior
+        [4, 5], [5, 6], [6, 7], [7, 4], // Face superior
+        [0, 4], [1, 5], [2, 6], [3, 7]  // Arestas laterais
+    ];
 
-            case 'rotation':
-                let rotationMatrix;
-                if (params.axis === 'x') {
-                    rotationMatrix = Matrix3D.rotationX(params.angle);
-                } else if (params.axis === 'y') {
-                    rotationMatrix = Matrix3D.rotationY(params.angle);
-                } else if (params.axis === 'z') {
-                    rotationMatrix = Matrix3D.rotationZ(params.angle);
-                }
-                objectVertices = objectVertices.map(vertex => {
-                    const transformed = Matrix3D.multiplyVector(rotationMatrix, [...vertex, 1]);
-                    return [transformed[0], transformed[1], transformed[2]];
-                });
-                updateTransformationHistory(`Rotação (Eixo: ${params.axis.toUpperCase()}, Ângulo: ${params.angle}°)`);
-                break;
-
-            case 'shear':
-                const shearMatrix = Matrix3D.shear(params.shXY, params.shXZ, params.shYZ);
-                objectVertices = objectVertices.map(vertex => {
-                    const transformed = Matrix3D.multiplyVector(shearMatrix, [...vertex, 1]);
-                    return [transformed[0], transformed[1], transformed[2]];
-                });
-                updateTransformationHistory(`Cisalhamento (XY: ${params.shXY}, XZ: ${params.shXZ}, YZ: ${params.shYZ})`);
-                break;
-
-            case 'reflection':
-                const reflectionMatrix = Matrix3D.reflection(params.axis);
-                objectVertices = objectVertices.map(vertex => {
-                    const transformed = Matrix3D.multiplyVector(reflectionMatrix, [...vertex, 1]);
-                    return [transformed[0], transformed[1], transformed[2]];
-                });
-                updateTransformationHistory(`Reflexão no plano ${params.axis.toUpperCase()}`);
-                break;
-
-            default:
-                console.error(`Transformação desconhecida: ${type}`);
-        }
-    });
-
-    drawObject();
+    return { vertices, edges };
 }
 
-// Evento para o botão "Adicionar à Sequência"
-document.getElementById('add-to-sequence-btn').addEventListener('click', () => {
-    const activeTab = document.querySelector('.tab-content.active');
-    if (activeTab.id === 'translation-tab') {
-        const tx = parseFloat(document.getElementById('tx').value) || 0;
-        const ty = parseFloat(document.getElementById('ty').value) || 0;
-        const tz = parseFloat(document.getElementById('tz').value) || 0;
-        addToSequence('translation', { tx, ty, tz });
-    } else if (activeTab.id === 'rotation-tab') {
-        const axis = document.getElementById('rotation-axis').value;
-        const angle = parseFloat(document.getElementById('rotation-angle').value) || 0;
-        addToSequence('rotation', { axis, angle });
-    } else if (activeTab.id === 'scale-tab') {
-        const sx = parseFloat(document.getElementById('sx').value) || 1;
-        const sy = parseFloat(document.getElementById('sy').value) || 1;
-        const sz = parseFloat(document.getElementById('sz').value) || 1;
-        addToSequence('scaling', { sx, sy, sz });
-    } else if (activeTab.id === 'shear-tab') {
-        const shXY = parseFloat(document.getElementById('sh-xy').value) || 0;
-        const shXZ = parseFloat(document.getElementById('sh-xz').value) || 0;
-        const shYZ = parseFloat(document.getElementById('sh-yz').value) || 0;
-        addToSequence('shear', { shXY, shXZ, shYZ });
-    } else if (activeTab.id === 'reflection-tab') {
-        const axis = document.getElementById('reflection-axis').value;
-        addToSequence('reflection', { axis });
+// Função de projeção 3D para 2D
+function projectPoint(x, y, z, applyObjectRotation = true) {
+    let point = [x, y, z, 1];
+    
+    if (applyObjectRotation) {
+        const rotX = Matrix3D.rotationX(objectRotationX);
+        const rotY = Matrix3D.rotationY(objectRotationY);
+        const rotZ = Matrix3D.rotationZ(objectRotationZ);
+        let transform = Matrix3D.multiply(rotY, rotX);
+        transform = Matrix3D.multiply(rotZ, transform);
+        point = Matrix3D.multiplyVector(transform, point);
     }
-});
 
-// Evento para o botão "Aplicar Sequência"
-document.getElementById('apply-sequence-btn').addEventListener('click', () => {
-    if (transformationSequence.length === 0) {
-        alert('Nenhuma transformação na sequência!');
+    // Aplicar rotação da câmera (visualização)
+    const camRotX = Matrix3D.rotationX(cameraRotationX);
+    const camRotY = Matrix3D.rotationY(cameraRotationY);
+    const camRotZ = Matrix3D.rotationZ(cameraRotationZ);
+    let cameraTransform = Matrix3D.multiply(camRotY, camRotX);
+    cameraTransform = Matrix3D.multiply(camRotZ, cameraTransform);
+    point = Matrix3D.multiplyVector(cameraTransform, point);
+    
+    const f = zoom / 100;
+    const px = (point[0] - point[2]) * f * 0.7071 + canvas.width / 2;
+    const py = (-point[1] + (point[0] + point[2]) * 0.5) * f * 0.7071 + canvas.height / 2;
+    
+    return { x: px, y: py };
+}
+
+// Função para desenhar eixos fixos
+function drawFixedAxes() {
+    const center = { x: canvas.width / 2, y: canvas.height / 2 };
+    const length = 1655 * (zoom / 100);
+    
+    // Eixo X (vermelho)
+    const xEnd = projectPoint(length, 0, 0, false);
+    drawLineDDA(center.x, center.y, xEnd.x, xEnd.y, 'red');
+    
+    // Eixo Y (verde)
+    const yEnd = projectPoint(0, length, 0, false);
+    drawLineDDA(center.x, center.y, yEnd.x, yEnd.y, 'green');
+    
+    // Eixo Z (azul)
+    const zEnd = projectPoint(0, 0, length, false);
+    drawLineDDA(center.x, center.y, zEnd.x, zEnd.y, 'blue');
+    
+    // Rótulos dos eixos
+    ctx.font = '12px Arial';
+    ctx.fillStyle = 'red';
+    //ctx.fillText('X', xEnd.x + 15, xEnd.y);
+    ctx.fillStyle = 'green';
+    //ctx.fillText('Y', yEnd.x, yEnd.y - 15);
+    ctx.fillStyle = 'blue';
+    //ctx.fillText('Z', zEnd.x - 15, zEnd.y);
+}
+
+// Função para desenhar eixos rotacionados
+function drawRotatedAxes() {
+    const center = { x: canvas.width / 2, y: canvas.height / 2 };
+    const length = 1655 * (zoom / 100);
+
+    // Eixo X (vermelho)
+    const xEnd = projectPoint(length, 0, 0, true); // Aplica rotação
+    drawLineDDA(center.x, center.y, xEnd.x, xEnd.y, 'red');
+
+    // Eixo Y (verde)
+    const yEnd = projectPoint(0, length, 0, true); // Aplica rotação
+    drawLineDDA(center.x, center.y, yEnd.x, yEnd.y, 'green');
+
+    // Eixo Z (azul)
+    const zEnd = projectPoint(0, 0, length, true); // Aplica rotação
+    drawLineDDA(center.x, center.y, zEnd.x, zEnd.y, 'blue');
+}
+
+// Função para desenhar o objeto 3D
+function drawObject() {
+    // Limpa o canvas
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Desenha os eixos rotacionados
+    drawFixedAxes();
+
+    if (!currentObject) return;
+
+    // Desenha todas as arestas do objeto
+    ctx.strokeStyle = '#111';
+    for (const edge of objectEdges) {
+        const v1 = objectVertices[edge[0]];
+        const v2 = objectVertices[edge[1]];
+
+        const p1 = projectPoint(v1[0], v1[1], v1[2]);
+        const p2 = projectPoint(v2[0], v2[1], v2[2]);
+
+        drawLineDDA(p1.x, p1.y, p2.x, p2.y, '#111');
+    }
+
+    // Desenha os vértices
+    for (const vertex of objectVertices) {
+        const p = projectPoint(vertex[0], vertex[1], vertex[2]);
+        setPixel(p.x, p.y, '#222');
+    }
+
+    updateObjectInfo();
+    drawOctants(); // Desenha os octantes
+}
+
+// Função para atualizar informações do objeto
+function updateObjectInfo() {
+    const verticesInfo = document.getElementById('vertices-info');
+    const centerInfo = document.getElementById('center-info');
+    const dimensionsInfo = document.getElementById('dimensions-info');
+    const octantInfo = document.getElementById('octant-info');
+    
+    if (!currentObject) {
+        verticesInfo.innerHTML = "Nenhum objeto gerado.";
+        centerInfo.innerHTML = "Nenhum objeto gerado.";
+        dimensionsInfo.innerHTML = "Nenhum objeto gerado.";
+        octantInfo.innerHTML = "Nenhum objeto gerado.";
         return;
     }
-    applyTransformationSequence(transformationSequence);
-    transformationSequence = []; // Limpa a sequência após aplicar
-    document.getElementById('transformation-sequence').value = ''; // Limpa o campo de texto
+    
+    // Atualiza informações dos vértices
+    let verticesHTML = '';
+    objectVertices.forEach((vertex, index) => {
+        verticesHTML += `<div class="vertex-info">V${index+1}: (${vertex[0].toFixed(1)}, ${vertex[1].toFixed(1)}, ${vertex[2].toFixed(1)})</div>`;
+    });
+    verticesInfo.innerHTML = verticesHTML;
+    
+    // Calcula centro geométrico
+    let centerX = 0, centerY = 0, centerZ = 0;
+    for (const vertex of objectVertices) {
+        centerX += vertex[0];
+        centerY += vertex[1];
+        centerZ += vertex[2];
+    }
+    centerX /= objectVertices.length;
+    centerY /= objectVertices.length;
+    centerZ /= objectVertices.length;
+    
+    centerInfo.innerHTML = `(${centerX.toFixed(1)}, ${centerY.toFixed(1)}, ${centerZ.toFixed(1)})`;
+    
+    // Calcula dimensões
+    let minX = Infinity, maxX = -Infinity;
+    let minY = Infinity, maxY = -Infinity;
+    let minZ = Infinity, maxZ = -Infinity;
+    
+    for (const vertex of objectVertices) {
+        minX = Math.min(minX, vertex[0]);
+        maxX = Math.max(maxX, vertex[0]);
+        minY = Math.min(minY, vertex[1]);
+        maxY = Math.max(maxY, vertex[1]);
+        minZ = Math.min(minZ, vertex[2]);
+        maxZ = Math.max(maxZ, vertex[2]);
+    }
+    
+    dimensionsInfo.innerHTML = `Largura: ${(maxX-minX).toFixed(1)}<br>Altura: ${(maxY-minY).toFixed(1)}<br>Profundidade: ${(maxZ-minZ).toFixed(1)}`;
+    
+    // Determina octante predominante
+    const octantCount = [0,0,0,0,0,0,0,0,0];
+    objectVertices.forEach(vertex => {
+        const x = vertex[0], y = vertex[1], z = vertex[2];
+        let octant = 0;
+        if (x >= 0 && y >= 0 && z >= 0) octant = 1;
+        else if (x < 0 && y >= 0 && z >= 0) octant = 2;
+        else if (x < 0 && y < 0 && z >= 0) octant = 3;
+        else if (x >= 0 && y < 0 && z >= 0) octant = 4;
+        else if (x >= 0 && y >= 0 && z < 0) octant = 5;
+        else if (x < 0 && y >= 0 && z < 0) octant = 6;
+        else if (x < 0 && y < 0 && z < 0) octant = 7;
+        else if (x >= 0 && y < 0 && z < 0) octant = 8;
+        octantCount[octant]++;
+    });
+    
+    const predominantOctant = octantCount.indexOf(Math.max(...octantCount.slice(1)));
+    octantInfo.innerHTML = predominantOctant > 0 ? `Octante ${predominantOctant}` : "Indeterminado";
+}
+
+// Atualiza o histórico de transformações
+function updateTransformationHistory(transformation) {
+    transformationHistory.push(transformation);
+    const historyElement = document.getElementById('transformation-history');
+    historyElement.innerHTML = transformationHistory.map((t, i) => `<div>${i + 1}. ${t}</div>`).join('');
+}
+
+// Event Listeners
+document.getElementById('generate-object-btn').addEventListener('click', () => {
+    const objectType = document.getElementById('object-type-select').value;
+    const size = parseInt(document.getElementById('object-size').value) || 50;
+    
+    switch (objectType) {
+        case 'cube':
+            currentObject = createCube(size);
+            break;
+        case 'pyramid':
+            currentObject = createPyramid(size);
+            break;
+        case 'prism':
+            currentObject = createPrism(size);
+            break;
+    }
+    
+    objectRotationX = 0;
+    objectRotationY = 0;
+    objectRotationZ = 0;
+    
+    document.getElementById('view-rot-x').value = 0;
+    document.getElementById('view-rot-y').value = 0;
+    document.getElementById('view-rot-z').value = 0;
+    document.getElementById('view-rot-x-value').textContent = '0°';
+    document.getElementById('view-rot-y-value').textContent = '0°';
+    document.getElementById('view-rot-z-value').textContent = '0°';
+    
+    objectVertices = currentObject.vertices.map(v => [...v]);
+    objectEdges = currentObject.edges;
+    drawObject();
+});
+
+// Atualiza a rotação da VISUALIZAÇÃO em X
+document.getElementById('view-rot-x').addEventListener('input', (e) => {
+    cameraRotationX = parseInt(e.target.value);
+    document.getElementById('view-rot-x-value').textContent = cameraRotationX + '°';
+    drawObject();
+});
+
+// Atualiza a rotação da VISUALIZAÇÃO em Y
+document.getElementById('view-rot-y').addEventListener('input', (e) => {
+    cameraRotationY = parseInt(e.target.value);
+    document.getElementById('view-rot-y-value').textContent = cameraRotationY + '°';
+    drawObject();
+});
+
+// Atualiza a rotação da VISUALIZAÇÃO em Z
+document.getElementById('view-rot-z').addEventListener('input', (e) => {
+    cameraRotationZ = parseInt(e.target.value);
+    document.getElementById('view-rot-z-value').textContent = cameraRotationZ + '°';
+    drawObject();
+});
+
+//Atualiza o zoom
+document.getElementById('view-zoom').addEventListener('input', (e) => {
+    zoom = parseInt(e.target.value);
+    document.getElementById('view-zoom-value').textContent = zoom + '%';
+    drawObject();
+});
+
+//Alternar entre as transformaçoes
+document.addEventListener("DOMContentLoaded", () => {
+    const tabButtons = document.querySelectorAll(".tab-button");
+    const tabContents = document.querySelectorAll(".tab-content");
+
+    tabButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            // Remove a classe 'active' de todos os botões e conteúdos
+            tabButtons.forEach(btn => btn.classList.remove("active"));
+            tabContents.forEach(content => content.classList.remove("active"));
+
+            // Adiciona a classe 'active' ao botão e conteúdo clicado
+            button.classList.add("active");
+            const tabId = button.getAttribute("data-tab");
+            document.getElementById(`${tabId}-tab`).classList.add("active");
+        });
+    });
+});
+
+//Botao Limpar
+document.getElementById('clear-btn').addEventListener('click', () => {
+    currentObject = null;
+    objectVertices = [];
+    objectEdges = [];
+    objectRotationX = 0;
+    objectRotationY = 0;
+    objectRotationZ = 0;
+    
+    document.getElementById('view-rot-x').value = 0;
+    document.getElementById('view-rot-y').value = 0;
+    document.getElementById('view-rot-z').value = 0;
+    document.getElementById('view-rot-x-value').textContent = '0°';
+    document.getElementById('view-rot-y-value').textContent = '0°';
+    document.getElementById('view-rot-z-value').textContent = '0°';
+    document.getElementById('view-zoom').value = 100;
+    document.getElementById('view-zoom-value').textContent = '100%';
+    
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawFixedAxes();
+    updateObjectInfo();
+    drawOctants();
+    transformationHistory = [];
+    document.getElementById('transformation-history').innerHTML = "Nenhuma transformação aplicada.";
+});
+
+document.getElementById('reset-view-btn').addEventListener('click', () => {
+    cameraRotationX = 0;
+    cameraRotationY = 0;
+    cameraRotationZ = 0;
+    zoom = 100;
+
+    // Atualiza os sliders visuais também
+    document.getElementById('view-rot-x').value = 0;
+    document.getElementById('view-rot-y').value = 0;
+    document.getElementById('view-rot-z').value = 0;
+    document.getElementById('view-zoom').value = 100;
+
+    // Atualiza os textos de valor
+    document.getElementById('view-rot-x-value').textContent = '0°';
+    document.getElementById('view-rot-y-value').textContent = '0°';
+    document.getElementById('view-rot-z-value').textContent = '0°';
+    document.getElementById('view-zoom-value').textContent = '100%';
+
+    drawObject();
+});
+
+// Navegação - Voltar ao Início
+document.getElementById('back').addEventListener('click', function(e) {
+    e.preventDefault();
+    window.location.href = this.getAttribute('href');
 });
 
 // Inicialização
 ctx.fillStyle = 'white';
 ctx.fillRect(0, 0, canvas.width, canvas.height);
-drawFixedAxes();
+drawFixedAxes(); 
+drawOctants();
 updateObjectInfo();
