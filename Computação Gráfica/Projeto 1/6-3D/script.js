@@ -34,6 +34,16 @@ function setPixel(x, y, color = '#000000') {
     }
 }
 
+function setPixelWorld(x, y, color = '#000000') {
+    const canvasX = Math.round(x);
+    const canvasY = Math.round(y);
+
+    if (canvasX >= 0 && canvasX < worldWindowCanvas.width && canvasY >= 0 && canvasY < worldWindowCanvas.height) {
+        worldWindowCtx.fillStyle = color;
+        worldWindowCtx.fillRect(canvasX, canvasY, 1, 1);
+    }
+}
+
 function setCameraRotation(x, y, z) {
     cameraRotationX = x;
     cameraRotationY = y;
@@ -59,6 +69,26 @@ function drawLineDDA(x1, y1, x2, y2, color = '#000000') {
         x += xIncrement;
         y += yIncrement;
         setPixel(x, y, color);
+    }
+}
+
+function drawLineDDAWorld(x1, y1, x2, y2, color = '#000000') {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const steps = Math.max(Math.abs(dx), Math.abs(dy));
+    
+    const xIncrement = dx / steps;
+    const yIncrement = dy / steps;
+    
+    let x = x1;
+    let y = y1;
+    
+    setPixelWorld(x, y, color);
+    
+    for (let i = 0; i < steps; i++) {
+        x += xIncrement;
+        y += yIncrement;
+        setPixelWorld(x, y, color);
     }
 }
 
@@ -521,19 +551,19 @@ document.getElementById('apply-sequence-btn').addEventListener('click', () => {
 });
 
 
-// Funções para criar objetos 3D
 function createCube(size) {
     const half = size / 2;
-    // Vértices centralizados na origem
+    // Vértice 1 vira a origem (0,0,0)
+    // Para isso, somamos half a cada coordenada de cada vértice
     const vertices = [
-        [-half, -half, -half], // V1
-        [ half, -half, -half], // V2
-        [ half,  half, -half], // V3
-        [-half,  half, -half], // V4
-        [-half, -half,  half], // V5
-        [ half, -half,  half], // V6
-        [ half,  half,  half], // V7
-        [-half,  half,  half]  // V8
+        [0, 0, 0],              // V1 agora na origem
+        [size, 0, 0],           // V2 deslocado
+        [size, size, 0],        // V3 deslocado
+        [0, size, 0],           // V4 deslocado
+        [0, 0, size],           // V5 deslocado
+        [size, 0, size],        // V6 deslocado
+        [size, size, size],     // V7 deslocado
+        [0, size, size]         // V8 deslocado
     ];
     const edges = [
         [0, 1], [1, 2], [2, 3], [3, 0], // Face inferior
@@ -928,9 +958,6 @@ function cohenSutherlandClip(x1, y1, x2, y2, xMin, yMin, xMax, yMax) {
 const worldWindowCanvas = document.getElementById('world-window');
 const worldWindowCtx = worldWindowCanvas.getContext('2d');
 
-const viewportCanvas = document.getElementById('viewport');
-const viewportCtx = viewportCanvas.getContext('2d');
-
 //TRANSFORMAÇÃO PARA VIEWPORT
 function transformToViewport(x, y, xMin, yMin, xMax, yMax, vpXMin, vpYMin, vpXMax, vpYMax) {
     const xViewport = ((x - xMin) / (xMax - xMin)) * (vpXMax - vpXMin) + vpXMin;
@@ -938,7 +965,6 @@ function transformToViewport(x, y, xMin, yMin, xMax, yMax, vpXMin, vpYMin, vpXMa
     return { x: xViewport, y: yViewport };
 }
 
-//Função para desenhar o objeto na janela do mundo
 function drawInWorldWindow() {
     const size = 300;
     worldWindowCtx.fillStyle = 'white';
@@ -956,22 +982,18 @@ function drawInWorldWindow() {
         return { x: cx, y: cy };
     }
 
-    // Desenha eixos
+    // Desenha eixos usando drawLineDDA
     const center = worldToCanvas(0, 0);
-    worldWindowCtx.strokeStyle = 'red';
-    worldWindowCtx.beginPath();
-    worldWindowCtx.moveTo(0, center.y);
-    worldWindowCtx.lineTo(size, center.y);
-    worldWindowCtx.stroke();
 
-    worldWindowCtx.strokeStyle = 'green';
-    worldWindowCtx.beginPath();
-    worldWindowCtx.moveTo(center.x, 0);
-    worldWindowCtx.lineTo(center.x, size);
-    worldWindowCtx.stroke();
+    // eixo X (horizontal, vermelho)
+    drawLineDDAWorld(0, center.y, size, center.y, 'red');
 
-    // Desenha vértices e arestas
-    worldWindowCtx.strokeStyle = '#111';
+    // eixo Y (vertical, verde)
+    drawLineDDAWorld(center.x, 0, center.x, size, 'green');
+
+    // Desenha vértices e arestas usando drawLineDDA
+    worldWindowCtx.strokeStyle = '#111'; // Aqui só para referência, mas o strokeStyle não afeta o drawLineDDA
+    
     for (const edge of objectEdges) {
         const v1 = objectVertices[edge[0]];
         const v2 = objectVertices[edge[1]];
@@ -979,64 +1001,9 @@ function drawInWorldWindow() {
         const p1 = worldToCanvas(v1[0], v1[1]);
         const p2 = worldToCanvas(v2[0], v2[1]);
 
-        worldWindowCtx.beginPath();
-        worldWindowCtx.moveTo(p1.x, p1.y);
-        worldWindowCtx.lineTo(p2.x, p2.y);
-        worldWindowCtx.stroke();
+        drawLineDDAWorld(p1.x, p1.y, p2.x, p2.y, '#111');
     }
 }
-
-// Função para desenhar a viewport o objeto
-function drawInViewport() {
-    const size = 300;
-    viewportCtx.fillStyle = 'white';
-    viewportCtx.fillRect(0, 0, size, size);
-
-    if (!currentObject) return;
-
-    // Limites da janela do mundo (mesmo usados na função anterior)
-    const xMin = -100, yMin = -100, xMax = 100, yMax = 100;
-
-    // Limites da viewport (ajustável visualmente)
-    const vpXMin = 0, vpYMin = 0, vpXMax = size, vpYMax = size;
-
-    // Desenha eixos na viewport
-    const center = transformToViewport(0, 0, xMin, yMin, xMax, yMax, vpXMin, vpYMin, vpXMax, vpYMax);
-    viewportCtx.strokeStyle = 'red';
-    viewportCtx.beginPath();
-    viewportCtx.moveTo(0, center.y);
-    viewportCtx.lineTo(size, center.y);
-    viewportCtx.stroke();
-
-    viewportCtx.strokeStyle = 'green';
-    viewportCtx.beginPath();
-    viewportCtx.moveTo(center.x, 0);
-    viewportCtx.lineTo(center.x, size);
-    viewportCtx.stroke();
-
-    // Desenha arestas com recorte Cohen-Sutherland
-    viewportCtx.strokeStyle = '#111';
-    for (const edge of objectEdges) {
-        const v1 = objectVertices[edge[0]];
-        const v2 = objectVertices[edge[1]];
-
-        const p1 = transformToViewport(v1[0], v1[1], xMin, yMin, xMax, yMax, vpXMin, vpYMin, vpXMax, vpYMax);
-        const p2 = transformToViewport(v2[0], v2[1], xMin, yMin, xMax, yMax, vpXMin, vpYMin, vpXMax, vpYMax);
-
-        const clipped = cohenSutherlandClip(
-            p1.x, p1.y, p2.x, p2.y,
-            vpXMin, vpYMin, vpXMax, vpYMax
-        );
-
-        if (clipped) {
-            viewportCtx.beginPath();
-            viewportCtx.moveTo(clipped.x1, clipped.y1);
-            viewportCtx.lineTo(clipped.x2, clipped.y2);
-            viewportCtx.stroke();
-        }
-    }
-}
-
 
 // Inicialização
 ctx.fillStyle = 'white';
