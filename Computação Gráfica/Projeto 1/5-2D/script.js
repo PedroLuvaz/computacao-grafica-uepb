@@ -147,6 +147,7 @@ function aplicarTranslacaoMatriz() {
     redesenharQuadrado(novosPontos);
     quadradoAtual = novosPontos;
     atualizarInformacoesObjeto()
+    updateTransformationHistory2D(`Translação: Δx = ${dx}, Δy = ${dy}`);
 }
 
 //Matriz de Rotação
@@ -221,6 +222,7 @@ function aplicarRotacaoMatriz() {
     redesenharQuadrado(novosPontos);
     quadradoAtual = novosPontos;
     atualizarInformacoesObjeto();
+    updateTransformationHistory2D(`Rotação: ${angulo}° em torno de (${centroX}, ${centroY})`);
 }
 
 
@@ -268,6 +270,7 @@ function aplicarEscalaMatriz() {
     redesenharQuadrado(novosPontos);
     quadradoAtual = novosPontos;
     atualizarInformacoesObjeto();
+    updateTransformationHistory2D(`Escala: Sx = ${sx}, Sy = ${sy}`);
 }
 
 //Matriz Cisalhamento
@@ -303,6 +306,7 @@ function aplicarCisalhamentoMatriz() {
     redesenharQuadrado(novosPontos);
     quadradoAtual = novosPontos;
     atualizarInformacoesObjeto(); // Atualiza a sidebar
+    updateTransformationHistory2D(`Cisalhamento: Shx = ${shx}, Shy = ${shy}`);
 }
 
 
@@ -344,6 +348,7 @@ function aplicarReflexaoMatriz() {
     redesenharQuadrado(novosPontos);
     quadradoAtual = novosPontos;
     atualizarInformacoesObjeto()
+    updateTransformationHistory2D(`Reflexão: ${refletirX ? 'em X' : ''} ${refletirY ? 'em Y' : ''}`);
 }
 
 //Função para obter os pontos originais do quadrado criado.
@@ -409,6 +414,22 @@ function clearCanvas() {
     // Limpa as informações exibidas na sidebar
     document.getElementById("vertices-list").innerHTML = "Nenhum objeto gerado.";
     document.getElementById("center-position").innerHTML = "Nenhum objeto gerado.";
+
+    // Limpa o histórico de transformações
+    transformationHistory2D = [];
+    document.getElementById('transformation-history').innerHTML = "Nenhuma transformação aplicada.";
+}
+
+
+
+
+// --- Histórico de Transformações 2D ---
+let transformationHistory2D = [];
+
+function updateTransformationHistory2D(transformation) {
+    transformationHistory2D.push(transformation);
+    const historyElement = document.getElementById('transformation-history');
+    historyElement.innerHTML = transformationHistory2D.map((t, i) => `<div>${i + 1}. ${t}</div>`).join('');
 }
 
 // Eventos para os botões
@@ -421,3 +442,207 @@ document.querySelectorAll('.type-op')[3].addEventListener('click', aplicarReflex
 document.querySelectorAll('.type-op')[4].addEventListener('click', aplicarCisalhamentoMatriz);
 // Inicializa o plano cartesiano
 desenharQuadrantes();
+
+
+// --- Sequência de Transformações 2D ---
+
+let transformationSequence2D = [];
+
+// Preenche o select com as opções de transformação
+const sequenceTypeSelect = document.getElementById('sequence-transformation-type');
+if (sequenceTypeSelect) {
+    sequenceTypeSelect.innerHTML = `
+        <option value="translation">Translação</option>
+        <option value="rotation">Rotação</option>
+        <option value="scale">Escala</option>
+        <option value="shear">Cisalhamento</option>
+        <option value="reflection">Reflexão</option>
+    `;
+}
+
+// Atualiza os parâmetros exibidos com base no tipo de transformação selecionado
+sequenceTypeSelect.addEventListener('change', (e) => {
+    const type = e.target.value;
+    const parametersDiv = document.getElementById('sequence-parameters');
+    parametersDiv.innerHTML = ''; // Limpa os parâmetros anteriores
+
+    switch (type) {
+        case 'translation':
+            parametersDiv.innerHTML = `
+                <div class="input-row">
+                    <label>X:</label>
+                    <input type="number" id="seq-tx" value="0">
+                </div>
+                <div class="input-row">
+                    <label>Y:</label>
+                    <input type="number" id="seq-ty" value="0">
+                </div>`;
+            break;
+        case 'rotation':
+            parametersDiv.innerHTML = `
+                <div class="input-row">
+                    <label>Ângulo:</label>
+                    <input type="number" id="seq-angle" value="0">
+                </div>
+                <div class="input-row">
+                    <label>Centro X:</label>
+                    <input type="number" id="seq-cx" value="0">
+                </div>
+                <div class="input-row">
+                    <label>Centro Y:</label>
+                    <input type="number" id="seq-cy" value="0">
+                </div>`;
+            break;
+        case 'scale':
+            parametersDiv.innerHTML = `
+                <div class="input-row">
+                    <label>X:</label>
+                    <input type="number" id="seq-sx" value="1" step="0.1">
+                </div>
+                <div class="input-row">
+                    <label>Y:</label>
+                    <input type="number" id="seq-sy" value="1" step="0.1">
+                </div>`;
+            break;
+        case 'shear':
+            parametersDiv.innerHTML = `
+                <div class="input-row">
+                    <label>X:</label>
+                    <input type="number" id="seq-shx" value="0" step="0.1">
+                </div>
+                <div class="input-row">
+                    <label>Y:</label>
+                    <input type="number" id="seq-shy" value="0" step="0.1">
+                </div>`;
+            break;
+        case 'reflection':
+            parametersDiv.innerHTML = `
+                <div class="input-row">
+                    <label><input type="checkbox" id="seq-ref-x"> Em X</label>
+                </div>
+                <div class="input-row">
+                    <label><input type="checkbox" id="seq-ref-y"> Em Y</label>
+                </div>`;
+            break;
+    }
+});
+
+// Inicializa os parâmetros ao carregar a página
+if (sequenceTypeSelect) {
+    const event = new Event('change');
+    sequenceTypeSelect.dispatchEvent(event);
+}
+
+// Adiciona a transformação configurada à sequência
+document.getElementById('add-to-sequence-btn').addEventListener('click', () => {
+    const type = sequenceTypeSelect.value;
+    let parameters = {};
+
+    switch (type) {
+        case 'translation':
+            parameters = {
+                dx: parseFloat(document.getElementById('seq-tx').value) || 0,
+                dy: parseFloat(document.getElementById('seq-ty').value) || 0
+            };
+            break;
+        case 'rotation':
+            parameters = {
+                angle: parseFloat(document.getElementById('seq-angle').value) || 0,
+                cx: parseFloat(document.getElementById('seq-cx').value) || 0,
+                cy: parseFloat(document.getElementById('seq-cy').value) || 0
+            };
+            break;
+        case 'scale':
+            parameters = {
+                sx: parseFloat(document.getElementById('seq-sx').value) || 1,
+                sy: parseFloat(document.getElementById('seq-sy').value) || 1
+            };
+            break;
+        case 'shear':
+            parameters = {
+                shx: parseFloat(document.getElementById('seq-shx').value) || 0,
+                shy: parseFloat(document.getElementById('seq-shy').value) || 0
+            };
+            break;
+        case 'reflection':
+            parameters = {
+                x: document.getElementById('seq-ref-x').checked,
+                y: document.getElementById('seq-ref-y').checked
+            };
+            break;
+    }
+
+    transformationSequence2D.push({ type, parameters });
+    updateTransformationHistory2D(`Adicionado à sequência: ${type} (${JSON.stringify(parameters)})`);
+});
+
+// Aplica a sequência de transformações
+document.getElementById('apply-sequence-btn').addEventListener('click', () => {
+    if (quadradoAtual.length === 0) {
+        alert('Gere um quadrado primeiro!');
+        return;
+    }
+
+    let pontos = quadradoAtual.map(p => ({ ...p }));
+
+    transformationSequence2D.forEach(transformation => {
+        const { type, parameters } = transformation;
+        let matriz;
+
+        switch (type) {
+            case 'translation':
+                matriz = criarMatrizTranslacao(parameters.dx, parameters.dy);
+                pontos = pontos.map(ponto => {
+                    const [x, y] = multiplicarMatrizVetor(matriz, [ponto.x, ponto.y]);
+                    return { x, y };
+                });
+                updateTransformationHistory2D(`Translação (dx: ${parameters.dx}, dy: ${parameters.dy})`);
+                break;
+            case 'rotation':
+                matriz = criarMatrizRotacao(parameters.angle, parameters.cx, parameters.cy);
+                pontos = pontos.map(ponto => {
+                    const [x, y] = multiplicarMatrizVetor(matriz, [ponto.x, ponto.y]);
+                    return { x, y };
+                });
+                updateTransformationHistory2D(`Rotação (ângulo: ${parameters.angle}°, centro: ${parameters.cx}, ${parameters.cy})`);
+                break;
+            case 'scale':
+                // Escala em torno do primeiro vértice
+                const origemX = pontos[0].x;
+                const origemY = pontos[0].y;
+                const t1 = criarMatrizTranslacao(-origemX, -origemY);
+                const escala = criarMatrizEscala(parameters.sx, parameters.sy);
+                const t2 = criarMatrizTranslacao(origemX, origemY);
+                matriz = multiplicarMatrizes(t2, multiplicarMatrizes(escala, t1));
+                pontos = pontos.map(ponto => {
+                    const [x, y] = multiplicarMatrizVetor(matriz, [ponto.x, ponto.y]);
+                    return { x, y };
+                });
+                updateTransformationHistory2D(`Escala (sx: ${parameters.sx}, sy: ${parameters.sy})`);
+                break;
+            case 'shear':
+                matriz = criarMatrizCisalhamento(parameters.shx, parameters.shy);
+                pontos = pontos.map(ponto => {
+                    const [x, y] = multiplicarMatrizVetor(matriz, [ponto.x, ponto.y]);
+                    return { x, y };
+                });
+                updateTransformationHistory2D(`Cisalhamento (shx: ${parameters.shx}, shy: ${parameters.shy})`);
+                break;
+            case 'reflection':
+                matriz = criarMatrizReflexao(parameters.x, parameters.y);
+                pontos = pontos.map(ponto => {
+                    const [x, y] = multiplicarMatrizVetor(matriz, [ponto.x, ponto.y]);
+                    return { x, y };
+                });
+                updateTransformationHistory2D(`Reflexão (X: ${parameters.x}, Y: ${parameters.y})`);
+                break;
+        }
+    });
+
+    // Redesenha e atualiza o quadrado
+    redesenharQuadrado(pontos);
+    quadradoAtual = pontos;
+    atualizarInformacoesObjeto();
+
+    transformationSequence2D = []; // Limpa a sequência após aplicar
+});

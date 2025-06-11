@@ -95,11 +95,14 @@
                 <div class="config-row">
                     <label for="square-y" class="config-label">Posição Y:</label>
                     <input type="number" id="square-y" class="config-input" value="0">
+                    
                 </div>
+                
                 <div id="input-div">
                     <button id="draw-square-btn" class="generate-btn">Gerar Quadrado</button>
                 </div>
             </div>
+            <hr>
         </div>
     </div>
     </div>
@@ -119,6 +122,28 @@
             <div id="center-position" class="info-box">Nenhum objeto gerado.</div>
         </div>
         <button id="clear-canvas-btn">Limpar</button>
+        <div class="control-group">
+            <h3>Histórico de Transformações</h3>
+            <div id="transformation-history" class="info-box">Nenhuma transformação aplicada.</div>
+        </div>
+        <div class="control-group">
+            <h3>Sequência de Transformações</h3>
+            <div class="input-row">
+                <label>Transformação:</label>
+                <select id="sequence-transformation-type">
+                    <option value="translation">Translação</option>
+                    <option value="rotation">Rotação</option>
+                    <option value="scale">Escala</option>
+                    <option value="shear">Cisalhamento</option>
+                    <option value="reflection">Reflexão</option>
+                </select>
+            </div>
+            <div id="sequence-parameters">
+                <!-- Os parâmetros específicos da transformação serão gerados dinamicamente -->
+            </div>
+            <button id="add-to-sequence-btn">Adicionar à Sequência</button>
+            <button id="apply-sequence-btn">Aplicar Sequência</button>
+        </div>
     </div>
     
     <script src="script.js"></script>

@@ -280,3 +280,36 @@ hr {
     background: #f9f9f9;
     box-sizing: border-box;
 }
+
+.control-group {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.input-row label {
+    width: 90px;
+    font-size: 13px;
+    margin-right: 10px;
+}
+
+/* Arredonda os botões da sequência de transformações */
+#add-to-sequence-btn,
+#apply-sequence-btn {
+    border-radius: 15px;
+    padding: 10px 20px;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+#draw-line-btn, #clear-btn {
+    border-radius: 15px;
+}
