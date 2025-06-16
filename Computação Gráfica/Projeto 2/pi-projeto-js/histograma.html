@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <title>Histograma</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="wrapper d-flex align-items-stretch">
+  <nav id="sidebar">
+    <div class="custom-menu">
+      <button type="button" id="sidebarCollapse" class="btn btn-primary">
+        <i class="fa fa-bars"></i>
+        <span class="sr-only">Toggle Menu</span>
+      </button>
+    </div>
+    <h1><a href="index.html" class="logo">Projeto Imagem</a></h1>
+    <ul class="list-unstyled components mb-5">
+      <li>
+        <a href="#"><span class="fa-solid fa-house mr-3"></span> Home</a>
+      </li>
+      <li>
+        <a href="filtros.html"><span class="fa-solid fa-filter mr-3"></span> Filtros
+        </a>
+      </li>
+      <li>
+        <a href="combinacao.html"><span class="fa-solid fa-plus mr-3"></span> Combinação
+        </a>
+      </li>
+      
+      <li>
+        <a href="transformacoes.html"><span class="fa-solid fa-image mr-3"></span> Transformações
+        </a>
+      </li>
+      
+      <li class="active">
+        <a href="histograma.html"><span class="fa-solid fa-chart-simple mr-3"></span> Histograma
+        </a>
+      </li>
+
+      <li>
+        <a href="morfologia.html"><span class="fa-solid fa-squarespace mr-3"></span> Morfologia
+        </a>
+      </li>
+      
+    </ul>
+
+  </nav>
+
+  <!-- Page Content  -->
+  <div id="content" class="p-4 p-md-5 pt-5">
+    <main>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="card text-center" style="height: 450px;">
+                        <div class="card-body">
+                            <h5 class="card-title">Imagem Original</h5>
+                            <div class="card-img-top" id="original-img"></div>
+                            <div class="btn-group mx-auto" role="group" aria-label="Ações" style="width: 256px;">
+                                <select class="form-select" aria-label="Selecionar imagem" id="img-selector">
+                                    <option selected value="0">Lena</option>
+                                    <option value="1">Cameraman</option>
+                                    <option value="2">Airplane</option>
+                                    <option value="3">Barbara</option>
+                                    <option value="4">Sea</option>
+                                    <option value="5">Lena Low</option>
+                                    <option value="6">Lena High</option>
+                                </select>
+                            </div>
+
+                            <button type="button" class="btn btn-outline-primary" id="equalize-btn" style="margin-top: 20px; width: 255px;">
+                                Equalizar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-5">
+                    <div class="card text-center" style="height: 600px;">
+                        <div class="card-body">
+                            <h5 class="card-title">Histogramas</h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="show-original-hist">
+                                Original
+                            </button>
+                            <div class="card-img-top" id="original-hist" style="margin: 10px 0 10px;"></div>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="show-processed-hist">
+                                Equalizado
+                            </button>
+                            <div class="card-img-top" id="processed-hist" style="margin: 10px 0 10px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card text-center" style="height: 400px;">
+                        <div class="card-body mx-auto">
+                            <h5 class="card-title">Imagem Processada</h5>
+                            <div class="card-img-top" id="processed-img"></div>
+                            <button type="button" class="btn btn-primary" id="download-btn" style="width: 256px;">
+                                Baixar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js" integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/src/utils.js"></script>
+<script src="js/src/histogram.js"></script>
+</body>
+</html>
