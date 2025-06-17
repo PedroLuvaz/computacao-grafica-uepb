@@ -5,10 +5,10 @@ Funções de operações morfológicas básicas para imagens binárias:
 - opening: Realiza abertura (erosão seguida de dilatação).
 - closing: Realiza fechamento (dilatação seguida de erosão).
 */
-const erosion = (img, w, h, k) => operation(img, w, h, k, 'erosion');
-const dilation = (img, w, h, k) => operation(img, w, h, k, 'dilation');
-const opening = (img, w, h, k) => dilation(erosion(img, w, h, k), w, h, k);
-const closing = (img, w, h, k) => erosion(dilation(img, w, h, k), w, h, k);
+const erosion = function(img, w, h, k) { return operation(img, w, h, k, 'erosion'); };
+const dilation = function(img, w, h, k) { return operation(img, w, h, k, 'dilation'); };
+const opening = function(img, w, h, k) { return dilation(erosion(img, w, h, k), w, h, k); };
+const closing = function(img, w, h, k) { return erosion(dilation(img, w, h, k), w, h, k); };
 
 /*
 complement: Calcula o complemento da imagem binária (inverte 0 e 1).
@@ -21,10 +21,10 @@ internal: Calcula o contorno interno (imagem original menos a erosão).
 gradient: Calcula o gradiente morfológico (dilatação menos erosão).
 thinning: Realiza afinamento (imagem menos gradiente).
 */
-const external = (img, w, h, k) => composition(dilation(img, w, h, k), img, w, h, sub);
-const internal = (img, w, h, k) => composition(img, erosion(img, w, h, k), w, h, sub);
-const gradient = (img, w, h, k) => composition(dilation(img, w, h, k), erosion(img, w, h, k), w, h, sub);
-const thinning = (img, w, h, k) => composition(img, gradient(img, w, h, k), w, h, sub);
+const external = function(img, w, h, k) { return composition(dilation(img, w, h, k), img, w, h, sub); };
+const internal = function(img, w, h, k) { return composition(img, erosion(img, w, h, k), w, h, sub); };
+const gradient = function(img, w, h, k) { return composition(dilation(img, w, h, k), erosion(img, w, h, k), w, h, sub); };
+const thinning = function(img, w, h, k) { return composition(img, gradient(img, w, h, k), w, h, sub); };
 
 // Operações para imagens em tons de cinza
 
@@ -192,35 +192,33 @@ Para cada pixel, calcula a soma dos vizinhos definidos pelo kernel.
 Para erosão, exige que todos os pixels do kernel estejam ativos.
 Para dilatação, basta um pixel ativo.
 */
-function operation(img, w, h, k, operate = 'erosion') {
-    let res = [];
 
-    // Para dilatação, basta 1 pixel ativo; para erosão, soma total do kernel
-    let target = operate === 'dilation' ? 1 : k.reduce((a, b) => a + b, 0);
+function operation(img, w, h, k, operate = 'erosion') {
+    const res = Array.from({ length: h }, () => Array(w).fill(0));
+    const kernelSum = k.reduce((a, b) => a + b, 0);
 
     for (let i = 0; i < h; i++) {
-        res[i] = [];
         for (let j = 0; j < w; j++) {
-            let acc = 0;
-
-            // Para cada posição do kernel, verifica bordas e soma se o kernel ativa o vizinho
-            acc += k[0] & (i === 0 || j === 0 ? 0 : img[i - 1][j - 1]);
-            acc += k[1] & (i === 0 ? 0 : img[i - 1][j]);
-            acc += k[2] & (i === 0 || j === w - 1 ? 0 : img[i - 1][j + 1]);
-
-            acc += k[3] & (j === 0 ? 0 : img[i][j - 1]);
-            acc += k[4] & img[i][j];
-            acc += k[5] & (j === w - 1 ? 0 : img[i][j + 1]);
-
-            acc += k[6] & (i === h - 1 || j === 0 ? 0 : img[i + 1][j - 1]);
-            acc += k[7] & (i === h - 1 ? 0 : img[i + 1][j]);
-            acc += k[8] & (i === h - 1 || j === img.w - 1 ? 0 : img[i + 1][j + 1]);
-
-            // Se atingir o alvo, ativa o pixel (1), senão desativa (0)
-            res[i][j] = acc >= target ? 1 : 0;
+            let match = 0;
+            // Percorre o kernel 3x3
+            for (let ki = -1; ki <= 1; ki++) {
+                for (let kj = -1; kj <= 1; kj++) {
+                    const kernelIdx = (ki + 1) * 3 + (kj + 1);
+                    if (!k[kernelIdx]) continue;
+                    const ni = i + ki;
+                    const nj = j + kj;
+                    if (ni >= 0 && ni < h && nj >= 0 && nj < w) {
+                        if (img[ni][nj]) match++;
+                    }
+                }
+            }
+            if (operate === 'dilation') {
+                res[i][j] = match > 0 ? 1 : 0;
+            } else { // erosion
+                res[i][j] = match === kernelSum ? 1 : 0;
+            }
         }
     }
-
     return res;
 }
 
@@ -234,36 +232,32 @@ Para cada pixel, coleta os vizinhos definidos pelo kernel.
 Para erosão, pega o menor valor; para dilatação, o maior.
 */
 function operationGray(img, w, h, k, value = 'dilation') {
-    let arr = [];
     let res = [];
 
     for (let i = 0; i < h; i++) {
         res[i] = [];
-
         for (let j = 0; j < w; j++) {
-            let acc = -1;
+            let neighbors = [];
 
             // Coleta os vizinhos conforme o kernel, tratando bordas
-            if (k[0] !== 0) arr[++acc] = i === 0 || j === 0 ? 0 : img[i - 1][j - 1];
-            if (k[1] !== 0) arr[++acc] = i === 0 ? 0 : img[i - 1][j];
-            if (k[2] !== 0) arr[++acc] = i === 0 || j === w - 1 ? 0 : img[i - 1][j + 1];
+            if (k[0]) neighbors.push(i > 0 && j > 0 ? img[i - 1][j - 1] : 0);
+            if (k[1]) neighbors.push(i > 0 ? img[i - 1][j] : 0);
+            if (k[2]) neighbors.push(i > 0 && j < w - 1 ? img[i - 1][j + 1] : 0);
 
-            if (k[3] !== 0) arr[++acc] = j === 0 ? 0 : img[i][j - 1];
-            if (k[4] !== 0) arr[++acc] = img[i][j];
-            if (k[5] !== 0) arr[++acc] = j === w - 1 ? 0 : img[i][j + 1];
+            if (k[3]) neighbors.push(j > 0 ? img[i][j - 1] : 0);
+            if (k[4]) neighbors.push(img[i][j]);
+            if (k[5]) neighbors.push(j < w - 1 ? img[i][j + 1] : 0);
 
-            if (k[6] !== 0) arr[++acc] = i === h - 1 || j === 0 ? 0 : img[i + 1][j - 1];
-            if (k[7] !== 0) arr[++acc] = i === h - 1 ? 0 : img[i + 1][j];
-            if (k[8] !== 0) arr[++acc] = i === h - 1 || j === w - 1 ? 0 : img[i + 1][j + 1];
+            if (k[6]) neighbors.push(i < h - 1 && j > 0 ? img[i + 1][j - 1] : 0);
+            if (k[7]) neighbors.push(i < h - 1 ? img[i + 1][j] : 0);
+            if (k[8]) neighbors.push(i < h - 1 && j < w - 1 ? img[i + 1][j + 1] : 0);
 
-            // Se só há um valor, retorna ele; senão, ordena e pega mínimo (erosão) ou máximo (dilatação)
-            if (acc === 0) {
-                res[i][j] = arr[0];
-            } else if (acc > 0) {
-                insertionSort(arr, acc + 1)
-                res[i][j] = arr[value === 'erosion' ? 0 : acc];
+            if (neighbors.length === 0) {
+                res[i][j] = img[i][j];
+            } else if (value === 'erosion') {
+                res[i][j] = Math.min(...neighbors);
             } else {
-                res[i][j] = res[i][j];
+                res[i][j] = Math.max(...neighbors);
             }
         }
     }
