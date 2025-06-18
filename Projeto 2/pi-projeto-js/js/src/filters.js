@@ -76,6 +76,7 @@ const operators = {
     21: sobelXY,
     22: prewittXY,
     23: medianFilter,
+    24: highBoostFilter
 }
 
 const imagesPath = {
@@ -83,14 +84,10 @@ const imagesPath = {
     1: '../assets/lenasalp.pgm',
     2: '../assets/lenag.pgm',
     3: '../assets/airplane.pgm',
-    4: '../assets/pepper.pgm',
-    5: '../assets/brain.pgm',
-    6: '../assets/barbara.pgm',
-    7: '../assets/einstein.pgm',
-    8: '../assets/sea.pgm',
 };
 
 const applyFilterBtn = document.getElementById('apply-filter-btn');
+const applyHBBtn = document.getElementById('apply-hb-btn');
 const applyAgainBtn = document.getElementById('apply-again-btn');
 const downloadBtn = document.getElementById('download-btn');
 
@@ -98,7 +95,7 @@ const filterSelector = document.getElementById('input-filter');
 const inputMatrix = document.getElementById('input-matrix');
 const inputMatrixValues = document.getElementsByName('array[]');
 const imgSelector = document.getElementById('img-selector');
-const scalar = document.getElementById('scalar');
+const ahb = document.getElementById('ahb');
 
 const normalizeSwitch = document.getElementById('normalizeSwitch');
 
@@ -122,33 +119,40 @@ const mainCanvas = function (sketch) {
         }
     }
 
-    inputMatrix.onchange = function () {
-        if (filterSelector.value !== 1) filterSelector.value = 1;
-
-        let k = 0;
-        for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 3; j++) {
-                custom[i][j] = parseFloat(scalar.value) * parseFloat(inputMatrixValues[k++].value);
-            }
-        }
-        activeKernel = custom;
-    }
+    //inputMatrix.onchange = function () {
+      //  if (filterSelector.value !== 1) filterSelector.value = 1;
+        //    let k = 0;
+         //   for (let i = 0; i < 3; i++) {
+           //     for (let j = 0; j < 3; j++) {
+             //       custom[i][j] = parseFloat(scalar.value) * parseFloat(inputMatrixValues[k++].value);
+               // }
+            //}
+            //activeKernel = custom;
+    //}
 }
 
 
+// Inicialização do valor do input scalar na criação do canvas processado
 const processedCanvas = function (sketch) {
     sketch.setup = function () {
         sketch.createCanvas(256, 256).parent("processed-img");
+        // define um valor padrão para o scalar
+        ahb.value = "1.5";  
     };
 
     filterSelector.onchange = function () {
-        let value = filterSelector.value;
+        let value = parseInt(filterSelector.value);
         processedImg.type = img.type;
         processedImg.w = img.w;
         processedImg.h = img.h;
 
+        if (value === 24) {
+            ahb.disabled = false; // ou ahb.readOnly = false;
+        } else {
+            ahb.disabled = true;  // ou ahb.readOnly = true;
+        }
 
-        if (value >= 19) {// filtros de magnitude > 18
+        if (value >= 19) { // filtros de magnitude > 18
             processedImg.data = operators[value](img);
         } else {
             activeKernel = kernel[value];
@@ -158,27 +162,36 @@ const processedCanvas = function (sketch) {
                     inputMatrixValues[k++].value = `${activeKernel[i][j]}`;
                 }
             }
-            processedImg.data = convolution(img, activeKernel, doNormalize)
+            processedImg.data = convolution(img, activeKernel, doNormalize);
         }
         paintImage(sketch, processedImg);
-    }
+    };
 
     normalizeSwitch.onchange = function () {
         doNormalize = !doNormalize;
-    }
+    };
 
-    applyFilterBtn.onclick = function () {
-        if (filterSelector.value < 19) {
-            processedImg.data = convolution(img, activeKernel, doNormalize);
-            paintImage(sketch, processedImg);
-        }
-    }
+    //applyFilterBtn.onclick = function () {
+      //  if (filterSelector.value < 19) {
+      //      processedImg.data = convolution(img, activeKernel, doNormalize);
+      //      paintImage(sketch, processedImg);
+      //  }
+    //};
 
     downloadBtn.onclick = function () {
         let filename = "image.pgm";
         download(filename, processedImg);
+    };
+
+    ahb.onchange = function () {
+        let value = parseInt(filterSelector.value);
+        if(value == 24) {
+            processedImg.data = highBoostFilter(img, ahb.value);
+            paintImage(sketch, processedImg);
+        }
     }
 };
+
 
 
 function medianFilter(img) {
@@ -212,6 +225,28 @@ function medianFilter(img) {
     return doNormalize ? normalize(res, w, h) : res;
 }
 
+function highBoostFilter(img, A) {
+    A = parseFloat(A);
+    if (isNaN(A)) A = 1.5;
+
+    const blurred = convolution(img, gaussianBlur, false); // ou 'average'
+    const h = img.h;
+    const w = img.w;
+    const result = [];
+
+    for (let i = 0; i < h; i++) {
+        result[i] = [];
+        for (let j = 0; j < w; j++) {
+            const original = img.data[i][j];
+            const smooth = blurred[i][j];
+            let boosted = (A * original) - smooth;
+            boosted = Math.min(255, Math.max(0, boosted));
+            result[i][j] = boosted;
+        }
+    }
+
+    return doNormalize ? normalize(result, w, h) : result;
+}
 
 new p5(mainCanvas, 'p5sketch');
 new p5(processedCanvas, 'p5sketch');
