@@ -23,12 +23,24 @@ let maxValue = 255;           // Valor máximo do pixel (depende da imagem)
 let minValue = 0;             // Valor mínimo do pixel (depende da imagem)
 
 // Funções de transformação de pixels
-const negative = (r) => maxValue - r; // Negativo: inverte os valores dos pixels
-const gamma = (r) => Math.round((((1 + r) / maxValue) ** gammaValue) * maxValue); // Gama
-const logarithmic = (r) => Math.round((logScalarValue * Math.log(1 + (r / maxValue))) * maxValue); // Logarítmica
-const linear = (r) => Math.round(aValue * r + bValue); // Linear
-const dynamicRange = (r) => Math.round((r / maxValue) * targetValue); // Alcance dinâmico
-const sigmoid = (r) => Math.round(maxValue * (1 / (1 + Math.exp(-(r - greyCenterValue) / sigmaValue)))); // Sigmoide
+// a) Negativo: S = 255 - r
+const negative = (r) => 255 - r;
+
+// b) Transformação Gamma: S = c * r^γ, c = 1, 0 ≤ γ ≤ 1
+const gamma = (r) => Math.round(Math.pow(r / 255, gammaValue) * 255);
+
+// c) Transformação Logarítmica: S = a * log(r + 1)
+const logarithmic = (r) => Math.round(logScalarValue * Math.log(r + 1));
+
+// d) Função de transferência de intensidade geral (sigmoide): 
+// S = 255 / (1 + exp(-(r - w) / σ)), w = centro, σ = largura
+const sigmoid = (r) => Math.round(255 / (1 + Math.exp(-(r - greyCenterValue) / sigmaValue)));
+
+// e) Função de transferência faixa dinâmica: S = (r / 255) * targetValue
+const dynamicRange = (r) => Math.round((r / 255) * targetValue);
+
+// f) Função de transferência linear: S = a * r + b
+const linear = (r) => Math.round(aValue * r + bValue);
 
 let currentOperator = null; // Operador de transformação atualmente selecionado
 
