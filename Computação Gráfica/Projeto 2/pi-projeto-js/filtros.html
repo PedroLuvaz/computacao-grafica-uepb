@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filtros</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <script src="../js/lib/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+
+    <div class="wrapper d-flex align-items-stretch">
+        <nav id="sidebar">
+          <div class="custom-menu">
+            <button type="button" id="sidebarCollapse" class="btn btn-primary">
+              <i class="fa fa-bars"></i>
+              <span class="sr-only">Toggle Menu</span>
+            </button>
+          </div>
+          <h1><a href="index.html" class="logo">Projeto Imagem</a></h1>
+          <ul class="list-unstyled components mb-5">
+            <li class="active">
+              <a href="filtros.html"><span class="fa-solid fa-filter mr-3"></span> Filtros
+              </a>
+            </li>
+            <li>
+              <a href="combinacao.html"><span class="fa-solid fa-plus mr-3"></span> Combinação
+              </a>
+            </li>
+            
+            <li>
+              <a href="transformacoes.html"><span class="fa-solid fa-image mr-3"></span> Transformações
+              </a>
+            </li>
+            
+            <li>
+              <a href="histograma.html"><span class="fa-solid fa-chart-simple mr-3"></span> Histograma
+              </a>
+            </li>
+      
+            <li>
+              <a href="morfologia.html"><span class="fa-solid fa-squarespace mr-3"></span> Morfologia
+              </a>
+            </li>
+
+            <li>    
+                <a href="morphing.html"><span class="fa-solid fa-image mr-3"></span> Morfismo Temporal
+                </a>
+            </li>
+            
+          </ul>
+      
+        </nav>
+      
+        <!-- Page Content  -->
+        <div id="content" class="p-4 p-md-5 pt-5">
+            <main>
+                <div class="container-fluid p-0 m-0 justify-content-center d-grid" style="min-height: 400px;">
+                    <div class="row w-100 p-0 w-0">
+                        <div class="col-lg-4 mb-2 align-items-center">
+                            <div class="card  mx-auto align-items-center" style="width:300px; height: 400px;">
+                                <div class="card-body">
+                                    <h5 class="card-title text-center">Imagem Original</h5>
+                                    <div class="card-img-top" id="original-img"></div>
+                                    <div style="width: 256px; height: 50px;" class="text-center">
+                                        <select class="form-select" aria-label="Selecionar imagem" id="img-selector">
+                                            <option selected value="0">Lena.pgm</option>
+                                            <option value="1">Lenasalp.pgm</option>
+                                            <option value="2">Lenag.pgm</option>
+                                            <option value="3">Airplane.pgm</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 mb-2">
+                            <div class="card  mx-auto align-items-center" style="width:300px; height: 450px;">
+                                <div class="card-body">
+                                    <h5 class="card-title text-center">Filtros</h5>
+                                    <div style="width: 250px;height: 135px;">
+                                        <select class="form-select" aria-label="Selecionar filtro" id="input-filter">
+                                            <option selected value="0">Original</option>
+                                            <option value="9">Media</option>
+                                            <option value="23">Mediana</option>
+                                            <option value="2">Passa Alta</option>
+                                            <option value="11">Roberts em X</option>
+                                            <option value="12">Roberts em Y</option>
+                                            <option value="13">Roberts Cruzado em X</option>
+                                            <option value="14">Roberts Cruzado em Y</option>
+                                            <option value="7">Prewitt em X</option>
+                                            <option value="8">Prewitt em Y</option>
+                                            <option value="5">Sobel X</option>
+                                            <option value="6">Sobel Y</option>
+                                            <option value="24">Alto Reforço</option>
+                                        </select>
+                                    </div>
+                                    <div class="container text-center" style="margin: 10px 0 18px">
+                                        <form id="input-matrix" class="text-center" role="form">
+                                            <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
+                                                   style="width: 65px; text-align:center" readonly>
+                                            <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
+                                                   style="width: 65px; text-align:center" readonly>
+                                            <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
+                                                   style="width: 65px; text-align:center" readonly>
+                                            <br>
+                                            <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
+                                                   style="width: 65px; text-align:center" readonly>
+                                            <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
+                                                   style="width: 65px; text-align:center" readonly>
+                                            <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
+                                                   style="width: 65px; text-align:center" readonly>
+                                            <br>
+                                            <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
+                                                   style="width: 65px; text-align:center" readonly>
+                                            <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
+                                                   style="width: 65px; text-align:center" readonly>
+                                            <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
+                                                   style="width: 65px; text-align:center" readonly>
+                                                <br><br> Valor A (High Boost): <br>
+                                                <input type="number" id="ahb" min="1.0" value="1,5"
+                                                    style="width: 65px; text-align:center" disabled step=".1">
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 mb-2">
+                            <div class="card  mx-auto align-items-center" style="width:300px; height: 450px;">
+                                <div class="card-body">
+                                    <h5 class="card-title text-center">Imagem Processada</h5>
+                                    <div class="card-img-top" id="processed-img"></div>
+                                    <div class="form-check form-switch" style="margin: 10px 0 10px">
+                                        <input class="form-check-input" type="checkbox" id="normalizeSwitch" style="display:none;">
+                                    </div>
+                                    <div class="btn-group d-flex" role="group">
+                                        <button type="button" class="btn btn-primary" id="apply-again-btn" style="display:none;">
+                                            Reusar
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary" id="download-btn" style="display:none;">
+                                            Baixar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+<script src="../js/lib/p5.min.js"></script>
+<script src="../js/src/utils.js"></script>
+<script src="../js/src/filters.js"></script>
+</body>
+</html>
