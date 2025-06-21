@@ -5,7 +5,7 @@ const width = canvas.width;
 const height = canvas.height;
 
 let t = 0;
-let speed = 5; // valor inicial da velocidade
+let speed = 1; // valor inicial da velocidade
 const history = [];
 const bpmHistory = [];
 
@@ -54,43 +54,72 @@ function drawCardio() {
   ctx.lineTo(width, height / 2);
   ctx.stroke();
 
-  // Simula batimento cardíaco com características de ECG
-  const frequency = speed * 0.01;
-  let value = Math.sin(t * frequency) * 10; // Base oscilante
+  // ECG mais fiel: P, Q, R, S, T (ciclo de 100)
+  // Parâmetros do ciclo
+  const baseY = height / 2;
+  let value = 0;
+  const cycle = t % 100;
 
-  // Adiciona picos característicos do ECG
-  if (t % 100 === 0) {
-    value += 50; // Pico R
-  } else if (t % 100 === 20) {
-    value -= 20; // Pico Q
-  } else if (t % 100 === 40) {
-    value += 30; // Pico S
-  } else if (t % 100 === 60) {
-    value += 15; // Onda T
-  } else if (t % 100 === 80) {
-    value += 5; // Onda P
+  if (cycle < 10) {
+    // Onda P (pequena subida)
+    value = -8 * Math.sin(Math.PI * cycle / 10);
+  } else if (cycle < 20) {
+    // Linha base
+    value = 0;
+  } else if (cycle < 25) {
+    // Q (descida curta)
+    value =  -15 * (cycle - 20) / 5;
+  } else if (cycle < 30) {
+    // R (pico alto)
+    value =  -15 + 60 * (cycle - 25) / 5;
+  } else if (cycle < 35) {
+    // S (descida rápida)
+    value =  45 - 35 * (cycle - 30) / 5;
+  } else if (cycle < 50) {
+    // Retorno à linha base
+    value = 10 * Math.sin(Math.PI * (cycle - 35) / 15);
+  } else if (cycle < 70) {
+    // Onda T (suave)
+    value = 12 * Math.sin(Math.PI * (cycle - 50) / 20);
+  } else {
+    // Linha base
+    value = 0;
   }
 
-  history.push(height / 2 - value);
+  // Oscilação leve para simular ruído fisiológico
+  value += Math.sin(t * 0.12) * 2;
+
+  history.push(baseY + value);
   if (history.length > width) {
     history.shift();
   }
 
   // Desenha a linha do batimento usando DDA
-  ctx.fillStyle = "#ff0000"; // Cor do traço
+  ctx.fillStyle = "#ff0000";
   for (let i = 1; i < history.length; i++) {
     drawLineDDA(i - 1, history[i - 1], i, history[i]);
   }
 
-  t++;
+  t += speed;
   requestAnimationFrame(drawCardio);
 }
 
 // Função para registrar BPM aproximado
 function recordBPM() {
-  const now = Date.now();
-  bpmHistory.push(now);
-  updateHistoryBox();
+    const now = Date.now();
+    // Se não houver histórico, apenas registra o tempo
+    if (bpmHistory.length === 0) {
+        bpmHistory.push(now);
+        history.push("Primeiro batimento registrado.");
+    } else {
+        // Calcula intervalo em segundos
+        const last = bpmHistory[bpmHistory.length - 1];
+        const interval = (now - last) / 1000;
+        const bpm = Math.round(60 / interval);
+        bpmHistory.push(now);
+        history.push(`BPM: ${bpm} (${new Date(now).toLocaleTimeString()})`);
+    }
+    updateHistoryBox();
 }
 
 //Função para resetar a simulação
@@ -103,7 +132,6 @@ function resetSimulation() {
     // Redesenha imediatamente com tela limpa
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
-
 
 // Atualiza histórico de batimentos
 function updateHistoryBox() {

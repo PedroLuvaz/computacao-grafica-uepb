@@ -3,23 +3,32 @@ Esse trecho de código faz parte de um programa que permite carregar imagens, ex
 original e processada, equalizar o histograma da imagem e fazer o download da imagem processada.
 */
 
-// Mapeia índices para caminhos de imagens
+// ===============================
+// Mapeamento de caminhos das imagens de exemplo
+// ===============================
 const imagesPath = {
     0: '../assets/lena.pgm',
     2: '../assets/airplane.pgm',
 };
 
-// Seletores de elementos da interface
+// ===============================
+// Seletores de elementos da interface (DOM)
+// ===============================
 const imgSelector = document.getElementById('img-selector');
 const showOriginalHist = document.getElementById('show-original-hist');
 const showProcessedHist = document.getElementById('show-processed-hist');
 const downloadBtn = document.getElementById('download-btn');
 const equalizeBtn = document.getElementById('equalize-btn');
 
-let img = new Image(); // Imagem original
+// ===============================
+// Variáveis globais de controle de estado
+// ===============================
+let img = new Image();         // Imagem original
 let processedImg = new Image(); // Imagem processada
 
-// Função principal do canvas da imagem original
+// ===============================
+// Canvas principal da imagem original
+// ===============================
 const mainCanvas = function (sketch) {
     sketch.setup = function () {
         // Cria o canvas e carrega a imagem padrão
@@ -34,7 +43,9 @@ const mainCanvas = function (sketch) {
     showOriginalHist.onclick = _ => img.width !== 0 ? originalHist.setup() : null;
 }
 
-// Função do canvas da imagem processada
+// ===============================
+// Canvas da imagem processada
+// ===============================
 let processedCanvas = function (sketch) {
     sketch.setup = function () {
         sketch.createCanvas(256, 256).parent("processed-img");
@@ -53,7 +64,9 @@ let processedCanvas = function (sketch) {
     }
 };
 
+// ===============================
 // Canvas do histograma original
+// ===============================
 const originalHistCanvas = function (sketch) {
     sketch.setup = function () {
         sketch.createCanvas(400, 200).parent("original-hist");
@@ -61,7 +74,9 @@ const originalHistCanvas = function (sketch) {
     }
 }
 
+// ===============================
 // Canvas do histograma processado
+// ===============================
 const processedHistCanvas = function (sketch) {
     sketch.setup = function () {
         sketch.createCanvas(400, 200).parent("processed-hist");
@@ -75,13 +90,17 @@ const processedHistCanvas = function (sketch) {
     }
 }
 
-// Inicializa os canvases usando p5.js
+// ===============================
+// Inicialização dos canvases usando p5.js
+// ===============================
 new p5(mainCanvas, 'p5sketch');
 new p5(processedCanvas, 'p5sketch');
 const originalHist = new p5(originalHistCanvas, 'p5sketch');
 const processedHist = new p5(processedHistCanvas, 'p5sketch');
 
+// ===============================
 // Função para equalizar a imagem (histograma)
+// ===============================
 function equalizeImage(img) {
     let hist = instantiateHistogram(img); // Calcula histograma
     let histProb = getHistProb(hist, img.h * img.w); // Probabilidade de cada nível
@@ -99,7 +118,9 @@ function equalizeImage(img) {
     return res;
 }
 
-// Cria o histograma da imagem
+// ===============================
+// Função para criar o histograma da imagem
+// ===============================
 function instantiateHistogram(img) {
     let hist = new Array(256).fill(0);
     for (let i = 0; i < img.h; i++) {
@@ -110,7 +131,9 @@ function instantiateHistogram(img) {
     return hist;
 }
 
+// ===============================
 // Calcula a probabilidade de cada nível de cinza
+// ===============================
 function getHistProb(hist, n) {
     let h = [];
     for (let i = 0; i < 256; i++) {
@@ -119,7 +142,9 @@ function getHistProb(hist, n) {
     return h
 }
 
+// ===============================
 // Calcula a função de distribuição acumulada (CDF)
+// ===============================
 function getAccumulatedProba(hist) {
     let acc = [];
     let sum = 0;
@@ -130,7 +155,9 @@ function getAccumulatedProba(hist) {
     return acc;
 }
 
+// ===============================
 // Gera o array de mapeamento dos níveis de cinza após equalização
+// ===============================
 function getScaleArr(arr) {
     let res = [];
     for (let i = 1; i < 256; i++) {
@@ -139,7 +166,9 @@ function getScaleArr(arr) {
     return res;
 }
 
+// ===============================
 // Desenha o histograma (e opcionalmente a CDF) no canvas
+// ===============================
 function drawHist(sketch, img, width, height, showCDF = false) {
     let hist = instantiateHistogram(img);
     let sum = 0;

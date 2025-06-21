@@ -5,6 +5,9 @@ Funções de operações morfológicas básicas para imagens binárias:
 - opening: Realiza abertura (erosão seguida de dilatação).
 - closing: Realiza fechamento (dilatação seguida de erosão).
 */
+// ===============================
+// Operações morfológicas binárias
+// ===============================
 const erosion = function(img, w, h, k) { return operation(img, w, h, k, 'erosion'); };
 const dilation = function(img, w, h, k) { return operation(img, w, h, k, 'dilation'); };
 const opening = function(img, w, h, k) { return dilation(erosion(img, w, h, k), w, h, k); };
@@ -13,6 +16,9 @@ const closing = function(img, w, h, k) { return erosion(dilation(img, w, h, k), 
 /*
 complement: Calcula o complemento da imagem binária (inverte 0 e 1).
 */
+// ===============================
+// Complemento e contornos
+// ===============================
 const complement = (img) => img.map((i) => i.map((j) => 1 - j));
 
 /*
@@ -26,8 +32,9 @@ const internal = function(img, w, h, k) { return composition(img, erosion(img, w
 const gradient = function(img, w, h, k) { return composition(dilation(img, w, h, k), erosion(img, w, h, k), w, h, sub); };
 const thinning = function(img, w, h, k) { return composition(img, gradient(img, w, h, k), w, h, sub); };
 
+// ===============================
 // Operações para imagens em tons de cinza
-
+// ===============================
 /*
 Funções de operações morfológicas para imagens em tons de cinza:
 - erosionGray: Erosão em tons de cinza.
@@ -49,8 +56,14 @@ const bottomHat = (img, w, h, k) => composition(closingGray(img, w, h, k), img, 
 /*
 sub: Função auxiliar para subtração de dois valores.
 */
+// ===============================
+// Função auxiliar de subtração
+// ===============================
 const sub = (a, b) => a - b;
 
+// ===============================
+// Controle de operadores e kernels
+// ===============================
 // Variável para armazenar o operador atual selecionado
 let currentOperator = null;
 
@@ -96,7 +109,9 @@ const imagesPath = {
 // kernelList: Kernel padrão 3x3 para operações morfológicas
 let kernelList = [0, 1, 0, 1, 1, 1, 0, 1, 0];
 
-// Elementos da interface
+// ===============================
+// Elementos da interface (DOM)
+// ===============================
 const downloadBtn = document.getElementById('download-btn');
 const applyAgainBtn = document.getElementById('apply-again-btn');
 const filterSelector = document.getElementById('input-filter');
@@ -104,7 +119,9 @@ const inputMatrix = document.getElementById('input-matrix');
 const inputMatrixValues = document.getElementsByName('array[]');
 const imgSelector = document.getElementById('img-selector');
 
+// ===============================
 // Objetos de imagem
+// ===============================
 let img = new Image();
 let processedImg = new Image();
 
@@ -114,6 +131,9 @@ mainCanvas: Função para configurar o canvas da imagem original.
 - Atualiza a imagem ao trocar a seleção.
 - Permite aplicar novamente o último filtro processado.
 */
+// ===============================
+// Canvas principal (imagem original)
+// ===============================
 const mainCanvas = function (sketch) {
     sketch.setup = function () {
         sketch.createCanvas(256, 256).parent("original-img");
@@ -136,6 +156,9 @@ processedCanvas: Função para configurar o canvas da imagem processada.
 - Atualiza o kernel conforme o usuário altera a matriz.
 - Permite baixar a imagem processada.
 */
+// ===============================
+// Canvas processado (imagem filtrada)
+// ===============================
 let processedCanvas = function (sketch) {
     sketch.setup = function () {
         sketch.createCanvas(256, 256).parent("processed-img");
@@ -178,7 +201,9 @@ let processedCanvas = function (sketch) {
     }
 };
 
-// Inicializa os dois canvas usando p5.js
+// ===============================
+// Inicialização dos dois canvas usando p5.js
+// ===============================
 new p5(mainCanvas, 'p5sketch');
 new p5(processedCanvas, 'p5sketch');
 
@@ -192,7 +217,9 @@ Para cada pixel, calcula a soma dos vizinhos definidos pelo kernel.
 Para erosão, exige que todos os pixels do kernel estejam ativos.
 Para dilatação, basta um pixel ativo.
 */
-
+// ===============================
+// Função de operação morfológica binária
+// ===============================
 function operation(img, w, h, k, operate = 'erosion') {
     const res = Array.from({ length: h }, () => Array(w).fill(0));
     const kernelSum = k.reduce((a, b) => a + b, 0);
@@ -231,6 +258,9 @@ operationGray: Realiza erosão ou dilatação em imagem em tons de cinza.
 Para cada pixel, coleta os vizinhos definidos pelo kernel.
 Para erosão, pega o menor valor; para dilatação, o maior.
 */
+// ===============================
+// Função de operação morfológica em tons de cinza
+// ===============================
 function operationGray(img, w, h, k, value = 'dilation') {
     let res = [];
 

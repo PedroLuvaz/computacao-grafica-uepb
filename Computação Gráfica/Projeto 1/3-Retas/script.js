@@ -1,3 +1,6 @@
+// ===============================
+// Seleção de elementos da interface (DOM)
+// ===============================
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const liveCoords = document.getElementById("live-coords");
@@ -11,40 +14,48 @@ let selectedPixel = null;
 let previousPixel = null;
 let lines = []; // Array para armazenar as retas desenhadas
 
-// Definir o tamanho do canvas
+// ===============================
+// Inicialização do canvas
+// ===============================
 canvas.width = 500;
 canvas.height = 500;
 
-// Função para desenhar as linhas que dividem o canvas em 4 quadrantes
+// ===============================
+// Desenha as linhas dos quadrantes (eixos X e Y)
+// ===============================
 function desenharQuadrantes() {
     const largura = canvas.width;
     const altura = canvas.height;
 
     ctx.lineWidth = 0.3;
 
-    // Desenhar linha vertical no centro
+    // Linha vertical central
     ctx.beginPath();
     ctx.moveTo(largura / 2, 0);
     ctx.lineTo(largura / 2, altura);
     ctx.stroke();
 
-    // Desenhar linha horizontal no centro
+    // Linha horizontal central
     ctx.beginPath();
     ctx.moveTo(0, altura / 2);
     ctx.lineTo(largura, altura / 2);
     ctx.stroke();
 }
 
+// ===============================
 // Função para desenhar um pixel no canvas
+// ===============================
 function setPixel(x, y) {
     const canvasX = x + canvas.width / 2;
-    const canvasY = canvas.height / 2 - y;  // Inverte o Y para que a direção positiva seja para baixo
+    const canvasY = canvas.height / 2 - y;  // Inverte o Y para que a direção positiva seja para cima
 
     ctx.fillStyle = "black";
     ctx.fillRect(canvasX, canvasY, 1, 1);
 }
 
-// Função para armazenar e desenhar as retas
+// ===============================
+// Função para desenhar todas as retas armazenadas
+// ===============================
 function drawLines() {
     lines.forEach(line => {
         const selectedAlgorithm = algorithmSelect.value;
@@ -59,7 +70,9 @@ function drawLines() {
     });
 }
 
-// Função para exibir as coordenadas do mouse
+// ===============================
+// Evento para exibir as coordenadas do mouse e quadrante
+// ===============================
 canvas.addEventListener("mousemove", (event) => {
     const rect = canvas.getBoundingClientRect();
     const x = Math.round(event.clientX - rect.left - canvas.width / 2); 
@@ -71,6 +84,9 @@ canvas.addEventListener("mousemove", (event) => {
     `;
 });
 
+// ===============================
+// Evento para capturar cliques e desenhar retas
+// ===============================
 let clickCount = 0;
 let x1, y1;
 
@@ -80,7 +96,7 @@ canvas.addEventListener("click", (event) => {
     const y = Math.round(canvas.height / 2 - (event.clientY - rect.top));
 
     if (clickCount === 0) {
-        // Armazenar o primeiro ponto
+        // Primeiro ponto da reta
         x1 = x;
         y1 = y;
         clickCount = 1;
@@ -89,19 +105,19 @@ canvas.addEventListener("click", (event) => {
         document.getElementById("x1").value = x1;
         document.getElementById("y1").value = y1;
     } else if (clickCount === 1) {
-        // Armazenar o segundo ponto e desenhar a reta
+        // Segundo ponto da reta, armazena e desenha
         lines.push({ x1, y1, x2: x, y2: y });
         clickCount = 0;
-        drawLines();  // Desenha a reta de acordo com o algoritmo selecionado
+        drawLines();
 
-        // Atualizar o painel direito com as coordenadas da reta desenhada
-        const lastLine = lines[lines.length - 1]; // Pega a última reta desenhada
+        // Atualiza painel direito com as coordenadas da reta desenhada
+        const lastLine = lines[lines.length - 1];
         document.getElementById("x-initial").textContent = lastLine.x1;
         document.getElementById("y-initial").textContent = lastLine.y1;
         document.getElementById("x-final").textContent = lastLine.x2;
         document.getElementById("y-final").textContent = lastLine.y2;
 
-        // Exibir as informações e esconder a mensagem de "Nenhuma reta desenhada"
+        // Exibe informações e esconde mensagem de "Nenhuma reta desenhada"
         document.getElementById("clicked-coords").style.display = "block";
         document.getElementById("no-line-message").style.display = "none";
 
@@ -111,16 +127,18 @@ canvas.addEventListener("click", (event) => {
     }
 });
 
-// Evento de limpeza das retas
+// ===============================
+// Evento para limpar todas as retas e restaurar o canvas
+// ===============================
 clearBtn.addEventListener("click", () => {
-    lines = [];  // Limpa as retas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);  // Limpa o canvas
-    desenharQuadrantes();  // Redesenha o plano cartesiano
-    drawLines();  // Garante que as linhas antigas ainda sejam desenhadas
+    lines = [];
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    desenharQuadrantes();
+    drawLines();
 
-    // Restaura o painel direito para o estado inicial
-    document.getElementById("no-line-message").style.display = "block";  // Exibe a mensagem "Nenhuma reta desenhada"
-    document.getElementById("clicked-coords").style.display = "none";  // Esconde as coordenadas da reta
+    // Restaura painel direito para o estado inicial
+    document.getElementById("no-line-message").style.display = "block";
+    document.getElementById("clicked-coords").style.display = "none";
 
     // Limpa os campos de entrada
     document.getElementById("x1").value = '';
@@ -131,21 +149,18 @@ clearBtn.addEventListener("click", () => {
     scrollContainer.innerHTML = "";
 });
 
-// Evento de troca de algoritmo
+// ===============================
+// Evento para trocar o algoritmo de desenho de reta
+// ===============================
 algorithmSelect.addEventListener("change", () => {
-    // Limpar as linhas e o canvas
-    lines = [];  // Limpa as linhas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);  // Limpa o canvas
-
-    // Redesenhar os quadrantes
+    lines = [];
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     desenharQuadrantes();
+    drawLines();
 
-    // Desenhar as linhas de acordo com o novo algoritmo
-    drawLines();  // Garante que as linhas antigas sejam desenhadas com o novo algoritmo
-
-    // Restaura o painel direito para o estado inicial
-    document.getElementById("no-line-message").style.display = "block";  // Exibe a mensagem "Nenhuma reta desenhada"
-    document.getElementById("clicked-coords").style.display = "none";  // Esconde as coordenadas da reta
+    // Restaura painel direito para o estado inicial
+    document.getElementById("no-line-message").style.display = "block";
+    document.getElementById("clicked-coords").style.display = "none";
 
     // Limpa os campos de entrada
     document.getElementById("x1").value = '';
@@ -154,22 +169,20 @@ algorithmSelect.addEventListener("change", () => {
     document.getElementById("y2").value = '';
 });
 
-// Evento do botão "Desenhar"
+// ===============================
+// Evento do botão "Desenhar" para criar uma reta via inputs
+// ===============================
 drawLineBtn.addEventListener("click", () => {
-    // Captura os valores dos inputs de coordenadas
     const x1Value = parseInt(document.getElementById("x1").value);
     const y1Value = parseInt(document.getElementById("y1").value);
     const x2Value = parseInt(document.getElementById("x2").value);
     const y2Value = parseInt(document.getElementById("y2").value);
 
-    // Adiciona a linha ao array
     lines.push({ x1: x1Value, y1: y1Value, x2: x2Value, y2: y2Value });
-
-    // Desenha as linhas de acordo com o algoritmo selecionado
     drawLines();
 
-    // Atualiza os valores das coordenadas da reta desenhada no painel
-    const lastLine = lines[lines.length - 1]; // Pega a última reta desenhada
+    // Atualiza painel direito com as coordenadas da reta desenhada
+    const lastLine = lines[lines.length - 1];
     document.getElementById("x-initial").textContent = lastLine.x1;
     document.getElementById("y-initial").textContent = lastLine.y1;
     document.getElementById("x-final").textContent = lastLine.x2;
@@ -180,10 +193,14 @@ drawLineBtn.addEventListener("click", () => {
     document.getElementById("no-line-message").style.display = "none";
 });
 
-// Inicializa o canvas com o plano cartesiano e sem linhas
+// ===============================
+// Inicializa o canvas com o plano cartesiano
+// ===============================
 desenharQuadrantes();
 
-// Função para atualizar o quadrante em tempo real
+// ===============================
+// Função para identificar o quadrante do ponto
+// ===============================
 function atualizarQuadrante(x, y) {
     let quadrante = '';
     if (x > 0 && y > 0) {
@@ -201,21 +218,20 @@ function atualizarQuadrante(x, y) {
     } else {
         return quadrante = 'Origem';
     }
-
-    // Atualiza o conteúdo da barra lateral com o quadrante
-    document.getElementById("quadrante-info").textContent = `Quadrante: ${quadrante}`;
 }
 
+// ===============================
+// Função auxiliar para adicionar coordenadas na barra lateral
+// ===============================
 function addCoordToSidebar(x, y, count) {
     let coordElement = document.createElement("div");
     coordElement.innerHTML = `<div style="justify-content: space-between; display: flex;"><strong>X${count}:</strong> ${x} <strong>Y${count}:</strong> ${y}</div><hr>`;
     scrollContainer.appendChild(coordElement);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------------------
-// Cálculos
-// ---------------------------------------------------------------------------------------------------------------------------------
-
+// ===============================
+// Algoritmo DDA para desenhar retas
+// ===============================
 function dda(x1, y1, x2, y2) {
     const length = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1));
     const xinc = (x2 - x1) / length;
@@ -226,7 +242,6 @@ function dda(x1, y1, x2, y2) {
 
     let count = 0;
 
-    // Desenha os pixels da reta
     setPixel(Math.round(x), Math.round(y));
 
     while (Math.abs(x - x2) > Math.abs(xinc) || Math.abs(y - y2) > Math.abs(yinc)) {
@@ -240,68 +255,59 @@ function dda(x1, y1, x2, y2) {
     }
 }
 
+// ===============================
+// Algoritmo do Ponto Médio (Bresenham) para desenhar retas
+// ===============================
 function pontoMedio(x1, y1, x2, y2) {
-    const dx = x2 - x1; // Diferença dos x
-    const dy = y2 - y1; // Diferença dos y
+    const dx = x2 - x1;
+    const dy = y2 - y1;
 
-    if(dy < dx) { // Procedimento Bresenham line-drawning para |m| < 1.0 (1º Oitante)
-        let ds = 2 * dy - dx; // Valor inicial de d
+    if(dy < dx) { // |m| < 1.0 (1º Oitante)
+        let ds = 2 * dy - dx;
+        const incE = 2 * dy;
+        const incNE = 2 * (dy - dx);
 
-        const incE = 2 * dy; // Incremento de E
-        const incNE = 2 * (dy - dx); // Incremento de NE
-    
         let x = x1;
         let y = y1;
-
         let count = 0;
-    
-        setPixel(x, y); // Ativa o primeiro pixel
-    
+
+        setPixel(x, y);
+
         while (x < x2) {
             if (ds <= 0) {
-                // Escolhe E
                 ds += incE;
                 x += 1;
             } else {
-                // Escolhe NE
                 ds += incNE;
                 x += 1;
-                y += 1; // Direção da linha (cima ou baixo)
+                y += 1;
             }
-
             count++;
-
-            setPixel(x, y); // Ativa o pixel atual
+            setPixel(x, y);
             addCoordToSidebar(x, y, count);
         }
-    } else { // Procedimento Bresennham line-drawning para |m| >= 1.0 (2º Oitante)
-        let ds = 2 * dx - dy; // Valor inicial de d
+    } else { // |m| >= 1.0 (2º Oitante)
+        let ds = 2 * dx - dy;
+        const incE = 2 * dx;
+        const incNE = 2 * (dx - dy);
 
-        const incE = 2 * dx; // Incremento de E
-        const incNE = 2 * (dx - dy); // Incremento de NE
-    
         let x = x1;
         let y = y1;
-
         let count = 0;
-    
-        setPixel(x, y); // Ativa o primeiro pixel
-    
+
+        setPixel(x, y);
+
         while (y < y2) {
             if (ds <= 0) {
-                // Escolhe E
                 ds += incE;
                 y += 1;
             } else {
-                // Escolhe NE
                 ds += incNE;
                 y += 1;
-                x += 1; // Direção da linha (cima ou baixo)
+                x += 1;
             }
-
             count++;
-
-            setPixel(x, y); // Ativa o pixel atual
+            setPixel(x, y);
             addCoordToSidebar(x, y, count);
         }
     }

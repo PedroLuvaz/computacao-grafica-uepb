@@ -1,13 +1,20 @@
+// ===============================
+// Seleção de elementos da interface (DOM)
+// ===============================
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const drawSquareBtn = document.getElementById("draw-square-btn");
 const clearCanvasBtn = document.getElementById("clear-canvas-btn");
 
-// Definir tamanho do canvas
+// ===============================
+// Inicialização do canvas
+// ===============================
 canvas.width = 500;
 canvas.height = 500;
 
-// Desenhar eixos cartesianos
+// ===============================
+// Desenha os eixos cartesianos
+// ===============================
 function desenharQuadrantes() {
     const largura = canvas.width;
     const altura = canvas.height;
@@ -24,7 +31,9 @@ function desenharQuadrantes() {
     ctx.stroke();
 }
 
+// ===============================
 // Função para desenhar um pixel no canvas
+// ===============================
 function setPixel(x, y) {
     const canvasX = x + canvas.width / 2;
     const canvasY = canvas.height / 2 - y;
@@ -32,7 +41,9 @@ function setPixel(x, y) {
     ctx.fillRect(canvasX, canvasY, 1, 1);
 }
 
+// ===============================
 // Algoritmo DDA para desenhar uma linha
+// ===============================
 function dda(x1, y1, x2, y2) {
     const length = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1));
     const xinc = (x2 - x1) / length;
@@ -50,28 +61,33 @@ function dda(x1, y1, x2, y2) {
     }
 }
 
-//para armazenar os pontos do quadrado anteriores para as operações.
+// ===============================
+// Variável para armazenar os pontos do quadrado atual
+// ===============================
 let quadradoAtual = [];
 
+// ===============================
+// Função para desenhar um quadrado customizado usando DDA
+// ===============================
 function drawCustomSquareDDA() {
-    // Obter valores ou usar padrão (50x50 no primeiro quadrante)
+    // Obter valores dos inputs ou usar padrão
     const size = parseInt(document.getElementById('square-size').value) || 50;
     const startX = parseInt(document.getElementById('square-x').value) || 0;
     const startY = parseInt(document.getElementById('square-y').value) || 0;
 
-    // Limpar canvas
+    // Limpar canvas e redesenhar eixos
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     desenharQuadrantes();
 
-    // Calcular vértices (primeiro quadrante)
+    // Calcular vértices do quadrado
     quadradoAtual = [
-        { x: startX, y: startY },          // Vértice inferior esquerdo
-        { x: startX + size, y: startY },    // Vértice inferior direito
-        { x: startX + size, y: startY + size }, // Vértice superior direito
-        { x: startX, y: startY + size }     // Vértice superior esquerdo
+        { x: startX, y: startY },
+        { x: startX + size, y: startY },
+        { x: startX + size, y: startY + size },
+        { x: startX, y: startY + size }
     ];
 
-    // Desenhar usando DDA
+    // Desenhar as quatro arestas usando DDA
     for (let i = 0; i < quadradoAtual.length; i++) {
         const current = quadradoAtual[i];
         const next = quadradoAtual[(i + 1) % quadradoAtual.length];
@@ -81,40 +97,19 @@ function drawCustomSquareDDA() {
     atualizarInformacoesObjeto();
 }
 
-// Event Listener
-document.getElementById('draw-square-btn').addEventListener('click', drawCustomSquareDDA);
-
-// Função para desenhar linha (DDA)
-function dda(x1, y1, x2, y2) {
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const steps = Math.max(Math.abs(dx), Math.abs(dy));
-    
-    const xInc = dx / steps;
-    const yInc = dy / steps;
-
-    let x = x1;
-    let y = y1;
-
-    for (let i = 0; i <= steps; i++) {
-        setPixel(Math.round(x), Math.round(y));
-        x += xInc;
-        y += yInc;
-    }
-}
-
-
-
-//Matriz Homogênea (usada nas operações)
+// ===============================
+// Função para multiplicar matriz 3x3 por vetor homogêneo
+// ===============================
 function multiplicarMatrizVetor(matriz, vetor) {
-    // vetor no formato [x, y, 1] (coordenadas homogêneas)
     return [
         matriz[0][0] * vetor[0] + matriz[0][1] * vetor[1] + matriz[0][2] * 1,
         matriz[1][0] * vetor[0] + matriz[1][1] * vetor[1] + matriz[1][2] * 1
     ];
 }
 
-//Matriz de Translacao
+// ===============================
+// Matrizes de transformação (translação, rotação, escala, cisalhamento, reflexão)
+// ===============================
 function criarMatrizTranslacao(dx, dy) {
     return [
         [1, 0, dx],
@@ -123,52 +118,20 @@ function criarMatrizTranslacao(dx, dy) {
     ];
 }
 
-//Operação Translação
-function aplicarTranslacaoMatriz() {
-    const dx = parseFloat(document.getElementById("x-translation").value) || 0;
-    const dy = parseFloat(document.getElementById("y-translation").value) || 0;
-
-    if (quadradoAtual.length === 0) {
-        alert("Gere um quadrado primeiro!");
-        return;
-    }
-
-    // Criar matriz de translação
-    const matrizTranslacao = criarMatrizTranslacao(dx, dy);
-
-    // Aplicar a cada ponto do quadrado
-    const novosPontos = quadradoAtual.map(ponto => {
-        const vetor = [ponto.x, ponto.y]; // Ponto original
-        const [novoX, novoY] = multiplicarMatrizVetor(matrizTranslacao, vetor);
-        return { x: novoX, y: novoY };
-    });
-
-    // Redesenhar e atualizar
-    redesenharQuadrado(novosPontos);
-    quadradoAtual = novosPontos;
-    atualizarInformacoesObjeto()
-    updateTransformationHistory2D(`Translação: Δx = ${dx}, Δy = ${dy}`);
-}
-
-//Matriz de Rotação
 function criarMatrizRotacao(anguloGraus, centroX = 0, centroY = 0) {
-    const anguloRad = (anguloGraus * Math.PI) / 180; // Converte graus para radianos
+    const anguloRad = (anguloGraus * Math.PI) / 180;
     const cos = Math.cos(anguloRad);
     const sin = Math.sin(anguloRad);
 
-    // Matriz de rotação em torno da origem
     const matrizRotacao = [
         [cos, -sin, 0],
         [sin,  cos, 0],
         [0,    0,   1]
     ];
 
-    // Se houver centro de rotação diferente da origem, combinar com translações
     if (centroX !== 0 || centroY !== 0) {
         const matrizTranslacaoPositiva = criarMatrizTranslacao(centroX, centroY);
         const matrizTranslacaoNegativa = criarMatrizTranslacao(-centroX, -centroY);
-
-        // Matriz composta: T⁻¹ × Rotação × T
         return multiplicarMatrizes(
             matrizTranslacaoPositiva,
             multiplicarMatrizes(matrizRotacao, matrizTranslacaoNegativa)
@@ -178,7 +141,33 @@ function criarMatrizRotacao(anguloGraus, centroX = 0, centroY = 0) {
     return matrizRotacao;
 }
 
-//Função multiplicar matrizes caso você precise rotacionar em um ponto fixo. (overload de método)
+function criarMatrizEscala(sx, sy) {
+    return [
+        [sx, 0, 0],
+        [0, sy, 0],
+        [0, 0, 1]
+    ];
+}
+
+function criarMatrizCisalhamento(shx, shy) {
+    return [
+        [1, shx, 0],
+        [shy, 1, 0],
+        [0, 0, 1]
+    ];
+}
+
+function criarMatrizReflexao(refletirX, refletirY) {
+    return [
+        [refletirY ? -1 : 1, 0, 0],
+        [0, refletirX ? -1 : 1, 0],
+        [0, 0, 1]
+    ];
+}
+
+// ===============================
+// Multiplicação de matrizes 3x3 (para compor transformações)
+// ===============================
 function multiplicarMatrizes(a, b) {
     const result = [
         [0, 0, 0],
@@ -197,7 +186,32 @@ function multiplicarMatrizes(a, b) {
     return result;
 }
 
-//Função Rotação
+// ===============================
+// Funções para aplicar transformações (translação, rotação, escala, cisalhamento, reflexão)
+// ===============================
+function aplicarTranslacaoMatriz() {
+    const dx = parseFloat(document.getElementById("x-translation").value) || 0;
+    const dy = parseFloat(document.getElementById("y-translation").value) || 0;
+
+    if (quadradoAtual.length === 0) {
+        alert("Gere um quadrado primeiro!");
+        return;
+    }
+
+    const matrizTranslacao = criarMatrizTranslacao(dx, dy);
+
+    const novosPontos = quadradoAtual.map(ponto => {
+        const vetor = [ponto.x, ponto.y];
+        const [novoX, novoY] = multiplicarMatrizVetor(matrizTranslacao, vetor);
+        return { x: novoX, y: novoY };
+    });
+
+    redesenharQuadrado(novosPontos);
+    quadradoAtual = novosPontos;
+    atualizarInformacoesObjeto();
+    updateTransformationHistory2D(`Translação: Δx = ${dx}, Δy = ${dy}`);
+}
+
 function aplicarRotacaoMatriz() {
     const angulo = parseFloat(document.getElementById("angle").value) || 0;
     const centroX = parseFloat(document.getElementById("x-rotation").value) || 0;
@@ -208,31 +222,18 @@ function aplicarRotacaoMatriz() {
         return;
     }
 
-    // Criar matriz de rotação (com centro especificado)
     const matrizRotacao = criarMatrizRotacao(angulo, centroX, centroY);
 
-    // Aplicar a cada ponto do quadrado
     const novosPontos = quadradoAtual.map(ponto => {
         const vetor = [ponto.x, ponto.y];
         const [novoX, novoY] = multiplicarMatrizVetor(matrizRotacao, vetor);
         return { x: novoX, y: novoY };
     });
 
-    // Redesenhar e atualizar
     redesenharQuadrado(novosPontos);
     quadradoAtual = novosPontos;
     atualizarInformacoesObjeto();
     updateTransformationHistory2D(`Rotação: ${angulo}° em torno de (${centroX}, ${centroY})`);
-}
-
-
-//Matriz de Escala
-function criarMatrizEscala(sx, sy) {
-    return [
-        [sx, 0, 0],
-        [0, sy, 0],
-        [0, 0, 1]
-    ];
 }
 
 function aplicarEscalaMatriz() {
@@ -244,45 +245,31 @@ function aplicarEscalaMatriz() {
         return;
     }
 
-    // Definir o ponto fixo (50,50)
+    // Escala em torno do primeiro vértice
     const origemX = quadradoAtual[0].x;
     const origemY = quadradoAtual[0].y;
 
-    // Criar as matrizes de transformação
     const matrizTranslacaoParaOrigem = criarMatrizTranslacao(-origemX, -origemY);
     const matrizEscala = criarMatrizEscala(sx, sy);
     const matrizTranslacaoDeVolta = criarMatrizTranslacao(origemX, origemY);
 
-    // Matriz composta: T⁻¹ × Escala × T
     const matrizFinal = multiplicarMatrizes(
         matrizTranslacaoDeVolta,
         multiplicarMatrizes(matrizEscala, matrizTranslacaoParaOrigem)
     );
 
-    // Aplicar transformação
     const novosPontos = quadradoAtual.map(ponto => {
         const vetor = [ponto.x, ponto.y];
         const [novoX, novoY] = multiplicarMatrizVetor(matrizFinal, vetor);
         return { x: novoX, y: novoY };
     });
 
-    // Redesenhar e atualizar
     redesenharQuadrado(novosPontos);
     quadradoAtual = novosPontos;
     atualizarInformacoesObjeto();
     updateTransformationHistory2D(`Escala: Sx = ${sx}, Sy = ${sy}`);
 }
 
-//Matriz Cisalhamento
-function criarMatrizCisalhamento(shx, shy) {
-    return [
-        [1, shx, 0],
-        [shy, 1, 0],
-        [0, 0, 1]
-    ];
-}
-
-//Função Cisalhamento
 function aplicarCisalhamentoMatriz() {
     const shx = parseFloat(document.getElementById("x-cis").value) || 0;
     const shy = parseFloat(document.getElementById("y-cis").value) || 0;
@@ -292,93 +279,61 @@ function aplicarCisalhamentoMatriz() {
         return;
     }
 
-    // Criar matriz de cisalhamento
     const matrizCisalhamento = criarMatrizCisalhamento(shx, shy);
 
-    // Aplicar a cada ponto do quadrado
     const novosPontos = quadradoAtual.map(ponto => {
         const vetor = [ponto.x, ponto.y];
         const [novoX, novoY] = multiplicarMatrizVetor(matrizCisalhamento, vetor);
         return { x: novoX, y: novoY };
     });
 
-    // Redesenhar e atualizar
     redesenharQuadrado(novosPontos);
     quadradoAtual = novosPontos;
-    atualizarInformacoesObjeto(); // Atualiza a sidebar
+    atualizarInformacoesObjeto();
     updateTransformationHistory2D(`Cisalhamento: Shx = ${shx}, Shy = ${shy}`);
 }
 
-
-//Matriz de Reflexão
-function criarMatrizReflexao(refletirX, refletirY) {
-    return [
-        [refletirY ? -1 : 1, 0, 0],
-        [0, refletirX ? -1 : 1, 0],
-        [0, 0, 1]
-    ];
-}
-
-//flag
-let estaRefletido = { x: false, y: false }; // Rastreia se o quadrado está atualmente refletido em X e/ou Y
-
-//Operação Reflexão
 function aplicarReflexaoMatriz() {
     const refletirX = document.getElementById("x-ref").checked;
     const refletirY = document.getElementById("y-ref").checked;
 
-    if (!refletirX && !refletirY) return; // Nada a fazer
+    if (!refletirX && !refletirY) return;
 
     if (quadradoAtual.length === 0) {
         alert("Gere um quadrado primeiro!");
         return;
     }
 
-    // Criar matriz de reflexão
     const matrizReflexao = criarMatrizReflexao(refletirX, refletirY);
 
-    // Aplicar a cada ponto do quadrado
     const novosPontos = quadradoAtual.map(ponto => {
         const vetor = [ponto.x, ponto.y];
         const [novoX, novoY] = multiplicarMatrizVetor(matrizReflexao, vetor);
         return { x: novoX, y: novoY };
     });
 
-    // Redesenhar e atualizar
     redesenharQuadrado(novosPontos);
     quadradoAtual = novosPontos;
-    atualizarInformacoesObjeto()
+    atualizarInformacoesObjeto();
     updateTransformationHistory2D(`Reflexão: ${refletirX ? 'em X' : ''} ${refletirY ? 'em Y' : ''}`);
 }
 
-//Função para obter os pontos originais do quadrado criado.
-function obterPontosOriginais() {
-    return [
-        { x: 0, y: 0 },
-        { x: 50, y: 0 },
-        { x: 50, y: 50 },
-        { x: 0, y: 50 }
-    ];
-}
-
-//Função para obter os pontos atuais da figura.
-function obterPontosAtuais() {
-    return quadradoAtual;
-}
-
+// ===============================
 // Função auxiliar para redesenhar o quadrado com novos pontos
+// ===============================
 function redesenharQuadrado(pontos) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     desenharQuadrantes();
-    
-    // Desenhar linhas entre os pontos
+
     for (let i = 0; i < pontos.length; i++) {
         const proximo = (i + 1) % pontos.length;
         dda(pontos[i].x, pontos[i].y, pontos[proximo].x, pontos[proximo].y);
     }
 }
 
-//Função para ter informações em tempo real do objeto
+// ===============================
+// Função para atualizar informações do objeto na interface
+// ===============================
 function atualizarInformacoesObjeto() {
     if (quadradoAtual.length === 0) {
         document.getElementById("vertices-list").innerHTML = "Nenhum objeto gerado.";
@@ -386,44 +341,34 @@ function atualizarInformacoesObjeto() {
         return;
     }
 
-    // Calcular centro geométrico (média dos vértices)
     const centroX = (quadradoAtual[0].x + quadradoAtual[1].x + quadradoAtual[2].x + quadradoAtual[3].x) / 4;
     const centroY = (quadradoAtual[0].y + quadradoAtual[1].y + quadradoAtual[2].y + quadradoAtual[3].y) / 4;
 
-    // Formatar vértices
-    const verticesHTML = quadradoAtual.map((vertice, index) => 
+    const verticesHTML = quadradoAtual.map((vertice, index) =>
         `Vértice ${index + 1}: (${vertice.x.toFixed(2)}, ${vertice.y.toFixed(2)})`
     ).join("<br>");
 
-    // Atualizar a UI
     document.getElementById("vertices-list").innerHTML = verticesHTML;
-    document.getElementById("center-position").innerHTML = 
+    document.getElementById("center-position").innerHTML =
         `(${centroX.toFixed(2)}, ${centroY.toFixed(2)})`;
 }
 
-
-// Função para limpar o canvas mantendo o plano cartesiano
+// ===============================
+// Função para limpar o canvas e informações
+// ===============================
 function clearCanvas() {
-    // Limpa o canvas e redesenhando os eixos
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     desenharQuadrantes();
-    
-    // Reseta o array do quadrado atual
     quadradoAtual = [];
-    
-    // Limpa as informações exibidas na sidebar
     document.getElementById("vertices-list").innerHTML = "Nenhum objeto gerado.";
     document.getElementById("center-position").innerHTML = "Nenhum objeto gerado.";
-
-    // Limpa o histórico de transformações
     transformationHistory2D = [];
     document.getElementById('transformation-history').innerHTML = "Nenhuma transformação aplicada.";
 }
 
-
-
-
-// --- Histórico de Transformações 2D ---
+// ===============================
+// Histórico de Transformações 2D
+// ===============================
 let transformationHistory2D = [];
 
 function updateTransformationHistory2D(transformation) {
@@ -432,7 +377,9 @@ function updateTransformationHistory2D(transformation) {
     historyElement.innerHTML = transformationHistory2D.map((t, i) => `<div>${i + 1}. ${t}</div>`).join('');
 }
 
-// Eventos para os botões
+// ===============================
+// Eventos dos botões principais
+// ===============================
 drawSquareBtn.addEventListener("click", drawCustomSquareDDA);
 clearCanvasBtn.addEventListener("click", clearCanvas);
 document.querySelectorAll('.type-op')[0].addEventListener('click', aplicarTranslacaoMatriz);
@@ -440,12 +387,13 @@ document.querySelectorAll('.type-op')[1].addEventListener('click', aplicarEscala
 document.querySelectorAll('.type-op')[2].addEventListener('click', aplicarRotacaoMatriz);
 document.querySelectorAll('.type-op')[3].addEventListener('click', aplicarReflexaoMatriz);
 document.querySelectorAll('.type-op')[4].addEventListener('click', aplicarCisalhamentoMatriz);
-// Inicializa o plano cartesiano
+
+// Inicializa o plano cartesiano ao carregar
 desenharQuadrantes();
 
-
-// --- Sequência de Transformações 2D ---
-
+// ===============================
+// Sequência de Transformações 2D
+// ===============================
 let transformationSequence2D = [];
 
 // Preenche o select com as opções de transformação
@@ -464,7 +412,7 @@ if (sequenceTypeSelect) {
 sequenceTypeSelect.addEventListener('change', (e) => {
     const type = e.target.value;
     const parametersDiv = document.getElementById('sequence-parameters');
-    parametersDiv.innerHTML = ''; // Limpa os parâmetros anteriores
+    parametersDiv.innerHTML = '';
 
     switch (type) {
         case 'translation':
@@ -533,7 +481,9 @@ if (sequenceTypeSelect) {
     sequenceTypeSelect.dispatchEvent(event);
 }
 
+// ===============================
 // Adiciona a transformação configurada à sequência
+// ===============================
 document.getElementById('add-to-sequence-btn').addEventListener('click', () => {
     const type = sequenceTypeSelect.value;
     let parameters = {};
@@ -576,7 +526,9 @@ document.getElementById('add-to-sequence-btn').addEventListener('click', () => {
     updateTransformationHistory2D(`Adicionado à sequência: ${type} (${JSON.stringify(parameters)})`);
 });
 
+// ===============================
 // Aplica a sequência de transformações
+// ===============================
 document.getElementById('apply-sequence-btn').addEventListener('click', () => {
     if (quadradoAtual.length === 0) {
         alert('Gere um quadrado primeiro!');
@@ -607,7 +559,6 @@ document.getElementById('apply-sequence-btn').addEventListener('click', () => {
                 updateTransformationHistory2D(`Rotação (ângulo: ${parameters.angle}°, centro: ${parameters.cx}, ${parameters.cy})`);
                 break;
             case 'scale':
-                // Escala em torno do primeiro vértice
                 const origemX = pontos[0].x;
                 const origemY = pontos[0].y;
                 const t1 = criarMatrizTranslacao(-origemX, -origemY);
@@ -639,10 +590,9 @@ document.getElementById('apply-sequence-btn').addEventListener('click', () => {
         }
     });
 
-    // Redesenha e atualiza o quadrado
     redesenharQuadrado(pontos);
     quadradoAtual = pontos;
     atualizarInformacoesObjeto();
 
-    transformationSequence2D = []; // Limpa a sequência após aplicar
+    transformationSequence2D = [];
 });

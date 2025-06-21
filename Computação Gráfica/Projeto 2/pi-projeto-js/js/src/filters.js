@@ -1,16 +1,22 @@
-
 /*
 Resumidamente, esse trecho de código define diferentes matrizes de máscaras de convolução que representam 
 filtros de imagem, define funções auxiliares para processar imagens com esses filtros, cria uma interface de 
 usuário para selecionar e aplicar filtros em imagens e usa a biblioteca p5.js para manipular os canvas e a 
 interação do usuário.
 */
+
+// ===============================
+// Constantes para cálculos de máscaras
+// ===============================
 const HALF = 1.0 / 2.0;
 const FOURTH = 1.0 / 4.0;
 const EIGHTH = 1.0 / 8.0;
 const NINTH = 1.0 / 9.0;
 const SIXTEENTH = 1.0 / 16.0;
 
+// ===============================
+// Definição das máscaras de filtros (Kernels)
+// ===============================
 const edgeDetection = [[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]];
 const edgeDetection2 = [[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]];
 const laplace = [[0, -1, 0], [-1, 4, -1], [0, -1, 0]];
@@ -38,15 +44,16 @@ const gradientX = [[0, 0, 0], [0, 1, 0], [0, -1, 0]];
 const gradientY = [[0, 0, 0], [0, 1, -1], [0, 0, 0]];
 const gradientXY = (img) => magnitude(convolution(img, gradientX, doNormalize), convolution(img, gradientY, doNormalize), img.w, img.h, doNormalize);
 
-
 const robertsX = [[0, 0, 0], [0, 1, 0], [0, 0, -1]];
 const robertsY = [[0, 0, 0], [0, 0, 1], [0, -1, 0]];
 const robertsXY = (img) => magnitude(convolution(img, robertsX, doNormalize), convolution(img, robertsY, doNormalize), img.w, img.h, doNormalize);
 
 const none = [[0, 0, 0], [0, 1, 0], [0, 0, 0]];
-
 const custom = [[0, 0, 0], [0, 1, 0], [0, 0, 0]];
 
+// ===============================
+// Variáveis de controle de kernel e operadores
+// ===============================
 let activeKernel = none;
 
 const kernel = {
@@ -78,6 +85,9 @@ const operators = {
     24: highBoostFilter
 }
 
+// ===============================
+// Caminhos das imagens de exemplo
+// ===============================
 const imagesPath = {
     0: '../assets/lena.pgm',
     1: '../assets/lenasalp.pgm',
@@ -85,6 +95,9 @@ const imagesPath = {
     3: '../assets/airplane.pgm',
 };
 
+// ===============================
+// Elementos da interface (DOM)
+// ===============================
 const applyFilterBtn = document.getElementById('apply-filter-btn');
 const applyHBBtn = document.getElementById('apply-hb-btn');
 const applyAgainBtn = document.getElementById('apply-again-btn');
@@ -98,11 +111,17 @@ const ahb = document.getElementById('ahb');
 
 const normalizeSwitch = document.getElementById('normalizeSwitch');
 
+// ===============================
+// Variáveis globais de controle de estado
+// ===============================
 let doNormalize = false;
 
 let img = new Image();
 let processedImg = new Image();
 
+// ===============================
+// Configuração do canvas principal (imagem original)
+// ===============================
 const mainCanvas = function (sketch) {
     sketch.setup = function () {
         sketch.createCanvas(256, 256).parent("original-img");
@@ -119,8 +138,9 @@ const mainCanvas = function (sketch) {
     }
 }
 
-
-// Inicialização do valor do input scalar na criação do canvas processado
+// ===============================
+// Configuração do canvas processado (imagem filtrada)
+// ===============================
 const processedCanvas = function (sketch) {
     sketch.setup = function () {
         sketch.createCanvas(256, 256).parent("processed-img");
@@ -173,8 +193,9 @@ const processedCanvas = function (sketch) {
     }
 };
 
-
-
+// ===============================
+// Função de filtro da mediana
+// ===============================
 function medianFilter(img) {
     let arr = [];
     let res = [];
@@ -206,6 +227,9 @@ function medianFilter(img) {
     return doNormalize ? normalize(res, w, h) : res;
 }
 
+// ===============================
+// Função de filtro High-Boost
+// ===============================
 function highBoostFilter(img, A) {
     A = parseFloat(A);
     if (isNaN(A)) A = 1.5;
@@ -229,5 +253,8 @@ function highBoostFilter(img, A) {
     return doNormalize ? normalize(result, w, h) : result;
 }
 
+// ===============================
+// Inicialização dos canvases p5.js
+// ===============================
 new p5(mainCanvas, 'p5sketch');
 new p5(processedCanvas, 'p5sketch');

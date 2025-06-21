@@ -1,3 +1,6 @@
+// ===============================
+// Caminhos das imagens de exemplo (PGM)
+// ===============================
 const imagesPath = {
   0: '../assets/kid.pgm',
   1: '../assets/adult.pgm',
@@ -7,15 +10,22 @@ const imagesPath = {
   5: '../assets/nathanadult.pgm',
 };
 
+// ===============================
+// Seletores de elementos da interface (DOM)
+// ===============================
 const imgASelector = document.getElementById('img-a-selector');
 const imgBSelector = document.getElementById('img-b-selector');
 
+// ===============================
+// Variáveis globais de controle de estado
+// ===============================
 let pgmKid = null;
 let pgmCurrent = null;
-
 let processedSketch = null;
 
-// --- Função para parsear PGM P2 (ASCII) ---
+// ===============================
+// Função para parsear PGM P2 (ASCII)
+// ===============================
 function parsePGMP2(text) {
   // Remove comentários e linhas em branco
   const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0 && !line.startsWith('#'));
@@ -34,7 +44,9 @@ function parsePGMP2(text) {
   return { width, height, maxVal, pixels };
 }
 
-// --- Função para desenhar PGM em canvas p5 ---
+// ===============================
+// Função para desenhar PGM em canvas p5
+// ===============================
 function drawPGMOnCanvas(pgm, sketch) {
   const img = sketch.createImage(pgm.width, pgm.height);
   img.loadPixels();
@@ -51,7 +63,9 @@ function drawPGMOnCanvas(pgm, sketch) {
   sketch.image(img, 0, 0);
 }
 
-// --- Função para ler PGM de uma URL e carregar no p5 ---
+// ===============================
+// Função para ler PGM de uma URL e carregar no p5
+// ===============================
 function readImage(path, sketch, setPgmCallback) {
   fetch(path)
     .then(res => res.text())
@@ -67,7 +81,9 @@ function readImage(path, sketch, setPgmCallback) {
     .catch(err => alert('Erro ao buscar arquivo: ' + err.message));
 }
 
-// --- Morphing entre dois PGM ---
+// ===============================
+// Função de morphing entre dois PGM
+// ===============================
 function morphPGM(pgmA, pgmB, t) {
   if (!pgmA || !pgmB) return null;
   if (pgmA.width !== pgmB.width || pgmA.height !== pgmB.height) {
@@ -87,7 +103,9 @@ function morphPGM(pgmA, pgmB, t) {
   };
 }
 
-// --- Canvas principal (Imagem Criança) ---
+// ===============================
+// Canvas principal (Imagem Criança)
+// ===============================
 const mainCanvas = function (sketch) {
   sketch.setup = function () {
     sketch.createCanvas(256, 256).parent("img-a");
@@ -100,7 +118,9 @@ const mainCanvas = function (sketch) {
   }
 }
 
-// --- Canvas secundário (Imagem Adulto) ---
+// ===============================
+// Canvas secundário (Imagem Adulto)
+// ===============================
 const secondaryCanvas = function (sketch) {
   sketch.setup = function () {
     sketch.createCanvas(256, 256).parent("img-b");
@@ -113,7 +133,9 @@ const secondaryCanvas = function (sketch) {
   }
 }
 
-// --- Canvas processado (Morfismo Temporal) ---
+// ===============================
+// Canvas processado (Morfismo Temporal)
+// ===============================
 const processedCanvas = function (sketch) {
   processedSketch = sketch;
   sketch.setup = function () {
@@ -122,12 +144,16 @@ const processedCanvas = function (sketch) {
   }
 }
 
-// --- Inicializa os três canvases ---
+// ===============================
+// Inicialização dos três canvases p5.js
+// ===============================
 new p5(mainCanvas, 'img-a');
 new p5(secondaryCanvas, 'img-b');
 new p5(processedCanvas, 'processed-img');
 
-// --- Botão para iniciar morfismo temporal animado ---
+// ===============================
+// Botão para iniciar morfismo temporal animado
+// ===============================
 document.getElementById('start-morphing-btn').addEventListener('click', function () {
   if (!pgmKid || !pgmCurrent) {
     alert('Carregue as duas imagens PGM válidas!');

@@ -10,7 +10,9 @@ operações de transformação de imagem de acordo com as seleções e entradas 
 instâncias do p5.js para lidar com o desenho da imagem original e processada na tela.
 */
 
-// Variáveis globais para armazenar parâmetros das transformações
+// ===============================
+// Variáveis globais para parâmetros das transformações
+// ===============================
 let gammaValue = 1;           // Valor do parâmetro gamma para a transformação gama
 let logScalarValue = 1;       // Valor escalar para a transformação logarítmica
 let aValue = 1;               // Coeficiente 'a' para a transformação linear
@@ -22,7 +24,9 @@ let sigmaValue = 25;          // Sigma para a transformação sigmoide
 let maxValue = 255;           // Valor máximo do pixel (depende da imagem)
 let minValue = 0;             // Valor mínimo do pixel (depende da imagem)
 
+// ===============================
 // Funções de transformação de pixels
+// ===============================
 // a) Negativo: S = 255 - r
 const negative = (r) => 255 - r;
 
@@ -42,6 +46,9 @@ const dynamicRange = (r) => Math.round((r / 255) * targetValue);
 // f) Função de transferência linear: S = a * r + b
 const linear = (r) => Math.round(aValue * r + bValue);
 
+// ===============================
+// Controle de operadores e kernels
+// ===============================
 let currentOperator = null; // Operador de transformação atualmente selecionado
 
 // Mapeamento dos operadores disponíveis
@@ -62,7 +69,9 @@ const imagesPath = {
 
 let kernelList = []; // Lista de kernels (não utilizada neste trecho)
 
-// Elementos da interface do usuário
+// ===============================
+// Elementos da interface do usuário (DOM)
+// ===============================
 const applyAgainBtn = document.getElementById('apply-again-btn'); // Botão para aplicar novamente
 const downloadBtn = document.getElementById('download-btn');      // Botão para download da imagem
 
@@ -83,10 +92,15 @@ const linearInput2 = document.getElementById('lin2');
 
 let doNormalize = false; // Flag para indicar se deve normalizar a imagem
 
+// ===============================
 // Objetos para armazenar a imagem original e processada
+// ===============================
 let img = new Image();
 let processedImg = new Image();
 
+// ===============================
+// Canvas principal (imagem original)
+// ===============================
 /*
  * Função principal do canvas da imagem original.
  * Utiliza p5.js para desenhar a imagem original na tela.
@@ -107,6 +121,9 @@ const mainCanvas = function (sketch) {
     }
 }
 
+// ===============================
+// Canvas processado (imagem transformada)
+// ===============================
 /*
  * Função principal do canvas da imagem processada.
  * Utiliza p5.js para desenhar a imagem após a transformação.
@@ -133,6 +150,7 @@ let processedCanvas = function (sketch) {
         }
         paintImage(sketch, processedImg); // Desenha a imagem processada
 
+        // Habilita/desabilita campos de acordo com o filtro selecionado
         if(value == 2) {
             gammaInput.disabled = false;
         } else {
@@ -148,7 +166,6 @@ let processedCanvas = function (sketch) {
         if(value == 6) {
             intensidadeInput1.disabled = false;
             intensidadeInput2.disabled = false;
-
         } else {
             intensidadeInput1.disabled = true;
             intensidadeInput2.disabled = true;
@@ -163,7 +180,6 @@ let processedCanvas = function (sketch) {
         if(value == 4) {
             linearInput1.disabled = false;
             linearInput2.disabled = false;
-
         } else {
             linearInput1.disabled = true;
             linearInput2.disabled = true;
@@ -200,6 +216,9 @@ let processedCanvas = function (sketch) {
     }
 };
 
+// ===============================
+// Função para aplicar a transformação em cada pixel da imagem
+// ===============================
 /*
  * Função responsável por aplicar a transformação em cada pixel da imagem.
  * Se doNormalize for verdadeiro, normaliza o resultado.
@@ -219,6 +238,8 @@ function transform(img, operation) {
     return doNormalize ? normalize(res, img.w, img.h) : res; // Normaliza se necessário
 }
 
-// Inicializa os dois canvases (original e processado) usando p5.js
+// ===============================
+// Inicialização dos dois canvases usando p5.js
+// ===============================
 new p5(mainCanvas, 'p5sketch');
 new p5(processedCanvas, 'p5sketch');

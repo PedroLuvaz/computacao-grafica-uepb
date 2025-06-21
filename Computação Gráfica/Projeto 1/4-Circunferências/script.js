@@ -1,3 +1,6 @@
+// ===============================
+// Seleção de elementos da interface (DOM)
+// ===============================
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const liveCoords = document.getElementById("live-coords");
@@ -11,40 +14,48 @@ let selectedPixel = null;
 let previousPixel = null;
 let circles = []; // Array para armazenar as circunferências desenhadas
 
-// Definir o tamanho do canvas
+// ===============================
+// Inicialização do canvas
+// ===============================
 canvas.width = 500;
 canvas.height = 500;
 
-// Função para desenhar as linhas que dividem o canvas em 4 quadrantes
+// ===============================
+// Desenha as linhas dos quadrantes (eixos X e Y)
+// ===============================
 function desenharQuadrantes() {
     const largura = canvas.width;
     const altura = canvas.height;
 
     ctx.lineWidth = 0.3;
 
-    // Desenhar linha vertical no centro
+    // Linha vertical central
     ctx.beginPath();
     ctx.moveTo(largura / 2, 0);
     ctx.lineTo(largura / 2, altura);
     ctx.stroke();
 
-    // Desenhar linha horizontal no centro
+    // Linha horizontal central
     ctx.beginPath();
     ctx.moveTo(0, altura / 2);
     ctx.lineTo(largura, altura / 2);
     ctx.stroke();
 }
 
+// ===============================
 // Função para desenhar um pixel no canvas
+// ===============================
 function setPixel(x, y) {
     const canvasX = x + canvas.width / 2;
-    const canvasY = canvas.height / 2 - y;  // Inverte o Y para que a direção positiva seja para baixo
+    const canvasY = canvas.height / 2 - y;  // Inverte o Y para que a direção positiva seja para cima
 
     ctx.fillStyle = "black";
     ctx.fillRect(canvasX, canvasY, 1, 1);
 }
 
-// Função para desenhar as circunferências
+// ===============================
+// Função para desenhar todas as circunferências armazenadas
+// ===============================
 function drawCircles() {
     circles.forEach(circle => {
         const selectedAlgorithm = algorithmSelect.value;
@@ -62,7 +73,9 @@ function drawCircles() {
     });
 }
 
-// Função para exibir as coordenadas do mouse
+// ===============================
+// Evento para exibir as coordenadas do mouse e quadrante
+// ===============================
 canvas.addEventListener("mousemove", (event) => {
     const rect = canvas.getBoundingClientRect();
     const x = Math.round(event.clientX - rect.left - canvas.width / 2); 
@@ -74,6 +87,9 @@ canvas.addEventListener("mousemove", (event) => {
     `;
 });
 
+// ===============================
+// Evento para capturar cliques e desenhar circunferências
+// ===============================
 let clickCount = 0;
 let cx, cy, r;
 
@@ -83,7 +99,7 @@ canvas.addEventListener("click", (event) => {
     const y = Math.round(canvas.height / 2 - (event.clientY - rect.top));
 
     if (clickCount === 0) {
-        // Define o centro da circunferência
+        // Primeiro clique: define o centro da circunferência
         cx = x;
         cy = y;
         clickCount = 1;
@@ -91,39 +107,38 @@ canvas.addEventListener("click", (event) => {
         document.getElementById("x").value = cx;
         document.getElementById("y").value = cy;
     } else if (clickCount === 1) {
-        // Calcula o raio com base no segundo clique
+        // Segundo clique: calcula o raio e armazena a circunferência
         r = Math.round(Math.sqrt((x - cx) ** 2 + (y - cy) ** 2));
         circles.push({ x: cx, y: cy, r: r });
         clickCount = 0;
 
         document.getElementById("r").value = r;
         
-        // Desenhar a circunferência após o segundo clique
-        drawCircles(); // Função que desenha a circunferência usando o algoritmo escolhido
+        // Desenha a circunferência após o segundo clique
+        drawCircles();
 
-        // Atualizar o painel direito com as informações da circunferência
+        // Atualiza o painel direito com as informações da circunferência
         document.getElementById("x-ponto").textContent = cx;
         document.getElementById("y-ponto").textContent = cy;
         document.getElementById("raio").textContent = r;
 
-        // Atualiza o painel com as informações da circunferência
         document.getElementById("clicked-coords").style.display = "block";
         document.getElementById("no-line-message").style.display = "none";
     }
 });
 
-// Evento de limpeza das circunferências
+// ===============================
+// Evento para limpar todas as circunferências e restaurar o canvas
+// ===============================
 clearBtn.addEventListener("click", () => {
-    circles = [];  // Limpa as circunferências
-    ctx.clearRect(0, 0, canvas.width, canvas.height);  // Limpa o canvas
-    desenharQuadrantes();  // Redesenha o plano cartesiano
-    drawCircles();  // Garante que as circunferências antigas ainda sejam desenhadas
+    circles = [];
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    desenharQuadrantes();
+    drawCircles();
 
-    // Restaura o painel direito para o estado inicial
-    document.getElementById("no-line-message").style.display = "block";  // Exibe a mensagem "Nenhuma circunferência desenhada"
-    document.getElementById("clicked-coords").style.display = "none";  // Esconde as informações da circunferência
+    document.getElementById("no-line-message").style.display = "block";
+    document.getElementById("clicked-coords").style.display = "none";
 
-    // Limpa os campos de entrada
     document.getElementById("x").value = '';
     document.getElementById("y").value = '';
     document.getElementById("r").value = '';
@@ -131,57 +146,51 @@ clearBtn.addEventListener("click", () => {
     scrollContainer.innerHTML = "";
 });
 
-// Evento de troca de algoritmo
+// ===============================
+// Evento para trocar o algoritmo de desenho de circunferência
+// ===============================
 algorithmSelect.addEventListener("change", () => {
-    // Limpar as circunferências e o canvas
-    circles = [];  // Limpa as circunferências
-    ctx.clearRect(0, 0, canvas.width, canvas.height);  // Limpa o canvas
-
-    // Redesenhar os quadrantes
+    circles = [];
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     desenharQuadrantes();
+    drawCircles();
 
-    // Desenhar as circunferências de acordo com o novo algoritmo
-    drawCircles();  // Garante que as circunferências antigas sejam desenhadas com o novo algoritmo
+    document.getElementById("no-line-message").style.display = "block";
+    document.getElementById("clicked-coords").style.display = "none";
 
-    // Restaura o painel direito para o estado inicial
-    document.getElementById("no-line-message").style.display = "block";  // Exibe a mensagem "Nenhuma circunferência desenhada"
-    document.getElementById("clicked-coords").style.display = "none";  // Esconde as informações da circunferência
-
-    // Limpa os campos de entrada
     document.getElementById("x").value = '';
     document.getElementById("y").value = '';
     document.getElementById("r").value = '';
 });
 
-// Evento do botão "Desenhar"
+// ===============================
+// Evento do botão "Desenhar" para criar circunferência via inputs
+// ===============================
 drawLineBtn.addEventListener("click", () => {
-    // Captura os valores dos inputs de coordenadas e raio
     const xValue = parseInt(document.getElementById("x").value);
     const yValue = parseInt(document.getElementById("y").value);
     const rValue = parseInt(document.getElementById("r").value);
 
-    // Adiciona a circunferência ao array
     circles.push({ x: xValue, y: yValue, r: rValue });
-
-    // Desenha as circunferências de acordo com o algoritmo selecionado
     drawCircles();
 
-    // Atualiza os valores das coordenadas da circunferência desenhada no painel
-    const lastCircle = circles[circles.length - 1]; // Pega a última circunferência desenhada
+    const lastCircle = circles[circles.length - 1];
     document.getElementById("x-ponto").textContent = lastCircle.x;
     document.getElementById("y-ponto").textContent = lastCircle.y;
     document.getElementById("raio").textContent = lastCircle.r;
 
-    // Exibe as coordenadas e o raio da circunferência e esconde a mensagem "Nenhuma circunferência desenhada"
     document.getElementById("clicked-coords").style.display = "block";
     document.getElementById("no-line-message").style.display = "none";
 });
 
-
-// Inicializa o canvas com o plano cartesiano e sem linhas
+// ===============================
+// Inicializa o canvas com o plano cartesiano
+// ===============================
 desenharQuadrantes();
 
-// Função para atualizar o quadrante em tempo real
+// ===============================
+// Função para identificar o quadrante do ponto
+// ===============================
 function atualizarQuadrante(x, y) {
     let quadrante = '';
     if (x > 0 && y > 0) {
@@ -199,21 +208,20 @@ function atualizarQuadrante(x, y) {
     } else {
         return quadrante = 'Origem';
     }
-
-    // Atualiza o conteúdo da barra lateral com o quadrante
-    document.getElementById("quadrante-info").textContent = `Quadrante: ${quadrante}`;
 }
 
+// ===============================
+// Função auxiliar para adicionar coordenadas na barra lateral
+// ===============================
 function addCoordToSidebar(x, y, count) {
     let coordElement = document.createElement("div");
     coordElement.innerHTML = `<div style="justify-content: space-between; display: flex;"><strong>X${count}:</strong> ${x} <strong>Y${count}:</strong> ${y}</div><hr>`;
     scrollContainer.appendChild(coordElement);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------------------
-// Cálculos 
-// ---------------------------------------------------------------------------------------------------------------------------------
-
+// ===============================
+// Algoritmo da Equação Explícita para circunferência
+// ===============================
 function drawCircleUsingExplicitEquation(xc, yc, r) {
     let count = 1; 
     for (let x = -r; x <= r; x++) {
@@ -227,6 +235,9 @@ function drawCircleUsingExplicitEquation(xc, yc, r) {
     }
 }
 
+// ===============================
+// Algoritmo Trigonométrico para circunferência
+// ===============================
 function drawCircleUsingTrigonometric(xc, yc, r) {
     const step = 0.1;  
     let count = 1; 
@@ -239,6 +250,9 @@ function drawCircleUsingTrigonometric(xc, yc, r) {
     }
 }
 
+// ===============================
+// Algoritmo do Ponto Médio para circunferência
+// ===============================
 function drawCircleUsingMidPoint(xc, yc, r) {
     let x = 0;
     let y = r;
