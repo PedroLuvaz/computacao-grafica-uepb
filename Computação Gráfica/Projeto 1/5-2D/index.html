@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transformações Geométricas</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+#right-bar {
+    overflow-y: auto;
+    max-height: 100vh;
+}
+#left-bar {
+    overflow-y: auto;
+    max-height: 100vh;
+}
+</style>
 </head>
 <body>
     <div class="sidebar" id="left-bar">
@@ -95,12 +105,10 @@
                 <div class="config-row">
                     <label for="square-y" class="config-label">Posição Y:</label>
                     <input type="number" id="square-y" class="config-input" value="0">
+                    <button id="draw-square-btn" class="generate-btn">Gerar Quadrado</button>
                     
                 </div>
                 
-                <div id="input-div">
-                    <button id="draw-square-btn" class="generate-btn">Gerar Quadrado</button>
-                </div>
             </div>
             <hr>
         </div>
@@ -143,6 +151,48 @@
             </div>
             <button id="add-to-sequence-btn">Adicionar à Sequência</button>
             <button id="apply-sequence-btn">Aplicar Sequência</button>
+        </div>
+        <div>
+            <div id="pgm-section">
+            <input type="file" id="pgm-upload" accept=".pgm">
+            <button id="render-pgm-btn">Carregar Imagem</button>
+            <div class="pgm-transform-group">
+                <h4>Translação</h4>
+                <label for="img-translate-x">X:</label>
+                <input type="number" id="img-translate-x" value="0" style="width:50px;">
+                <label for="img-translate-y">Y:</label>
+                <input type="number" id="img-translate-y" value="0" style="width:50px;">
+                <button id="img-translate-btn">Aplicar</button>
+            </div>
+            <div class="pgm-transform-group">
+                <h4>Escala</h4>
+                <label for="img-scale-x">X:</label>
+                <input type="number" id="img-scale-x" value="1" step="0.1" style="width:50px;">
+                <label for="img-scale-y">Y:</label>
+                <input type="number" id="img-scale-y" value="1" step="0.1" style="width:50px;">
+                <button id="img-scale-btn">Aplicar</button>
+            </div>
+            <div class="pgm-transform-group">
+                <h4>Rotação</h4>
+                <label for="img-rotate-angle">Ângulo (°):</label>
+                <input type="number" id="img-rotate-angle" value="0" style="width:50px;">
+                <button id="img-rotate-btn">Aplicar</button>
+            </div>
+            <div class="pgm-transform-group">
+                <h4>Reflexão</h4>
+                <label><input type="checkbox" id="img-reflect-x"> Em X</label>
+                <label><input type="checkbox" id="img-reflect-y"> Em Y</label>
+                <button id="img-reflect-btn">Aplicar</button>
+            </div>
+            <div class="pgm-transform-group">
+                <h4>Cisalhamento</h4>
+                <label for="img-shear-x">X:</label>
+                <input type="number" id="img-shear-x" value="0" step="0.1" style="width:50px;">
+                <label for="img-shear-y">Y:</label>
+                <input type="number" id="img-shear-y" value="0" step="0.1" style="width:50px;">
+                <button id="img-shear-btn">Aplicar</button>
+            </div>
+            </div>
         </div>
     </div>
     

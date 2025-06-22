@@ -596,3 +596,259 @@ document.getElementById('apply-sequence-btn').addEventListener('click', () => {
 
     transformationSequence2D = [];
 });
+
+// ===============================
+// PGM IMAGE HANDLING
+// ===============================
+
+// Armazena os pontos do objeto da imagem carregada
+let imagemObjetoPontos = [];
+let imagemCentro = { x: 0, y: 0 };
+
+// Função para ler arquivo PGM (P2 ou P5) e extrair pontos do objeto
+function parsePGM(arrayBuffer) {
+    const view = new Uint8Array(arrayBuffer);
+    let currentIndex = 0;
+
+    function readToken() {
+        let token = "";
+        while (currentIndex < view.length) {
+            const charCode = view[currentIndex];
+            const char = String.fromCharCode(charCode);
+            if (/\s/.test(char)) {
+                if (token.length > 0) {
+                    currentIndex++;
+                    return token;
+                }
+            } else if (char === "#") {
+                // Skip comment
+                while (
+                    currentIndex < view.length &&
+                    String.fromCharCode(view[currentIndex]) !== "\n"
+                ) {
+                    currentIndex++;
+                }
+            } else {
+                token += char;
+            }
+            currentIndex++;
+        }
+        return token;
+    }
+
+    const magic = readToken();
+    if (magic !== "P2" && magic !== "P5") {
+        alert("Erro: Formato de arquivo PGM inválido.");
+        return null;
+    }
+    const width = parseInt(readToken());
+    const height = parseInt(readToken());
+    const maxVal = parseInt(readToken());
+    if (isNaN(width) || isNaN(height) || isNaN(maxVal)) {
+        alert("Erro ao ler o cabeçalho do PGM.");
+        return null;
+    }
+    let pixels;
+    if (magic === "P5") {
+        // Dados binários
+        pixels = [];
+        for (let i = 0; i < width * height; i++) {
+            pixels.push(view[currentIndex++]);
+        }
+    } else {
+        // P2: texto
+        const textDecoder = new TextDecoder();
+        const remainingText = textDecoder.decode(view.subarray(currentIndex));
+        pixels = remainingText
+            .split(/\s+/)
+            .filter((s) => s)
+            .map((s) => parseInt(s));
+    }
+    if (pixels.length < width * height) {
+        alert("Erro: O arquivo PGM está incompleto.");
+        return null;
+    }
+    pixels = pixels.slice(0, width * height);
+
+    // Descobre valor do fundo (mais frequente)
+    const freq = {};
+    for (const px of pixels) freq[px] = (freq[px] || 0) + 1;
+    const bg = parseInt(Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0]);
+
+    // Extrai pontos do objeto (não fundo)
+    const pontos = [];
+    let sumX = 0, sumY = 0, count = 0;
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const val = pixels[y * width + x];
+            if (val !== bg) {
+                // Centraliza no canvas (0,0 no centro)
+                const px = x - width / 2;
+                const py = height / 2 - y;
+                pontos.push({ x: px, y: py });
+                sumX += px;
+                sumY += py;
+                count++;
+            }
+        }
+    }
+    const imagemCentro = { x: sumX / count, y: sumY / count };
+    return { pontos, imagemCentro };
+}
+
+// Renderiza os pontos da imagem no canvas
+function renderImagemObjeto(pontos) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    desenharQuadrantes();
+    // Fundo branco
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Desenha pontos do objeto
+    ctx.fillStyle = "black";
+    for (const p of pontos) {
+        setPixel(Math.round(p.x), Math.round(p.y));
+    }
+}
+
+function atualizarCentroImagem() {
+    if (imagemObjetoPontos.length === 0) return;
+    let sumX = 0, sumY = 0;
+    for (const p of imagemObjetoPontos) {
+        sumX += p.x;
+        sumY += p.y;
+    }
+    imagemCentro = {
+        x: sumX / imagemObjetoPontos.length,
+        y: sumY / imagemObjetoPontos.length
+    };
+}
+
+function aplicarTransformacaoImagem(matriz) {
+    if (imagemObjetoPontos.length === 0) {
+        alert("Carregue uma imagem PGM primeiro!");
+        return;
+    }
+    imagemObjetoPontos = imagemObjetoPontos.map(p => {
+        const [x, y] = multiplicarMatrizVetor(matriz, [p.x, p.y]);
+        return { x, y };
+    });
+    atualizarCentroImagem(); // Atualiza o centro após a transformação
+    renderImagemObjeto(imagemObjetoPontos);
+}
+
+// Handlers para cada transformação (usando os mesmos campos do quadrado)
+function aplicarTranslacaoImagem() {
+    const dx = parseFloat(document.getElementById("x-translation").value) || 0;
+    const dy = parseFloat(document.getElementById("y-translation").value) || 0;
+    const matriz = criarMatrizTranslacao(dx, dy);
+    aplicarTransformacaoImagem(matriz);
+}
+function aplicarEscalaImagem() {
+    const sx = parseFloat(document.getElementById("x-scale").value) || 1;
+    const sy = parseFloat(document.getElementById("y-scale").value) || 1;
+    // Escala em torno do centro do objeto
+    const t1 = criarMatrizTranslacao(-imagemCentro.x, -imagemCentro.y);
+    const escala = criarMatrizEscala(sx, sy);
+    const t2 = criarMatrizTranslacao(imagemCentro.x, imagemCentro.y);
+    const matriz = multiplicarMatrizes(t2, multiplicarMatrizes(escala, t1));
+    aplicarTransformacaoImagem(matriz);
+}
+function aplicarRotacaoImagem() {
+    const angulo = parseFloat(document.getElementById("angle").value) || 0;
+    const cx = parseFloat(document.getElementById("x-rotation").value) || imagemCentro.x;
+    const cy = parseFloat(document.getElementById("y-rotation").value) || imagemCentro.y;
+    const matriz = criarMatrizRotacao(angulo, cx, cy);
+    aplicarTransformacaoImagem(matriz);
+}
+function aplicarReflexaoImagem() {
+    const refletirX = document.getElementById("x-ref").checked;
+    const refletirY = document.getElementById("y-ref").checked;
+    if (!refletirX && !refletirY) return;
+    const matriz = criarMatrizReflexao(refletirX, refletirY);
+    aplicarTransformacaoImagem(matriz);
+}
+function aplicarCisalhamentoImagem() {
+    const shx = parseFloat(document.getElementById("x-cis").value) || 0;
+    const shy = parseFloat(document.getElementById("y-cis").value) || 0;
+    const matriz = criarMatrizCisalhamento(shx, shy);
+    aplicarTransformacaoImagem(matriz);
+}
+
+
+// Handler para upload e renderização
+document.getElementById("render-pgm-btn").addEventListener("click", () => {
+    const fileInput = document.getElementById("pgm-upload");
+    if (!fileInput.files[0]) {
+        alert("Selecione um arquivo PGM.");
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const result = parsePGM(e.target.result);
+            if (!result) return;
+            imagemObjetoPontos = result.pontos;
+            imagemCentro = result.imagemCentro;
+            renderImagemObjeto(imagemObjetoPontos);
+        } catch (err) {
+            alert("Erro ao ler PGM: " + err.message);
+        }
+    };
+    reader.readAsArrayBuffer(fileInput.files[0]);
+});
+
+// Botões para aplicar transformações na imagem
+document.getElementById('img-translate-btn').addEventListener('click', function() {
+    const dx = parseFloat(document.getElementById('img-translate-x').value);
+    const dy = parseFloat(document.getElementById('img-translate-y').value);
+    // Aplica translação na imagem
+    const matriz = criarMatrizTranslacao(dx, dy);
+    aplicarTransformacaoImagem(matriz);
+});
+
+document.getElementById('img-scale-btn').addEventListener('click', function() {
+    const sx = parseFloat(document.getElementById('img-scale-x').value);
+    const sy = parseFloat(document.getElementById('img-scale-y').value);
+    // Escala em torno do centro da imagem
+    atualizarCentroImagem();
+    const t1 = criarMatrizTranslacao(-imagemCentro.x, -imagemCentro.y);
+    const escala = criarMatrizEscala(sx, sy);
+    const t2 = criarMatrizTranslacao(imagemCentro.x, imagemCentro.y);
+    const matriz = multiplicarMatrizes(t2, multiplicarMatrizes(escala, t1));
+    aplicarTransformacaoImagem(matriz);
+});
+
+document.getElementById('img-rotate-btn').addEventListener('click', function() {
+    const angle = parseFloat(document.getElementById('img-rotate-angle').value);
+    atualizarCentroImagem();
+    const matriz = criarMatrizRotacao(angle, imagemCentro.x, imagemCentro.y);
+    aplicarTransformacaoImagem(matriz);
+});
+
+document.getElementById('img-reflect-btn').addEventListener('click', function() {
+    const reflectX = document.getElementById('img-reflect-x').checked;
+    const reflectY = document.getElementById('img-reflect-y').checked;
+    const matriz = criarMatrizReflexao(reflectX, reflectY);
+    aplicarTransformacaoImagem(matriz);
+});
+
+document.getElementById('img-shear-btn').addEventListener('click', function() {
+    const shx = parseFloat(document.getElementById('img-shear-x').value);
+    const shy = parseFloat(document.getElementById('img-shear-y').value);
+    const matriz = criarMatrizCisalhamento(shx, shy);
+    aplicarTransformacaoImagem(matriz);
+});
+
+// Garante que o plano cartesiano seja desenhado após a imagem ser plotada
+function renderImagemObjeto(pontos) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Fundo branco
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    desenharQuadrantes(); // Desenha os eixos APÓS o fundo
+    // Desenha pontos do objeto
+    ctx.fillStyle = "black";
+    for (const p of pontos) {
+        setPixel(Math.round(p.x), Math.round(p.y));
+    }
+}
