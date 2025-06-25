@@ -9,6 +9,10 @@ original e processada, equalizar o histograma da imagem e fazer o download da im
 const imagesPath = {
     0: '../assets/lena.pgm',
     2: '../assets/airplane.pgm',
+    3: '../assets/pedrokid.pgm',
+    4: '../assets/kidnathan.pgm',
+    5: '../assets/pedroadult.pgm',
+    6: '../assets/nathanadult.pgm',
 };
 
 // ===============================

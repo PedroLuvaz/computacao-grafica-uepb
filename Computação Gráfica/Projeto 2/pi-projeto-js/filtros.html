@@ -11,6 +11,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="../css/bootstrap.min.css">
     <script src="../js/lib/bootstrap.bundle.min.js"></script>
+    <style>
+        /* Estilos para os contêineres das tabelas de pixels */
+        .pixel-table-container {
+            max-height: 500px; /* Define uma altura máxima */
+            overflow: auto;    /* Adiciona barras de rolagem vertical e horizontal quando necessário */
+            border: 1px solid #dee2e6; /* Borda sutil para delimitar a área */
+            padding: 1rem;
+            margin-top: 1rem;
+            background-color: #f8f9fa; /* Cor de fundo leve */
+        }
+        /* Estilo para a célula do pixel destacado */
+        .pixel-highlight {
+            background-color: #ffc107 !important; /* Amarelo Bootstrap (com !important para garantir a sobreposição) */
+            color: black;
+            font-weight: bold;
+        }
+    </style>
 </head>
 
 <body>
@@ -61,20 +78,26 @@
         <!-- Page Content  -->
         <div id="content" class="p-4 p-md-5 pt-5">
             <main>
-                <div class="container-fluid p-0 m-0 justify-content-center d-grid" style="min-height: 400px;">
+                <div class="container-fluid p-0 m-0 justify-content-center d-grid">
                     <div class="row w-100 p-0 w-0">
                         <div class="col-lg-4 mb-2 align-items-center">
-                            <div class="card  mx-auto align-items-center" style="width:300px; height: 400px;">
+                            <div class="card  mx-auto align-items-center" style="width:300px; height: 450px;">
                                 <div class="card-body">
                                     <h5 class="card-title text-center">Imagem Original</h5>
                                     <div class="card-img-top" id="original-img"></div>
-                                    <div style="width: 256px; height: 50px;" class="text-center">
+                                    <div style="width: 256px;" class="text-center mt-2">
                                         <select class="form-select" aria-label="Selecionar imagem" id="img-selector">
                                             <option selected value="0">Lena.pgm</option>
                                             <option value="1">Lenasalp.pgm</option>
                                             <option value="2">Lenag.pgm</option>
                                             <option value="3">Airplane.pgm</option>
+                                            <option value="4">Pedrokid.pgm</option>
+                                            <option value="5">Nathankid.pgm</option>
                                         </select>
+                                    </div>
+                                    <div class="form-check form-switch mt-2">
+                                        <input class="form-check-input" type="checkbox" id="normalizeOriginalSwitch">
+                                        <label class="form-check-label" for="normalizeOriginalSwitch">Normalizar</label>
                                     </div>
                                 </div>
                             </div>
@@ -97,6 +120,10 @@
                                             <option value="8">Prewitt em Y</option>
                                             <option value="5">Sobel X</option>
                                             <option value="6">Sobel Y</option>
+                                            <option value="17">Laplace</option>
+                                            <option value="10">Gaussian Blur</option>
+                                            <option value="11">Gradiente X</option>
+                                            <option value="12">Gradiente Y</option>
                                             <option value="24">Alto Reforço</option>
                                         </select>
                                     </div>
@@ -136,7 +163,8 @@
                                     <h5 class="card-title text-center">Imagem Processada</h5>
                                     <div class="card-img-top" id="processed-img"></div>
                                     <div class="form-check form-switch" style="margin: 10px 0 10px">
-                                        <input class="form-check-input" type="checkbox" id="normalizeSwitch" style="display:none;">
+                                        <input class="form-check-input" type="checkbox" id="normalizeSwitch">
+                                        <label class="form-check-label" for="normalizeSwitch">Normalizar</label>
                                     </div>
                                     <div class="btn-group d-flex" role="group">
                                         <button type="button" class="btn btn-primary" id="apply-again-btn" style="display:none;">
@@ -147,6 +175,25 @@
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seção para exibir as tabelas de pixels -->
+                    <div class="row w-100 p-0 w-0 mt-4">
+                        <!-- Coluna para a tabela da imagem original -->
+                        <div class="col-lg-6">
+                            <h5>Tabela de Pixels (Original)</h5>
+                            <div id="original-pixels-table" class="pixel-table-container">
+                                <p class="text-muted">A tabela de pixels da imagem original será carregada aqui...</p>
+                            </div>
+                        </div>
+                
+                        <!-- Coluna para a tabela da imagem processada -->
+                        <div class="col-lg-6">
+                            <h5>Tabela de Pixels (Processada)</h5>
+                            <div id="processed-pixels-table" class="pixel-table-container">
+                                <p class="text-muted">Selecione um filtro para gerar a tabela de pixels da imagem processada.</p>
                             </div>
                         </div>
                     </div>

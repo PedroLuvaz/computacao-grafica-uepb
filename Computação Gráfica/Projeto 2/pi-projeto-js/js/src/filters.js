@@ -93,6 +93,8 @@ const imagesPath = {
     1: '../assets/lenasalp.pgm',
     2: '../assets/lenag.pgm',
     3: '../assets/airplane.pgm',
+    4: "../assets/pedrokid.pgm",
+    5: "../assets/kidnathan.pgm",
 };
 
 // ===============================
@@ -118,22 +120,51 @@ let doNormalize = false;
 
 let img = new Image();
 let processedImg = new Image();
+let originalImageData = []; // Para guardar uma cópia dos dados originais
 
 // ===============================
 // Configuração do canvas principal (imagem original)
 // ===============================
 const mainCanvas = function (sketch) {
+    const normalizeOriginalSwitch = document.getElementById('normalizeOriginalSwitch');
+
+    // Função a ser chamada após o carregamento de uma imagem
+    const onImageLoaded = (loadedImg) => {
+        // Guarda uma cópia profunda para evitar modificações
+        originalImageData = JSON.parse(JSON.stringify(loadedImg.data));
+        // Renderiza a tabela com os dados brutos por padrão
+        renderPixelTable('original-pixels-table', originalImageData);
+        // Garante que o switch de normalização comece desmarcado
+        if (normalizeOriginalSwitch) normalizeOriginalSwitch.checked = false;
+    };
+
     sketch.setup = function () {
         sketch.createCanvas(256, 256).parent("original-img");
-        readImage('../assets/lena.pgm', sketch, img);
+        // Usa o callback para renderizar a tabela após o carregamento
+        readImage('../assets/lena.pgm', sketch, img, onImageLoaded);
     }
 
-    imgSelector.onchange = _ => readImage(imagesPath[imgSelector.value], sketch, img);
+    imgSelector.onchange = _ => readImage(imagesPath[imgSelector.value], sketch, img, onImageLoaded);
+
+    if (normalizeOriginalSwitch) {
+        normalizeOriginalSwitch.onchange = function () {
+            if (originalImageData.length === 0) return;
+
+            if (this.checked) {
+                const normalizedData = normalize(originalImageData, img.w, img.h);
+                renderPixelTable('original-pixels-table', normalizedData);
+            } else {
+                renderPixelTable('original-pixels-table', originalImageData);
+            }
+        };
+    }
 
     applyAgainBtn.onclick = function () {
         if (processedImg.w !== 0) {
             img.data = processedImg.data;
             paintImage(sketch, img);
+            // A imagem "original" agora é a processada. Atualiza a cópia e a tabela.
+            onImageLoaded(img);
         }
     }
 }
@@ -144,7 +175,7 @@ const mainCanvas = function (sketch) {
 const processedCanvas = function (sketch) {
     sketch.setup = function () {
         sketch.createCanvas(256, 256).parent("processed-img");
-        // define um valor padrão para o scalar
+        // Define um valor padrão para o scalar
         ahb.value = "1.5";  
     };
 
@@ -173,10 +204,31 @@ const processedCanvas = function (sketch) {
             processedImg.data = convolution(img, activeKernel, doNormalize);
         }
         paintImage(sketch, processedImg);
+        renderPixelTable('processed-pixels-table', processedImg.data);
     };
 
     normalizeSwitch.onchange = function () {
         doNormalize = !doNormalize;
+        // Re-apply the current filter to update processedImg.data with new normalization setting
+        let value = parseInt(filterSelector.value);
+        if (value !== 0) { // Check if a filter is active (not 'none')
+            processedImg.type = img.type;
+            processedImg.w = img.w;
+            processedImg.h = img.h;
+
+            if (value >= 19) { // filters de magnitude > 18
+                processedImg.data = operators[value](img);
+            } else if (value === 24) { // High-Boost filter
+                processedImg.data = highBoostFilter(img, ahb.value);
+            } else { // Convolution filters
+                activeKernel = kernel[value];
+                processedImg.data = convolution(img, activeKernel, doNormalize);
+            }
+        } else {
+            processedImg.data = img.data; // If no filter, processed is same as original
+        }
+        paintImage(sketch, processedImg);
+        renderPixelTable('processed-pixels-table', processedImg.data);
     };
 
     downloadBtn.onclick = function () {
@@ -187,6 +239,7 @@ const processedCanvas = function (sketch) {
     ahb.onchange = function () {
         let value = parseInt(filterSelector.value);
         if(value == 24) {
+            processedImg.type = img.type; processedImg.w = img.w; processedImg.h = img.h; // Ensure properties are set
             processedImg.data = highBoostFilter(img, ahb.value);
             paintImage(sketch, processedImg);
         }
@@ -251,6 +304,22 @@ function highBoostFilter(img, A) {
     }
 
     return doNormalize ? normalize(result, w, h) : result;
+}
+
+// ===============================
+// Função para renderizar tabela de pixels (descomentada e ativada)
+// ===============================
+function renderPixelTable(containerId, imageMatrix) {
+    let html = '<table class="table table-sm table-bordered" style="font-size:10px"><tbody>';
+    for (let row of imageMatrix) {
+        html += '<tr>';
+        for (let val of row) {
+            html += `<td style="text-align:center">${val}</td>`; // Added text-align for better readability
+        }
+        html += '</tr>';
+    }
+    html += '</tbody></table>';
+    document.getElementById(containerId).innerHTML = html;
 }
 
 // ===============================

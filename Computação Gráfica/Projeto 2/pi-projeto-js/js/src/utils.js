@@ -5,15 +5,15 @@ function Image() {
     this.h = 0;
 }
 
-function readImage(path, sketch, img) {
-    fetch(path).then(data => data.blob().then(file => buildImage(file, sketch, img)));
+function readImage(path, sketch, img, callback) {
+    fetch(path).then(data => data.blob().then(file => buildImage(file, sketch, img, callback)));
 }
 
 /*
 Nesse trecho de código, temos a definição da função buildImage, que é responsável por ler um arquivo de 
 imagem no formato PGM (Portable Gray Map) e criar uma representação da imagem dentro de um objeto img.
 */
-const buildImage = function (file, sketch, img) {
+const buildImage = function (file, sketch, img, callback) {
     let reader = new FileReader();
 
     reader.readAsText(file);
@@ -37,7 +37,9 @@ const buildImage = function (file, sketch, img) {
         for (let i = count; i < lines.length; i++) {
             let line = lines[i].trim().split(separator);
             for (let j = 0; j < line.length; j++) {
-                flat[k++] = parseInt(line[j]);
+                if(line[j]) { // Ignora strings vazias que podem surgir de múltiplos espaços
+                    flat[k++] = parseInt(line[j]) || 0; // Usa 0 se o parsing falhar (resultar em NaN)
+                }
             }
         }
 
@@ -50,6 +52,9 @@ const buildImage = function (file, sketch, img) {
         }
 
         paintImage(sketch, img);
+        if (callback) {
+            callback(img);
+        }
     }
 }
 
@@ -102,7 +107,7 @@ function convolution(img, k, doNormalize) {
 
             acc += k[0][2] * (i === h - 1 || j === 0 ? 0 : data[i + 1][j - 1]);
             acc += k[0][1] * (i === h - 1 ? 0 : data[i + 1][j]);
-            acc += k[0][0] * (i === h - 1 || j === data.w - 1 ? 0 : data[i + 1][j + 1]);
+            acc += k[0][0] * (i === h - 1 || j === w - 1 ? 0 : data[i + 1][j + 1]);
 
             res[i][j] = acc
         }
@@ -271,4 +276,3 @@ function inTriangle(p, t) {
 
     return ((u >= 0) && (v >= 0) && (u + v < 1));
 }
-

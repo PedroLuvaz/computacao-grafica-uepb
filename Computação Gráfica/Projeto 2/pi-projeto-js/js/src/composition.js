@@ -29,6 +29,8 @@ let selectedOperator = null;
 const imagesPath = {
     0: '../assets/lena.pgm',
     1: '../assets/airplane.pgm',
+    2: '../assets/pedrokid.pgm',
+    3: '../assets/kidnathan.pgm'
 };
 
 const filterSelector = document.getElementById('input-filter');

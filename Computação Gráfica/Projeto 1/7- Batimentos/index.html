@@ -1,64 +1,73 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batimentos Cardíacos</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Batimentos Cardíacos</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
-    <!-- Barra lateral esquerda -->
-    <div class="sidebar" id="left-sidebar">
-        <div class="control-group">
-            <h3>Configurações</h3>
-            <button id="reset-btn">Reiniciar Simulação</button>
-        </div>
-
-        <div class="tab-buttons">
-            <button class="batimento-btn" data-tab="cardio">Batimento</button>
-        </div>
-
-        <div class="control-group">
-            <h3>Velocidade</h3>
-            <div class="slider-container">
-                <label for="speedRange">Ritmo:</label>
-                <input type="range" id="speedRange" min="1" max="10" value="5">
-                <span id="speedValue">5</span>
-            </div>
-        </div>
-
-        <div class="control-group">
-            <h3>Histórico</h3>
-            <div id="historyBox" class="info-box">Nenhum batimento registrado.</div>
-        </div>
-
-        <button id="clear-btn">Limpar Histórico</button>
+  <!-- Barra lateral esquerda -->
+  <div class="sidebar" id="left-sidebar">
+    <div class="control-group">
+      <h3>Configurações</h3>
+      <button id="reset-btn">Reiniciar Simulação</button>
     </div>
 
-    <!-- Área principal com o canvas -->
-    <div class="main">
-        <br>
-        <canvas id="cardioCanvas" width="600" height="300"></canvas>
-        <br>
-        <p id="credits1">Implementado por: Erick Nathan, Pedro Lucas</p>
-        <p id="credits2">Computação Gráfica - Prof. Robson Pequeno de Souza</p>
-        <a id="back" href="../1-Tela Principal/index.html">Voltar ao Início</a>
+    <div class="tab-buttons">
+      <button class="batimento-btn" data-tab="cardio">Batimento</button>
     </div>
 
-    <!-- Barra lateral direita -->
-    <div class="sidebar" id="right-sidebar">
-        <div class="info-panel">
-            <h3>Informações</h3>
-            <div class="info-box">
-                Simulação de batimento cardíaco em tempo real.<br><br>
-                A linha vermelha representa os picos do coração.<br><br>
-                Use o controle de ritmo para ajustar a velocidade dos batimentos.
-            </div>
-        </div>
+    <div class="control-group">
+      <h3>Velocidade</h3>
+      <div class="slider-container">
+        <label for="speedRange">Ritmo:</label>
+        <input type="range" id="speedRange" min="1" max="10" value="5" />
+        <span id="speedValue">5</span>
+      </div>
     </div>
 
-    <!-- Script -->
-    <script src="script.js"></script>
+    <div class="control-group">
+      <h3>Histórico</h3>
+      <div id="historyBox" class="info-box">Nenhum batimento registrado.</div>
+    </div>
+
+    <div class="control-group">
+      <h3>Modo de Simulação</h3>
+      <select id="ecg-mode" style="width: 100%">
+        <option value="rest">Repouso</option>
+        <option value="run">Corrida</option>
+        <option value="stress">Estresse</option>
+        <option value="sleep">Sono</option>
+      </select>
+    </div>
+
+    <button id="clear-btn">Limpar Histórico</button>
+  </div>
+
+  <!-- Área principal -->
+  <div class="main">
+    <br />
+    <canvas id="cardioCanvas" width="600" height="300"></canvas>
+    <br />
+    <p id="credits1">Implementado por: Erick Nathan, Pedro Lucas</p>
+    <p id="credits2">Computação Gráfica - Prof. Robson Pequeno de Sousa</p>
+    <a id="back" href="../1-Tela Principal/index.html">Voltar ao Início</a>
+  </div>
+
+  <!-- Barra lateral direita -->
+  <div class="sidebar" id="right-sidebar">
+    <div class="info-panel">
+      <h3>Informações</h3>
+      <div class="info-box">
+        Simulação de batimento cardíaco em tempo real.<br /><br />
+        A linha vermelha representa os picos do coração.<br /><br />
+        Use o controle de ritmo para ajustar a velocidade dos batimentos.
+      </div>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script src="script.js"></script>
 </body>
 </html>
