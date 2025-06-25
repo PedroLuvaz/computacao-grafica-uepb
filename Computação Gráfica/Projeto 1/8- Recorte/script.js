@@ -381,6 +381,34 @@ document.getElementById("reset-btn").addEventListener("click", () => {
 });
 
 // ===============================
+// Evento para adicionar linha manualmente pelos inputs
+// ===============================
+document.getElementById("add-line-btn").addEventListener("click", () => {
+  const x1 = parseFloat(document.getElementById("x1").value);
+  const y1 = parseFloat(document.getElementById("y1").value);
+  const x2 = parseFloat(document.getElementById("x2").value);
+  const y2 = parseFloat(document.getElementById("y2").value);
+
+  if (
+    isNaN(x1) || isNaN(y1) ||
+    isNaN(x2) || isNaN(y2)
+  ) {
+    alert("Preencha todos os campos com valores válidos.");
+    return;
+  }
+
+  lines.push([x1, y1, x2, y2]);
+  draw();
+
+  // Limpa os campos após adicionar
+  document.getElementById("x1").value = "";
+  document.getElementById("y1").value = "";
+  document.getElementById("x2").value = "";
+  document.getElementById("y2").value = "";
+});
+
+
+// ===============================
 // Primeira renderização ao carregar a página
 // ===============================
 draw();
