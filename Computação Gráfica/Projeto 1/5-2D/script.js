@@ -854,3 +854,185 @@ function renderImagemObjeto(pontos) {
         setPixel(Math.round(p.x), Math.round(p.y));
     }
 }
+
+// ===============================
+// VIEWPORT (Recorte de Tela)
+// ===============================
+let viewportActive = false;
+let viewport = { xmin: -100, ymin: -100, xmax: 100, ymax: 100 };
+
+// UI handlers
+const viewportActiveCheckbox = document.getElementById('viewport-active');
+const viewportConfigDiv = document.getElementById('viewport-config');
+viewportActiveCheckbox.addEventListener('change', function() {
+    viewportActive = this.checked;
+    viewportConfigDiv.style.display = viewportActive ? 'block' : 'none';
+    updateViewportFromInputs();
+    redrawAll();
+});
+['viewport-xmin', 'viewport-ymin', 'viewport-xmax', 'viewport-ymax'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+        updateViewportFromInputs();
+        redrawAll();
+    });
+});
+function updateViewportFromInputs() {
+    viewport.xmin = parseInt(document.getElementById('viewport-xmin').value);
+    viewport.ymin = parseInt(document.getElementById('viewport-ymin').value);
+    viewport.xmax = parseInt(document.getElementById('viewport-xmax').value);
+    viewport.ymax = parseInt(document.getElementById('viewport-ymax').value);
+}
+
+// Desenha a viewport no canvas
+function drawViewportRect() {
+    if (!viewportActive) return;
+    ctx.save();
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([5, 5]);
+    ctx.strokeRect(
+        viewport.xmin + canvas.width / 2,
+        canvas.height / 2 - viewport.ymax,
+        viewport.xmax - viewport.xmin,
+        viewport.ymax - viewport.ymin
+    );
+    ctx.restore();
+}
+
+// Cohen-Sutherland para recorte de linhas
+function cohenSutherlandClip(x1, y1, x2, y2, vp) {
+    const INSIDE = 0, LEFT = 1, RIGHT = 2, BOTTOM = 4, TOP = 8;
+    function computeOutCode(x, y) {
+        let code = INSIDE;
+        if (x < vp.xmin) code |= LEFT;
+        else if (x > vp.xmax) code |= RIGHT;
+        if (y < vp.ymin) code |= BOTTOM;
+        else if (y > vp.ymax) code |= TOP;
+        return code;
+    }
+    let outcode0 = computeOutCode(x1, y1);
+    let outcode1 = computeOutCode(x2, y2);
+    let accept = false;
+    while (true) {
+        if (!(outcode0 | outcode1)) { accept = true; break; }
+        else if (outcode0 & outcode1) { break; }
+        else {
+            let x, y;
+            let outcodeOut = outcode0 ? outcode0 : outcode1;
+            if (outcodeOut & TOP) {
+                x = x1 + (x2 - x1) * (vp.ymax - y1) / (y2 - y1);
+                y = vp.ymax;
+            } else if (outcodeOut & BOTTOM) {
+                x = x1 + (x2 - x1) * (vp.ymin - y1) / (y2 - y1);
+                y = vp.ymin;
+            } else if (outcodeOut & RIGHT) {
+                y = y1 + (y2 - y1) * (vp.xmax - x1) / (x2 - x1);
+                x = vp.xmax;
+            } else if (outcodeOut & LEFT) {
+                y = y1 + (y2 - y1) * (vp.xmin - x1) / (x2 - x1);
+                x = vp.xmin;
+            }
+            if (outcodeOut === outcode0) {
+                x1 = x; y1 = y; outcode0 = computeOutCode(x1, y1);
+            } else {
+                x2 = x; y2 = y; outcode1 = computeOutCode(x2, y2);
+            }
+        }
+    }
+    if (accept) return [x1, y1, x2, y2];
+    else return null;
+}
+
+// DDA para desenhar um pixel de cor customizada
+function setPixelColor(x, y, color) {
+    const canvasX = x + canvas.width / 2;
+    const canvasY = canvas.height / 2 - y;
+    ctx.fillStyle = color;
+    ctx.fillRect(canvasX, canvasY, 1, 1);
+}
+
+// Redefina o DDA para usar recorte se viewport ativa e desenhar vermelho fora
+function ddaClipped(x1, y1, x2, y2) {
+    if (viewportActive) {
+        // Desenha parte dentro da viewport em preto, fora em vermelho
+        // 1. Desenha parte dentro (clipped) em preto
+        const clipped = cohenSutherlandClip(x1, y1, x2, y2, viewport);
+        if (clipped) {
+            ddaColor(clipped[0], clipped[1], clipped[2], clipped[3], "black");
+        }
+        // 2. Desenha parte(s) fora em vermelho
+        // Se a linha original não está totalmente dentro, desenhe as partes fora
+        // a) Antes do segmento visível
+        // b) Depois do segmento visível
+        // Se não há parte visível, desenhe tudo em vermelho
+        if (!clipped) {
+            ddaColor(x1, y1, x2, y2, "red");
+        } else {
+            // Desenha do ponto inicial até o início do segmento visível (se diferente)
+            if (x1 !== clipped[0] || y1 !== clipped[1]) {
+                ddaColor(x1, y1, clipped[0], clipped[1], "red");
+            }
+            // Desenha do fim do segmento visível até o ponto final (se diferente)
+            if (x2 !== clipped[2] || y2 !== clipped[3]) {
+                ddaColor(clipped[2], clipped[3], x2, y2, "red");
+            }
+        }
+    } else {
+        dda(x1, y1, x2, y2);
+    }
+}
+
+// DDA com cor customizada
+function ddaColor(x1, y1, x2, y2, color) {
+    const length = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1));
+    const xinc = (x2 - x1) / length;
+    const yinc = (y2 - y1) / length;
+    let x = x1;
+    let y = y1;
+    setPixelColor(Math.round(x), Math.round(y), color);
+    for (let i = 0; i < length; i++) {
+        x += xinc;
+        y += yinc;
+        setPixelColor(Math.round(x), Math.round(y), color);
+    }
+}
+
+// Redefina redesenharQuadrado para usar DDA com recorte
+function redesenharQuadrado(pontos) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    desenharQuadrantes();
+    for (let i = 0; i < pontos.length; i++) {
+        const proximo = (i + 1) % pontos.length;
+        ddaClipped(pontos[i].x, pontos[i].y, pontos[proximo].x, pontos[proximo].y);
+    }
+    drawViewportRect();
+}
+
+// Redefina renderImagemObjeto para recortar pixels fora da viewport e pintar vermelho
+function renderImagemObjeto(pontos) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    desenharQuadrantes();
+    for (const p of pontos) {
+        if (viewportActive) {
+            if (
+                p.x < viewport.xmin || p.x > viewport.xmax ||
+                p.y < viewport.ymin || p.y > viewport.ymax
+            ) {
+                setPixelColor(Math.round(p.x), Math.round(p.y), "red");
+            } else {
+                setPixelColor(Math.round(p.x), Math.round(p.y), "black");
+            }
+        } else {
+            setPixelColor(Math.round(p.x), Math.round(p.y), "black");
+        }
+    }
+    drawViewportRect();
+}
+
+// Redesenha tudo (quadrado e imagem) ao mudar viewport
+function redrawAll() {
+    if (quadradoAtual.length > 0) redesenharQuadrado(quadradoAtual);
+    if (imagemObjetoPontos.length > 0) renderImagemObjeto(imagemObjetoPontos);
+}

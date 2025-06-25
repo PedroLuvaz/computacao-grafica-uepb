@@ -935,9 +935,240 @@ function drawInWorldWindow() {
     }
 }
 
+// Viewport state
+let viewportActive = false;
+let viewport = { xmin: -50, ymin: -50, xmax: 50, ymax: 50 };
+
+// UI listeners para viewport
+document.getElementById('viewport-active').addEventListener('change', (e) => {
+    viewportActive = e.target.checked;
+    drawObject();
+});
+['viewport-xmin', 'viewport-ymin', 'viewport-xmax', 'viewport-ymax'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+        viewport.xmin = parseFloat(document.getElementById('viewport-xmin').value);
+        viewport.ymin = parseFloat(document.getElementById('viewport-ymin').value);
+        viewport.xmax = parseFloat(document.getElementById('viewport-xmax').value);
+        viewport.ymax = parseFloat(document.getElementById('viewport-ymax').value);
+        drawObject();
+    });
+});
+
+// Cohen-Sutherland codes para 3D (usando só X e Y para viewport 2D)
+function computeOutCode(x, y, vp) {
+    let code = 0;
+    if (x < vp.xmin) code |= 1; // esquerda
+    else if (x > vp.xmax) code |= 2; // direita
+    if (y < vp.ymin) code |= 4; // abaixo
+    else if (y > vp.ymax) code |= 8; // acima
+    return code;
+}
+
+// Cohen-Sutherland para recorte de linhas 3D projetadas no plano XY
+function cohenSutherlandClip(x0, y0, x1, y1, vp) {
+    let outcode0 = computeOutCode(x0, y0, vp);
+    let outcode1 = computeOutCode(x1, y1, vp);
+    let accept = false;
+    let clipped0 = {x: x0, y: y0};
+    let clipped1 = {x: x1, y: y1};
+
+    while (true) {
+        if (!(outcode0 | outcode1)) {
+            accept = true;
+            break;
+        } else if (outcode0 & outcode1) {
+            break;
+        } else {
+            let outcodeOut = outcode0 ? outcode0 : outcode1;
+            let x, y;
+            if (outcodeOut & 8) { // acima
+                x = x0 + (x1 - x0) * (vp.ymax - y0) / (y1 - y0);
+                y = vp.ymax;
+            } else if (outcodeOut & 4) { // abaixo
+                x = x0 + (x1 - x0) * (vp.ymin - y0) / (y1 - y0);
+                y = vp.ymin;
+            } else if (outcodeOut & 2) { // direita
+                y = y0 + (y1 - y0) * (vp.xmax - x0) / (x1 - x0);
+                x = vp.xmax;
+            } else if (outcodeOut & 1) { // esquerda
+                y = y0 + (y1 - y0) * (vp.xmin - x0) / (x1 - x0);
+                x = vp.xmin;
+            }
+            if (outcodeOut === outcode0) {
+                clipped0.x = x; clipped0.y = y;
+                outcode0 = computeOutCode(x, y, vp);
+            } else {
+                clipped1.x = x; clipped1.y = y;
+                outcode1 = computeOutCode(x, y, vp);
+            }
+        }
+    }
+    if (accept) {
+        return { accept: true, p0: clipped0, p1: clipped1 };
+    } else {
+        return { accept: false };
+    }
+}
+
+// Desenha a viewport no canvas principal
+function drawViewportRect() {
+    if (!viewportActive) return;
+    // Projeta os cantos da viewport para o canvas
+    const p1 = projectPoint(viewport.xmin, viewport.ymin, 0);
+    const p2 = projectPoint(viewport.xmax, viewport.ymin, 0);
+    const p3 = projectPoint(viewport.xmax, viewport.ymax, 0);
+    const p4 = projectPoint(viewport.xmin, viewport.ymax, 0);
+
+    ctx.save();
+    ctx.setLineDash([5, 5]);
+    ctx.strokeStyle = 'blue';
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.lineTo(p3.x, p3.y);
+    ctx.lineTo(p4.x, p4.y);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+}
+
+// Altere a função drawObject para usar o recorte
+function drawObject() {
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    drawFixedAxes();
+
+    if (!currentObject) return;
+
+    // Desenha as arestas com recorte
+    for (const edge of objectEdges) {
+        const v1 = objectVertices[edge[0]];
+        const v2 = objectVertices[edge[1]];
+        const p1 = projectPoint(v1[0], v1[1], v1[2]);
+        const p2 = projectPoint(v2[0], v2[1], v2[2]);
+
+        if (viewportActive) {
+            // Use coordenadas do mundo para clipping
+            const clip = cohenSutherlandClip(v1[0], v1[1], v2[0], v2[1], viewport);
+            if (clip.accept) {
+                // Parte dentro: preto
+                const q1 = projectPoint(clip.p0.x, clip.p0.y, v1[2]);
+                const q2 = projectPoint(clip.p1.x, clip.p1.y, v2[2]);
+                drawLineDDA(q1.x, q1.y, q2.x, q2.y, '#111');
+                // Se houve recorte, desenhe as partes fora em vermelho
+                if (clip.p0.x !== v1[0] || clip.p0.y !== v1[1]) {
+                    const r1 = projectPoint(v1[0], v1[1], v1[2]);
+                    drawLineDDA(r1.x, r1.y, q1.x, q1.y, 'red');
+                }
+                if (clip.p1.x !== v2[0] || clip.p1.y !== v2[1]) {
+                    const r2 = projectPoint(v2[0], v2[1], v2[2]);
+                    drawLineDDA(r2.x, r2.y, q2.x, q2.y, 'red');
+                }
+            } else {
+                // Totalmente fora: vermelho
+                drawLineDDA(p1.x, p1.y, p2.x, p2.y, 'red');
+            }
+        } else {
+            drawLineDDA(p1.x, p1.y, p2.x, p2.y, '#111');
+        }
+    }
+
+    // Desenha os vértices
+    for (const vertex of objectVertices) {
+        const p = projectPoint(vertex[0], vertex[1], vertex[2]);
+        setPixel(p.x, p.y, '#222');
+    }
+
+    drawViewportRect();
+    updateObjectInfo();
+    drawInWorldWindow();
+}
+
+// Altere a função drawInWorldWindow para desenhar a viewport
+function drawInWorldWindow() {
+    const size = 300;
+    worldWindowCtx.fillStyle = 'white';
+    worldWindowCtx.fillRect(0, 0, size, size);
+
+    if (!currentObject) return;
+
+    // Limites da janela do mundo
+    const xMin = -100, yMin = -100, xMax = 100, yMax = 100;
+    function worldToCanvas(x, y) {
+        const cx = ((x - xMin) / (xMax - xMin)) * size;
+        const cy = size - ((y - yMin) / (yMax - yMin)) * size;
+        return { x: cx, y: cy };
+    }
+
+    // Eixos
+    const center = worldToCanvas(0, 0);
+    drawLineDDAWorld(0, center.y, size, center.y, 'red');
+    drawLineDDAWorld(center.x, 0, center.x, size, 'green');
+
+    // Arestas com recorte visual
+    for (const edge of objectEdges) {
+        const v1 = objectVertices[edge[0]];
+        const v2 = objectVertices[edge[1]];
+
+        if (viewportActive) {
+            // Use coordenadas do mundo para clipping
+            const clip = cohenSutherlandClip(v1[0], v1[1], v2[0], v2[1], viewport);
+            if (clip.accept) {
+                // Parte dentro: preto
+                const q1 = worldToCanvas(clip.p0.x, clip.p0.y);
+                const q2 = worldToCanvas(clip.p1.x, clip.p1.y);
+                drawLineDDAWorld(q1.x, q1.y, q2.x, q2.y, '#111');
+                // Se houve recorte, desenhe as partes fora em vermelho
+                if (clip.p0.x !== v1[0] || clip.p0.y !== v1[1]) {
+                    const r1 = worldToCanvas(v1[0], v1[1]);
+                    drawLineDDAWorld(r1.x, r1.y, q1.x, q1.y, 'red');
+                }
+                if (clip.p1.x !== v2[0] || clip.p1.y !== v2[1]) {
+                    const r2 = worldToCanvas(v2[0], v2[1]);
+                    drawLineDDAWorld(r2.x, r2.y, q2.x, q2.y, 'red');
+                }
+            } else {
+                // Totalmente fora: vermelho
+                const p1 = worldToCanvas(v1[0], v1[1]);
+                const p2 = worldToCanvas(v2[0], v2[1]);
+                drawLineDDAWorld(p1.x, p1.y, p2.x, p2.y, 'red');
+            }
+        } else {
+            // Sem viewport, desenha normalmente
+            const p1 = worldToCanvas(v1[0], v1[1]);
+            const p2 = worldToCanvas(v2[0], v2[1]);
+            drawLineDDAWorld(p1.x, p1.y, p2.x, p2.y, '#111');
+        }
+    }
+
+    // Desenha a viewport
+    if (viewportActive) {
+        const vp1 = worldToCanvas(viewport.xmin, viewport.ymin);
+        const vp2 = worldToCanvas(viewport.xmax, viewport.ymin);
+        const vp3 = worldToCanvas(viewport.xmax, viewport.ymax);
+        const vp4 = worldToCanvas(viewport.xmin, viewport.ymax);
+        worldWindowCtx.save();
+        worldWindowCtx.setLineDash([5, 5]);
+        worldWindowCtx.strokeStyle = 'blue';
+        worldWindowCtx.beginPath();
+        worldWindowCtx.moveTo(vp1.x, vp1.y);
+        worldWindowCtx.lineTo(vp2.x, vp2.y);
+        worldWindowCtx.lineTo(vp3.x, vp3.y);
+        worldWindowCtx.lineTo(vp4.x, vp4.y);
+        worldWindowCtx.closePath();
+        worldWindowCtx.stroke();
+        worldWindowCtx.setLineDash([]);
+        worldWindowCtx.restore();
+    }
+}
+
+
 // Inicialização
 ctx.fillStyle = 'white';
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 drawFixedAxes(); 
 drawOctants();
 updateObjectInfo();
+

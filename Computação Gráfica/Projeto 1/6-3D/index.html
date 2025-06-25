@@ -163,6 +163,30 @@
             <button id="apply-sequence-btn">Aplicar Sequência</button>
         </div>
 
+        <div class="control-group">
+            <h3>Viewport 3D</h3>
+            <div class="input-row">
+                <label>Ativar Viewport:</label>
+                <input type="checkbox" id="viewport-active">
+            </div>
+            <div class="input-row">
+                <label>Xmin:</label>
+                <input type="number" id="viewport-xmin" value="-50">
+            </div>
+            <div class="input-row">
+                <label>Ymin:</label>
+                <input type="number" id="viewport-ymin" value="-50">
+            </div>
+            <div class="input-row">
+                <label>Xmax:</label>
+                <input type="number" id="viewport-xmax" value="50">
+            </div>
+            <div class="input-row">
+                <label>Ymax:</label>
+                <input type="number" id="viewport-ymax" value="50">
+            </div>
+        </div>
+
         <button id="clear-btn">Limpar Tudo</button>
 
     </div>
@@ -177,7 +201,7 @@
     </div>
 
     <div class="main">
-        <h3>Janela de Coordenadas do Mundo</h3>
+        <h3>View Port</h3>
         <canvas id="world-window" width="300" height="300" style="border: 1px solid black;"></canvas>
     </div>
 
