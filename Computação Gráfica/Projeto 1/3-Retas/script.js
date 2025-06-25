@@ -256,55 +256,75 @@ function dda(x1, y1, x2, y2) {
 }
 
 // ===============================
-// Algoritmo do Ponto Médio (Bresenham) para desenhar retas
+// Algoritmo do Ponto Médio (Bresenham) para desenhar retas (8 oitantes)
 // ===============================
 function pontoMedio(x1, y1, x2, y2) {
-    const dx = x2 - x1;
-    const dy = y2 - y1;
+    let dx = x2 - x1;
+    let dy = y2 - y1;
 
-    if(dy < dx) { // |m| < 1.0 (1º Oitante)
-        let ds = 2 * dy - dx;
-        const incE = 2 * dy;
-        const incNE = 2 * (dy - dx);
+    let x = x1;
+    let y = y1;
+    let count = 0;
 
-        let x = x1;
-        let y = y1;
-        let count = 0;
+    // Determina o sentido de incremento
+    const sx = dx >= 0 ? 1 : -1;
+    const sy = dy >= 0 ? 1 : -1;
 
-        setPixel(x, y);
+    dx = Math.abs(dx);
+    dy = Math.abs(dy);
 
-        while (x < x2) {
-            if (ds <= 0) {
-                ds += incE;
-                x += 1;
+    // Determina o oitante
+    let oitante = '';
+    if (sx === 1 && sy === 1 && dx >= dy) oitante = '1º oitante (0° a 45°)';
+    else if (sx === 1 && sy === 1 && dx < dy) oitante = '2º oitante (45° a 90°)';
+    else if (sx === -1 && sy === 1 && dx < dy) oitante = '3º oitante (90° a 135°)';
+    else if (sx === -1 && sy === 1 && dx >= dy) oitante = '4º oitante (135° a 180°)';
+    else if (sx === -1 && sy === -1 && dx >= dy) oitante = '5º oitante (180° a 225°)';
+    else if (sx === -1 && sy === -1 && dx < dy) oitante = '6º oitante (225° a 270°)';
+    else if (sx === 1 && sy === -1 && dx < dy) oitante = '7º oitante (270° a 315°)';
+    else if (sx === 1 && sy === -1 && dx >= dy) oitante = '8º oitante (315° a 360°)';
+
+    // Mostra o oitante na barra lateral
+    let oitanteDiv = document.createElement("div");
+    oitanteDiv.innerHTML = `<strong>Oitante:</strong> ${oitante}<hr>`;
+    scrollContainer.appendChild(oitanteDiv);
+
+    setPixel(x, y);
+    addCoordToSidebar(x, y, count);
+
+    if (dx > dy) {
+        // Oitantes com |m| <= 1
+        let d = 2 * dy - dx;
+        let incE = 2 * dy;
+        let incNE = 2 * (dy - dx);
+
+        for (let i = 0; i < dx; i++) {
+            if (d <= 0) {
+                d += incE;
+                x += sx;
             } else {
-                ds += incNE;
-                x += 1;
-                y += 1;
+                d += incNE;
+                x += sx;
+                y += sy;
             }
             count++;
             setPixel(x, y);
             addCoordToSidebar(x, y, count);
         }
-    } else { // |m| >= 1.0 (2º Oitante)
-        let ds = 2 * dx - dy;
-        const incE = 2 * dx;
-        const incNE = 2 * (dx - dy);
+    } else {
+        // Oitantes com |m| > 1
+        let d = 2 * dx - dy;
+        let incE = 2 * dx;
+        let incNE = 2 * (dx - dy);
 
-        let x = x1;
-        let y = y1;
-        let count = 0;
-
-        setPixel(x, y);
-
-        while (y < y2) {
-            if (ds <= 0) {
-                ds += incE;
-                y += 1;
+        for (let i = 0; i < dy; i++) {
+            if (d <= 0) {
+                d += incE;
+                y += sy;
             } else {
-                ds += incNE;
-                y += 1;
-                x += 1;
+                d += incNE;
+                y += sy;
+                x += sx;
             }
             count++;
             setPixel(x, y);

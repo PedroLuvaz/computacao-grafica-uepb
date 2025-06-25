@@ -597,6 +597,8 @@ document.getElementById('apply-sequence-btn').addEventListener('click', () => {
     transformationSequence2D = [];
 });
 
+
+
 // ===============================
 // PGM IMAGE HANDLING
 // ===============================
