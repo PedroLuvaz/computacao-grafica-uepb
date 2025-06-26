@@ -246,3 +246,12 @@ button:hover {
     width: 100px;
     margin-left: auto;
 }
+
+.vp3d {
+    margin-left: 50px;
+    width: 80px;
+}
+
+#viewport-active {
+    margin-left: 50px;
+}
