@@ -8322,6 +8322,7 @@ a[data-toggle="collapse"] {
   -webkit-transition: all 0.3s;
   transition: all 0.3s;
   background-color: var(--light-gray);
+  margin-top: 20px;
 }
 
 .btn.btn-primary {
@@ -8340,4 +8341,50 @@ a[data-toggle="collapse"] {
   }
 
 .subscribe-form .form-control {
-  background: #4897fc; }
+  background: #4897fc; 
+}
+
+#topbar {
+  background-color: #45a049;
+  padding: 10px 20px;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-links li a {
+  color: white;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.navbar-links li a:hover {
+  background-color: #495057;
+}

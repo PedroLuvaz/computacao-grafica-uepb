@@ -33,47 +33,19 @@
 <body>
 
     <div class="wrapper d-flex align-items-stretch">
-        <nav id="sidebar">
-          <div class="custom-menu">
-            <button type="button" id="sidebarCollapse" class="btn btn-primary">
-              <i class="fa fa-bars"></i>
-              <span class="sr-only">Toggle Menu</span>
-            </button>
-          </div>
-          <h1><a href="index.html" class="logo">Projeto 2 - Imagens</a></h1>
-          <ul class="list-unstyled components mb-5">
-            <li class="active">
-              <a href="filtros.html">Filtros
-              </a>
-            </li>
-            <li>
-              <a href="combinacao.html">Combinação
-              </a>
-            </li>
-            
-            <li>
-              <a href="transformacoes.html">Transformações
-              </a>
-            </li>
-            
-            <li>
-              <a href="histograma.html">Histograma
-              </a>
-            </li>
-      
-            <li>
-              <a href="morfologia.html">Morfologia
-              </a>
-            </li>
-
-            <li>    
-                <a href="morphing.html">Morfismo Temporal
-                </a>
-            </li>
-            
-          </ul>
-      
-        </nav>
+    <nav id="topbar" class="navbar">
+        <div class="navbar-container">
+        <a href="index.html" class="logo" style="margin-right: 10px;">Projeto 2 - Imagens</a>
+        <ul class="navbar-links">
+            <li><a href="filtros.html">Filtros</a></li>
+            <li><a href="combinacao.html">Combinação</a></li>
+            <li><a href="transformacoes.html">Transformações</a></li>
+            <li><a href="histograma.html">Histograma</a></li>
+            <li><a href="morfologia.html">Morfologia</a></li>
+            <li><a href="morphing.html">Morfismo Temporal</a></li>
+        </ul>
+        </div>
+    </nav>
       
         <!-- Page Content  -->
         <div id="content" class="p-4 p-md-5 pt-5">
@@ -96,8 +68,8 @@
                                         </select>
                                     </div>
                                     <div class="form-check form-switch mt-2">
-                                        <input class="form-check-input" type="checkbox" id="normalizeOriginalSwitch">
-                                        <label class="form-check-label" for="normalizeOriginalSwitch">Normalizar</label>
+                                        <input class="form-check-input" type="checkbox" id="normalizeOriginalSwitch" style="display: none;">
+                                        <label class="form-check-label" for="normalizeOriginalSwitch" style="display: none;">Normalizar</label>
                                     </div>
                                 </div>
                             </div>
