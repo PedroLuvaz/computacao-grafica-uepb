@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <title>Histograma</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="wrapper d-flex align-items-stretch">
+  <nav id="topbar" class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="logo" style="margin-right: 10px;">Projeto 2 - Imagens</a>
+      <ul class="navbar-links">
+        <li><a href="filtros.html">Filtros</a></li>
+        <li><a href="combinacao.html">Combinação</a></li>
+        <li><a href="transformacoes.html">Transformações</a></li>
+        <li><a href="histograma.html">Histograma</a></li>
+        <li><a href="morfologia.html">Morfologia</a></li>
+        <li><a href="morphing.html">Morfismo Temporal</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Page Content  -->
+  <div id="content" class="p-4 p-md-5 pt-5">
+    <main>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="card text-center" style="height: 450px;">
+                        <div class="card-body">
+                            <h5 class="card-title">Imagem Original</h5>
+                            <div class="card-img-top" id="original-img"></div>
+                            <div class="btn-group mx-auto" role="group" aria-label="Ações" style="width: 256px;">
+                                <select class="form-select" aria-label="Selecionar imagem" id="img-selector">
+                                    <option selected value="0">Lena</option>
+                                    <option value="2">Airplane</option>
+                                    <option value="3">Pedro Criança</option>
+                                    <option value="4">Nathan Criança</option>
+                                    <option value="5">Pedro Adulto</option>
+                                    <option value="6">Nathan Adulto</option>
+                                </select>
+                            </div>
+
+                            <button type="button" class="btn btn-outline-primary" id="equalize-btn" style="margin-top: 20px; width: 255px;">
+                                Equalizar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-5">
+                    <div class="card text-center" style="height: 600px;">
+                        <div class="card-body">
+                            <h5 class="card-title">Histogramas</h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="show-original-hist">
+                                Mostrar Original
+                            </button>
+                            <div class="card-img-top" id="original-hist" style="margin: 10px 0 10px;"></div>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="show-processed-hist">
+                                Mostrar Equalizado
+                            </button>
+                            <div class="card-img-top" id="processed-hist" style="margin: 10px 0 10px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card text-center" style="height: 400px;">
+                        <div class="card-body mx-auto">
+                            <h5 class="card-title">Imagem Processada</h5>
+                            <div class="card-img-top" id="processed-img"></div>
+                            <button type="button" class="btn btn-primary" id="download-btn" style="width: 256px; display: none;" >
+                                Baixar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js" integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/src/utils.js"></script>
+<script src="js/src/histogram.js"></script>
+</body>
+</html>

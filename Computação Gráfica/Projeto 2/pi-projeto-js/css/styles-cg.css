@@ -1,0 +1,41 @@
+.container,
+.container-fluid,
+.container-sm,
+.container-md,
+.container-lg,
+.container-xl {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+#screen {
+    display: table;
+    margin: auto;
+}
+
+.controles .row {
+    --bs-gutter-x: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.controles .row.botao {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.controles .row.botao button {
+    width: 100%;
+}
+
+#coordenadas-mouse {
+    text-align: center;
+    margin: 0 auto;
+    width: 600px;
+    font-size: 14px;
+}
+
+#mouseX,
+#mouseY {
+    width: 50px;
+}
