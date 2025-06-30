@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <title>Morfologia</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="wrapper d-flex align-items-stretch">
+  <nav id="topbar" class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="logo" style="margin-right: 10px;">Projeto 2 - Imagens</a>
+      <ul class="navbar-links">
+        <li><a href="filtros.html">Filtros</a></li>
+        <li><a href="combinacao.html">Combinação</a></li>
+        <li><a href="transformacoes.html">Transformações</a></li>
+        <li><a href="histograma.html">Histograma</a></li>
+        <li><a href="morfologia.html">Morfologia</a></li>
+        <li><a href="morphing.html">Morfismo Temporal</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Page Content  -->
+  <div id="content" class="p-4 p-md-5 pt-5">
+    <main>
+        <div class="container-fluid p-0 m-0 justify-content-center d-grid" style="min-height: 450px;">
+            <div class="row w-100 p-0 w-0">
+                <div class="col-lg-4 mb-2 align-items-center">
+                    <div class="card  mx-auto align-items-center" style="width:300px; height: 450px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-center">Imagem Original</h5>
+                            <div class="card-img-top" id="original-img" style="margin-bottom: 20px"></div>
+                            <div style="width: 256px; height: 50px;" class="text-center">
+                                <select class="form-select" aria-label="Selecionar filtro" id="img-selector">
+                                    <optgroup label="Imagens Binárias">
+                                        <option selected value="0">Digital</option>
+                                        <option value="2">Texto</option>
+                                        <option value="3">Mapa</option>
+                                    </optgroup>
+                                    <optgroup label="Imagens Em Níveis De Cinza">
+                                        <option value="4">Lena</option>
+                                        <option value="5">Airplane</option>
+                                        <option value="9">Tomografia</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-2">
+                    <div class="card  mx-auto align-items-center" style="width:300px; height: 450px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-center">Transformação</h5>
+                            <div style="width: 280px; height: 135px;" class="text-center">
+                                <select class="form-select" aria-label="Selecionar filtro" id="input-filter">
+                                    <option selected value="0">Original</option>
+                                    <optgroup label="Operadores Binários">
+                                        <option value="1">Complemento</option>
+                                        <option value="2">Erosão</option>
+                                        <option value="3">Dilatação</option>
+                                        <option value="4">Abertura</option>
+                                        <option value="5">Fechamento</option>
+                                        <option value="6">Contorno Externo</option>
+                                        <option value="7">Contorno Interno</option>
+                                        <option value="8">Gradiente</option>
+                                    </optgroup>
+                                    <optgroup label="Operadores Em Níveis De Cinza">
+                                        <option value="10">Erosão</option>
+                                        <option value="11">Dilatação</option>
+                                        <option value="12">Abertura</option>
+                                        <option value="13">Fechamento</option>
+                                        <option value="14">Gradiente</option>
+                                        <option value="15">Top-Hat</option>
+                                        <option value="16">Bottom-Hat</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div class="container text-end" style="width: 280px; display:none;">
+                                <form id="input-matrix" class="text-center" role="form">
+                                    <input type="number" name="array[]" value="0" min="0" max="1" step="1"
+                                           style="width: 65px; text-align:center">
+                                    <input type="number" name="array[]" value="1" min="0" max="1" step="1"
+                                           style="width: 65px; text-align:center">
+                                    <input type="number" name="array[]" value="0" min="0" max="1" step="1"
+                                           style="width: 65px; text-align:center">
+                                    <br>
+                                    <input type="number" name="array[]" value="1" min="0" max="1" step="1"
+                                           style="width: 65px; text-align:center">
+                                    <input type="number" name="array[]" value="1" min="0" max="1" step="1"
+                                           style="width: 65px; text-align:center">
+                                    <input type="number" name="array[]" value="1" min="0" max="1" step="1"
+                                           style="width: 65px; text-align:center">
+                                    <br>
+                                    <input type="number" name="array[]" value="0" min="0" max="1" step="1"
+                                           style="width: 65px; text-align:center">
+                                    <input type="number" name="array[]" value="1" min="0" max="1" step="1"
+                                           style="width: 65px; text-align:center">
+                                    <input type="number" name="array[]" value="0" min="0" max="1" step="1"
+                                           style="width: 65px; text-align:center">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-2">
+                    <div class="card  mx-auto align-items-center" style="width:300px; height: 450px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-center">Imagem Processada</h5>
+                            <div class="card-img-top" id="processed-img" style="margin-bottom: 20px"></div>
+                            <div class="btn-group d-flex" role="group">
+                                <button type="button" class="btn btn-primary" id="apply-again-btn" style="display:none;">
+                                    Reusar
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" id="download-btn" style="display:none;">
+                                    Baixar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js" integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/src/utils.js"></script>
+<script src="js/src/morphology.js"></script>
+</body>
+</html>

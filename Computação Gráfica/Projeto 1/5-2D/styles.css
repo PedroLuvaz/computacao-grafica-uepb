@@ -1,0 +1,403 @@
+body {
+    display: flex;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+p, h3 {
+    user-select: none;
+}
+
+.sidebar {
+    width: 220px;
+    padding: 10px;
+    background: #f0f0f0;
+    border: 1px solid black;
+    position: relative;
+}
+
+.main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; 
+    background: #ddd;
+}
+
+#bounds-info {
+    position: fixed;
+    padding: 5px 10px;
+    margin-bottom: 5px;
+    font-size: 14px;
+    text-align: center;
+    border-radius: 5px;
+    top: 10px;
+}
+
+canvas {
+    border: 1px solid black;
+    background-color: white;
+}
+
+#live-coords, #clicked-coords {
+    font-size: 13px;
+}
+
+h3 {
+    font-size: 15px;
+}
+
+#title-h {
+    margin: 5px;
+}
+
+.check {
+    margin: 0;
+}
+
+#credits1, #credits2 {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgb(112, 110, 110);
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+#back {
+    color: rgb(112, 110, 110); /* Cor do texto */
+    text-decoration: none; /* Remove o sublinhado padrão */
+    font-weight: bold; /* Deixa o texto um pouco mais forte */
+    padding: 5px;
+    transition: 0.3s; /* Suaviza a transição */
+    position: fixed;
+    top: 5%;
+    user-select: none;
+}
+
+#back:hover {
+    text-decoration: underline; /* Adiciona sublinhado ao passar o mouse */
+}
+
+/*informações sobre o objeto*/
+/* --- Sidebar Direita --- */
+#right-bar {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+#content-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+
+#content-bar > * {
+    margin: 0.5px 0; /* Controla o espaçamento vertical */
+}
+
+#object-info {
+    margin-top: 10px; /* Espaço abaixo do título */
+}
+
+.info-box {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    margin: 5px 0;
+    font-family: monospace;
+    font-size: 13px;
+}
+
+#clear-canvas-btn {
+    margin-top: auto;
+    padding: 8px;
+    border-radius: 10px;
+}
+
+/* Aumentar a altura do select */
+#algorithm-select {
+    height: 30px; /* Ajuste conforme necessário */
+    font-size: 15px; /* Ajuste o tamanho da fonte, se necessário */
+    border-radius: 5px;
+}
+
+.coord-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+#clicked-coords {
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+#no-line-message {
+    font-size: 13px;
+}
+
+
+#credits1 {
+    bottom: 20px;
+}
+
+#credits2 {
+    bottom: -5px;
+}
+
+.sidebar div {
+    margin-bottom: 5px;
+    gap: 3px; /
+}
+
+.sidebar label {
+    font-size: 13px;
+    margin-right: 10px;
+    font-weight: bold;
+    width: 50px;
+    text-align: left; 
+}
+
+/* input do quadrado */
+
+
+
+
+.sidebar input {
+    flex-grow: 1; 
+    padding: 3px;
+    font-size: 13px;
+    width: 50px; 
+    box-sizing: border-box;
+    height: 20px;
+}
+
+.number-inputs {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.number-inputs div {
+    margin-right: 10px; 
+}
+
+.type-op {
+    width: 200px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    margin: 0;
+}
+
+.number-inputs div:last-child {
+    margin-right: 0;
+}
+
+#angle {
+    width: 104px;
+}
+
+#input-xmax, #input-xmin, #input-ymax, #input-ymin {
+    margin-bottom: 5px;
+}
+
+#input-xmax, #input-xmin, #input-ymax, #input-ymin {
+    width: 120px;
+}
+
+.square-config label {
+    width: 90px; /* Ajuste conforme necessário */
+    text-align: start; /* Alinha o texto à direita */
+    display: inline-block;
+}
+
+.square-config input {
+    margin-left: 13px;
+}
+
+#left-bar button, #right-bar button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+#left-bar button:hover {
+    background-color: #45a049;
+}
+
+#right-bar button:hover {
+    background-color: #45a049;
+}
+
+#input-div {
+    width: 100%; 
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    position: absolute;
+    bottom: 10px; 
+    left: 50%;
+    transform: translateX(-50%);
+    overflow: visible;
+}
+
+hr {
+    width: 100%;
+    margin: 5px 0;
+}
+
+#draw-line-btn, #clear-btn {
+    border-radius: 15px;
+}
+
+#draw-square-btn {
+    margin-top: auto; /* Fixa o botão no final */
+    padding: 8px;
+    border-radius: 10px;
+    width: 90%;
+}
+
+.scroll-container {
+    width: 220px;  /* Largura fixa */
+    height: 520px; /* Altura fixa */
+    border: 2px solid #333;
+    padding: 10px;
+    overflow-y: auto; /* Permite rolagem vertical */
+    background: #f9f9f9;
+    box-sizing: border-box;
+}
+
+.control-group {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.input-row label {
+    width: 90px;
+    font-size: 13px;
+    margin-right: 10px;
+}
+
+/* Arredonda os botões da sequência de transformações */
+#add-to-sequence-btn,
+#apply-sequence-btn {
+    border-radius: 15px;
+    padding: 10px 20px;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+#draw-line-btn, #clear-btn {
+    border-radius: 15px;
+}
+#pgm-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px 10px 10px 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+#pgm-section input[type="file"] {
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+#render-pgm-btn {
+    background: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 20px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+#render-pgm-btn:hover {
+    background: #45a049;
+}
+
+.pgm-transform-group {
+    background: #fff;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pgm-transform-group h4 {
+    margin: 0 0 6px 0;
+    font-size: 15px;
+    color: #333;
+}
+
+.pgm-transform-group label {
+    margin-right: 8px;
+    font-size: 13px;
+    color: #444;
+    font-weight: bold;
+    width: 70px;
+    text-align: left;
+    display: inline-block;
+}
+
+.pgm-transform-group input[type="number"] {
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 3px;
+    margin-right: 8px;
+    font-size: 13px;
+    width: 60px;
+    box-sizing: border-box;
+    height: 20px;
+}
+
+.pgm-transform-group input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+.pgm-transform-group button {
+    background: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 20px;
+    margin-top: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.pgm-transform-group button:hover {
+    background: #45a049;
+}
