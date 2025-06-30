@@ -31,20 +31,39 @@ let minValue = 0;             // Valor mínimo do pixel (depende da imagem)
 const negative = (r) => 255 - r;
 
 // b) Transformação Gamma: S = c * r^γ, c = 1, 0 ≤ γ ≤ 1
-const gamma = (r) => Math.round(Math.pow(r / 255, gammaValue) * 255);
+// A fórmula foi ajustada para que valores maiores de 'gammaValue' clareiem a imagem, como solicitado.
+const gamma = (r) => {
+    if (gammaValue <= 0) return r; // Evita erros matemáticos com gamma <= 0.
+    return Math.round(Math.pow(r / 255, 1 / gammaValue) * 255);
+};
 
 // c) Transformação Logarítmica: S = a * log(r + 1)
-const logarithmic = (r) => Math.round(logScalarValue * Math.log(r + 1));
+// A fórmula foi corrigida para escalar o resultado para a faixa de 0-255, evitando uma imagem quase preta.
+const logarithmic = (r) => {
+    // A constante 'c' normaliza o resultado para a faixa de 0-255.
+    const c = 255 / Math.log(1 + 255);
+    const val = Math.round(logScalarValue * c * Math.log(r + 1));
+    return Math.max(0, Math.min(255, val)); // Garante que o valor permaneça em [0, 255].
+};
 
 // d) Função de transferência de intensidade geral (sigmoide): 
 // S = 255 / (1 + exp(-(r - w) / σ)), w = centro, σ = largura
-const sigmoid = (r) => Math.round(255 / (1 + Math.exp(-(r - greyCenterValue) / sigmaValue)));
+// Corrigido para evitar divisão por zero quando sigma é 0, o que fazia a imagem "sumir".
+const sigmoid = (r) => {
+    // Evita divisão por zero, tratando como uma função degrau (contraste máximo).
+    if (sigmaValue === 0) return r < greyCenterValue ? 0 : 255;
+    return Math.round(255 / (1 + Math.exp(-(r - greyCenterValue) / sigmaValue)));
+};
 
 // e) Função de transferência faixa dinâmica: S = (r / 255) * targetValue
 const dynamicRange = (r) => Math.round((r / 255) * targetValue);
 
 // f) Função de transferência linear: S = a * r + b
-const linear = (r) => Math.round(aValue * r + bValue);
+// O resultado agora é limitado a [0, 255] para evitar que a imagem fique toda preta ou branca.
+const linear = (r) => {
+    const val = Math.round(aValue * r + bValue);
+    return Math.max(0, Math.min(255, val)); // Garante que o valor permaneça em [0, 255].
+};
 
 // ===============================
 // Controle de operadores e kernels
@@ -188,13 +207,15 @@ let processedCanvas = function (sketch) {
 
     // Callback para mudança nos parâmetros das transformações
     inputMatrix.onchange = function () {
+        // Corrige a leitura dos valores para corresponder à ordem dos inputs no HTML.
+        // A ordem no HTML é: Gamma, Log, Intensidade(w,σ), Faixa Dinâmica, Linear(a,b)
         gammaValue = parseFloat(inputMatrixValues[0].value);
         logScalarValue = parseFloat(inputMatrixValues[1].value);
-        aValue = parseFloat(inputMatrixValues[2].value);
-        bValue = parseFloat(inputMatrixValues[3].value);
+        greyCenterValue = parseFloat(inputMatrixValues[2].value);
+        sigmaValue = parseFloat(inputMatrixValues[3].value);
         targetValue = parseFloat(inputMatrixValues[4].value);
-        greyCenterValue = parseFloat(inputMatrixValues[5].value);
-        sigmaValue = parseFloat(inputMatrixValues[6].value);
+        aValue = parseFloat(inputMatrixValues[5].value);
+        bValue = parseFloat(inputMatrixValues[6].value);
 
         if (currentOperator != null) {
             processedImg.data = transform(img, currentOperator); // Aplica a transformação com novos parâmetros

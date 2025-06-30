@@ -8,10 +8,10 @@ Funções de operações morfológicas básicas para imagens binárias:
 // ===============================
 // Operações morfológicas binárias
 // ===============================
-const erosion = function(img, w, h, k) { return operation(img, w, h, k, 'erosion'); };
-const dilation = function(img, w, h, k) { return operation(img, w, h, k, 'dilation'); };
-const opening = function(img, w, h, k) { return dilation(erosion(img, w, h, k), w, h, k); };
-const closing = function(img, w, h, k) { return erosion(dilation(img, w, h, k), w, h, k); };
+const dilation = function(img, w, h, k) { return operation(img, w, h, k, 'erosion'); };
+const erosion = function(img, w, h, k) { return operation(img, w, h, k, 'dilation'); };
+const opening = function(img, w, h, k) { return erosion(dilation(img, w, h, k), w, h, k); };
+const closing = function(img, w, h, k) { return dilation(erosion(img, w, h, k), w, h, k); };
 
 /*
 complement: Calcula o complemento da imagem binária (inverte 0 e 1).

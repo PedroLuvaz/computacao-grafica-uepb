@@ -915,11 +915,6 @@ function drawInWorldWindow() {
     // Desenha eixos usando drawLineDDA
     const center = worldToCanvas(0, 0);
 
-    // eixo X (horizontal, vermelho)
-    drawLineDDAWorld(0, center.y, size, center.y, 'red');
-
-    // eixo Y (vertical, verde)
-    drawLineDDAWorld(center.x, 0, center.x, size, 'green');
 
     // Desenha vértices e arestas usando drawLineDDA
     worldWindowCtx.strokeStyle = '#111'; // Aqui só para referência, mas o strokeStyle não afeta o drawLineDDA
@@ -1104,9 +1099,6 @@ function drawInWorldWindow() {
 
     // Eixos
     const center = worldToCanvas(0, 0);
-    drawLineDDAWorld(0, center.y, size, center.y, 'red');
-    drawLineDDAWorld(center.x, 0, center.x, size, 'green');
-
     // Arestas com recorte visual
     for (const edge of objectEdges) {
         const v1 = objectVertices[edge[0]];

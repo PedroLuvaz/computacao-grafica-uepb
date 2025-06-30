@@ -1036,3 +1036,140 @@ function redrawAll() {
     if (quadradoAtual.length > 0) redesenharQuadrado(quadradoAtual);
     if (imagemObjetoPontos.length > 0) renderImagemObjeto(imagemObjetoPontos);
 }
+
+// ===============================
+// Lousa (Viewport) - Apenas objeto, sem eixos
+// ===============================
+const lousaCanvas = document.getElementById('lousa-canvas');
+const lousaCtx = lousaCanvas.getContext('2d');
+const lousaWidthInput = document.getElementById('lousa-width');
+const lousaHeightInput = document.getElementById('lousa-height');
+
+// Atualiza tamanho da lousa dinamicamente
+lousaWidthInput.addEventListener('input', () => {
+    lousaCanvas.width = parseInt(lousaWidthInput.value);
+    desenharNaLousa();
+});
+lousaHeightInput.addEventListener('input', () => {
+    lousaCanvas.height = parseInt(lousaHeightInput.value);
+    desenharNaLousa();
+});
+
+// Função para transformar coordenadas do mundo para a lousa
+function worldToLousa(x, y) {
+    // A viewport é definida por viewport.xmin, ymin, xmax, ymax
+    const vp = viewport;
+    const w = lousaCanvas.width;
+    const h = lousaCanvas.height;
+    const lx = ((x - vp.xmin) / (vp.xmax - vp.xmin)) * w;
+    const ly = h - ((y - vp.ymin) / (vp.ymax - vp.ymin)) * h;
+    return { x: lx, y: ly };
+}
+
+// Cohen-Sutherland para lousa (viewport)
+function cohenSutherlandClipLousa(x1, y1, x2, y2, vp) {
+    const INSIDE = 0, LEFT = 1, RIGHT = 2, BOTTOM = 4, TOP = 8;
+    function computeOutCode(x, y) {
+        let code = INSIDE;
+        if (x < vp.xmin) code |= LEFT;
+        else if (x > vp.xmax) code |= RIGHT;
+        if (y < vp.ymin) code |= BOTTOM;
+        else if (y > vp.ymax) code |= TOP;
+        return code;
+    }
+    let outcode0 = computeOutCode(x1, y1);
+    let outcode1 = computeOutCode(x2, y2);
+    let accept = false;
+    while (true) {
+        if (!(outcode0 | outcode1)) { accept = true; break; }
+        else if (outcode0 & outcode1) { break; }
+        else {
+            let x, y;
+            let outcodeOut = outcode0 ? outcode0 : outcode1;
+            if (outcodeOut & TOP) {
+                x = x1 + (x2 - x1) * (vp.ymax - y1) / (y2 - y1);
+                y = vp.ymax;
+            } else if (outcodeOut & BOTTOM) {
+                x = x1 + (x2 - x1) * (vp.ymin - y1) / (y2 - y1);
+                y = vp.ymin;
+            } else if (outcodeOut & RIGHT) {
+                y = y1 + (y2 - y1) * (vp.xmax - x1) / (x2 - x1);
+                x = vp.xmax;
+            } else if (outcodeOut & LEFT) {
+                y = y1 + (y2 - y1) * (vp.xmin - x1) / (x2 - x1);
+                x = vp.xmin;
+            }
+            if (outcodeOut === outcode0) {
+                x1 = x; y1 = y; outcode0 = computeOutCode(x1, y1);
+            } else {
+                x2 = x; y2 = y; outcode1 = computeOutCode(x2, y2);
+            }
+        }
+    }
+    if (accept) return [x1, y1, x2, y2];
+    else return null;
+}
+
+// Desenha o objeto atual na lousa, usando recorte
+function desenharNaLousa() {
+    lousaCtx.clearRect(0, 0, lousaCanvas.width, lousaCanvas.height);
+    if (quadradoAtual.length === 0) return;
+    for (let i = 0; i < quadradoAtual.length; i++) {
+        const proximo = (i + 1) % quadradoAtual.length;
+        const v1 = quadradoAtual[i];
+        const v2 = quadradoAtual[proximo];
+        // Recorte na viewport
+        const clipped = cohenSutherlandClipLousa(v1.x, v1.y, v2.x, v2.y, viewport);
+        if (clipped) {
+            const p0 = worldToLousa(clipped[0], clipped[1]);
+            const p1 = worldToLousa(clipped[2], clipped[3]);
+            lousaCtx.strokeStyle = "#111";
+            lousaCtx.beginPath();
+            lousaCtx.moveTo(p0.x, p0.y);
+            lousaCtx.lineTo(p1.x, p1.y);
+            lousaCtx.stroke();
+        }
+    }
+    // Também desenha pontos da imagem PGM na lousa
+    if (imagemObjetoPontos && imagemObjetoPontos.length > 0) {
+        for (const p of imagemObjetoPontos) {
+            if (
+                p.x >= viewport.xmin && p.x <= viewport.xmax &&
+                p.y >= viewport.ymin && p.y <= viewport.ymax
+            ) {
+                const lp = worldToLousa(p.x, p.y);
+                lousaCtx.fillStyle = "#111";
+                lousaCtx.fillRect(lp.x, lp.y, 1, 1);
+            }
+        }
+    }
+}
+
+// Sempre que redesenhar o quadrado, atualize a lousa também
+const oldRedesenharQuadrado = redesenharQuadrado;
+redesenharQuadrado = function(pontos) {
+    oldRedesenharQuadrado(pontos);
+    desenharNaLousa();
+};
+// Também ao limpar canvas
+const oldClearCanvas = clearCanvas;
+clearCanvas = function() {
+    oldClearCanvas();
+    desenharNaLousa();
+};
+// E ao carregar quadrado
+drawCustomSquareDDA = (function(orig) {
+    return function() {
+        orig();
+        desenharNaLousa();
+    };
+})(drawCustomSquareDDA);
+
+// Atualize a lousa ao mudar viewport
+['viewport-xmin', 'viewport-ymin', 'viewport-xmax', 'viewport-ymax'].forEach(id => {
+    document.getElementById(id).addEventListener('input', desenharNaLousa);
+});
+document.getElementById('viewport-active').addEventListener('change', desenharNaLousa);
+
+// Inicializa lousa ao carregar
+desenharNaLousa();

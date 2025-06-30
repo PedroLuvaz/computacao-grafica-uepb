@@ -287,6 +287,7 @@ function highBoostFilter(img, A) {
     A = parseFloat(A);
     if (isNaN(A)) A = 1.5;
 
+    // Etapa 1: Obter a versão suavizada (passa-baixa) da imagem.
     const blurred = convolution(img, gaussianBlur, false); // ou 'average'
     const h = img.h;
     const w = img.w;
@@ -297,7 +298,17 @@ function highBoostFilter(img, A) {
         for (let j = 0; j < w; j++) {
             const original = img.data[i][j];
             const smooth = blurred[i][j];
-            let boosted = (A * original) - smooth;
+
+            // Etapa 2: Calcular a máscara de nitidez (unsharp mask ou g_mascara).
+            // Passa alta = original – passa baixa
+            const g_mascara = original - smooth;
+
+            // Etapa 3: Aplicar o filtro High-Boost.
+            // A fórmula é: High-boost = original + A * g_mascara
+            // Onde 'A' é o fator de realce (boost factor). Se A = 1, o filtro é o unsharp masking padrão.
+            let boosted = original + (A * g_mascara);
+
+            // Garante que o valor do pixel permaneça no intervalo válido [0, 255].
             boosted = Math.min(255, Math.max(0, boosted));
             result[i][j] = boosted;
         }
