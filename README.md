@@ -1,47 +1,113 @@
-🚀 Projeto de Computação Gráfica
+# 🚀 Projeto de Computação Gráfica e Processamento de Imagens
 
-📌 Descrição
+## 📌 Descrição Geral
 
-Este projeto tem como objetivo a implementação de algoritmos fundamentais de computação gráfica utilizando HTML, CSS e JavaScript. As principais funcionalidades incluem a ativação de pixels na tela e a rasterização de primitivas gráficas, como segmentos de reta e circunferências, utilizando diferentes algoritmos.
+Este projeto tem como objetivo a implementação de algoritmos fundamentais das áreas de **Computação Gráfica (CG)** e **Processamento Digital de Imagens (PI)** usando tecnologias web: **HTML, CSS e JavaScript**. A estrutura é dividida em dois módulos complementares:
 
-🛠 Tecnologias Utilizadas
+- 🖼️ **Projeto 1 – Computação Gráfica (CG)**: Focado na manipulação de pixels, rasterização de primitivas, transformações 2D e 3D, recortes e simulações gráficas.
+- 🧪 **Projeto 2 – Processamento de Imagens (PI)**: Direcionado para a análise, filtragem e transformação de imagens digitais, com suporte a imagens coloridas e binárias.
 
-🖥 HTML5: Estrutura da interface gráfica.
+---
 
-🎨 CSS3: Estilização da interface.
+## 🛠 Tecnologias Utilizadas
 
-✨ JavaScript: Implementação dos algoritmos de desenho e manipulação dos pixels na tela.
+- 🖥 **HTML5**: Estrutura da interface e elementos gráficos.
+- 🎨 **CSS3**: Design visual e responsividade.
+- ✨ **JavaScript**: Núcleo da lógica e algoritmos de computação gráfica e imagem.
 
-🎯 Funcionalidades
+---
 
-✅ 1ª Entrega: Ativação de Pixel (SetPixel)
+## 🎯 Funcionalidades
 
-Implementação básica do conceito de "SetPixel", ativando um pixel em uma grade (canvas ou tabela HTML).
+### ✅ Projeto 1 – Computação Gráfica (CG)
 
-✅ 2ª Entrega: Algoritmos de Rasterização
+#### 1️⃣ Ativação de Pixel (SetPixel)
+- Controle direto de pixels em um grid para simular o acesso ao framebuffer.
 
-📏 Algoritmos de Traçado de Retas:
+#### 2️⃣ Rasterização de Primitivas
 
-🔹 DDA (Digital Differential Analyzer): Algoritmo incremental para desenhar segmentos de reta.
+**Retas:**
+- 🔹 DDA (Digital Differential Analyzer)
+- 🔹 Algoritmo do Ponto Médio
 
-🔹 Algoritmo do Ponto Médio: Eficiência aprimorada para rasterização de segmentos de reta.
+**Circunferências:**
+- 🟠 Equação Explícita
+- 🟠 Algoritmo Trigonométrico
+- 🟠 Algoritmo do Ponto Médio
 
-🔵 Algoritmos de Rasterização de Circunferências:
+#### 3️⃣ Transformações 2D
 
-🟠 Equação Explícita: Cálculo de pontos baseando-se na equação da circunferência.
+- 🔄 Rotação
+- ✂️ Cisalhamento
+- ➡️ Translação
+- 📏 Escala
+- 🔃 Reflexão
+- 🖼️ **ViewPort 2D**: Mapeamento de coordenadas lógicas para coordenadas físicas.
 
-🟠 Trigonométrico: Utilização de funções trigonométricas para calcular os pontos.
+#### 4️⃣ Transformações 3D
 
-🟠 Algoritmo do Ponto Médio: Implementação eficiente baseada em decisão incremental.
+- 📦 Projeção Ortográfica
+- 🔄 Rotação nos eixos X, Y e Z
+- ✂️ Cisalhamento e Escala
+- 📏 Translação
+- 🖼️ **ViewPort 3D**
 
-✅ 3ª Entrega: Transformações 2D
+#### 5️⃣ Recorte de Tela (Clipping)
 
-🔄 Rotação: Aplicação de rotação de um objeto em torno de um ponto de referência.
+- ✂️ **Algoritmo de Cohen-Sutherland**: Recorte eficiente de segmentos de reta com base em regiões codificadas.
 
-✂️ Cisalhamento: Modificação da forma do objeto deslocando suas coordenadas.
+#### 6️⃣ Simulador de Batimentos Cardíacos (ECG)
 
-➡️ Translação: Movimentação do objeto ao longo dos eixos X e Y.
+- ❤️ Simulação gráfica de um eletrocardiograma com ondas P, Q, R, S, T animadas dinamicamente.
+- ⏱️ Botão de batimento com histórico de picos registrado a cada 10 segundos.
 
-📏 Escala: Redimensionamento do objeto, aumentando ou diminuindo seu tamanho proporcionalmente.
+---
 
-🔃 Reflexão: Espelhamento do objeto em relação a um eixo (horizontal, vertical ou diagonal).
+### ✅ Projeto 2 – Processamento de Imagens (PI)
+
+#### 🎨 Filtros
+
+- 🔸 Média
+- 🔸 Mediana
+- 🔸 Gaussiano
+- 🔸 Laplaciano
+- 🔸 Sobel (detecção de bordas)
+
+#### ➕ Combinação de Imagens
+
+- Operações:
+  - Soma / Subtração
+  - Lógicas: AND, OR, XOR
+
+#### 🔁 Transformações
+
+- 📐 Geométricas:
+  - Rotação, Translação, Redimensionamento, Espelhamento
+- 🌗 Conversão: Tons de cinza, binarização
+- 🧾 **Transformações em Imagens Binárias**:
+  - Redução, expansão e movimentação de objetos binarizados
+
+#### 📊 Histograma
+
+- Cálculo do histograma de intensidades
+- Equalização para realce de contraste
+
+#### 🧬 Morfologia Matemática
+
+- 🧼 Erosão
+- 🔁 Dilatação
+- 🔄 Abertura
+- 🔃 Fechamento
+
+#### ⏳ Morfismo Temporal
+
+- Detecção de movimento entre quadros
+- Subtração temporal
+- Simulação de movimento em sequências de imagens
+
+---
+
+## 📸 Interface
+
+A interface é organizada por categorias com botões para cada funcionalidade:
+
