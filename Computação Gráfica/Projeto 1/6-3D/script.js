@@ -876,12 +876,6 @@ document.getElementById('reset-view-btn').addEventListener('click', () => {
     drawObject();
 });
 
-// Navegação - Voltar ao Início
-document.getElementById('back').addEventListener('click', function(e) {
-    e.preventDefault();
-    window.location.href = this.getAttribute('href');
-});
-
 
 //IMPLEMENTAÇÃO DA VIEWPORT E JANELA DO MUNDO
 
@@ -1160,7 +1154,6 @@ function drawInWorldWindow() {
 // Inicialização
 ctx.fillStyle = 'white';
 ctx.fillRect(0, 0, canvas.width, canvas.height);
-drawFixedAxes(); 
-drawOctants();
+drawFixedAxes();
 updateObjectInfo();
 

@@ -2,12 +2,12 @@
 // Caminhos das imagens de exemplo (PGM)
 // ===============================
 const imagesPath = {
-  0: '../assets/kid.pgm',
-  1: '../assets/adult.pgm',
-  2: '../assets/pedrokid.pgm',
-  3: '../assets/pedroadult.pgm',
-  4: '../assets/kidnathan.pgm',
-  5: '../assets/nathanadult.pgm',
+  0: 'assets/kid.pgm',
+  1: 'assets/adult.pgm',
+  2: 'assets/pedrokid.pgm',
+  3: 'assets/pedroadult.pgm',
+  4: 'assets/kidnathan.pgm',
+  5: 'assets/nathanadult.pgm',
 };
 
 // ===============================

@@ -9,13 +9,14 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/styles-cg.css">
 </head>
 <body>
 
 <div class="wrapper d-flex align-items-stretch">
   <nav id="topbar" class="navbar">
     <div class="navbar-container">
-      <a href="index.html" class="logo" style="margin-right: 10px;">Projeto 2 - Imagens</a>
+      <a href="index.html" class="logo">Projeto 2 - Imagens</a>
       <ul class="navbar-links">
         <li><a href="filtros.html">Filtros</a></li>
         <li><a href="combinacao.html">Combinação</a></li>
@@ -23,6 +24,8 @@
         <li><a href="histograma.html">Histograma</a></li>
         <li><a href="morfologia.html">Morfologia</a></li>
         <li><a href="morphing.html">Morfismo Temporal</a></li>
+        <li><a href="../../Projeto 1/1-Tela Principal/index.html" class="nav-cross">Projeto 1</a></li>
+        <li><a href="../../index.html" class="nav-cross">Início</a></li>
       </ul>
     </div>
   </nav>
@@ -30,14 +33,14 @@
   <!-- Page Content  -->
   <div id="content" class="p-4 p-md-5 pt-5">
     <main>
-        <div class="container-fluid p-0 m-0 justify-content-center d-grid" style="min-height: 450px;">
+        <div class="container-fluid p-0 m-0 justify-content-center d-grid min-h-450">
             <div class="row w-100 p-0 w-0">
                 <div class="col-lg-4 mb-2 align-items-center">
-                    <div class="card  mx-auto" style="width:300px; height: 450px;">
+                    <div class="card mx-auto card-module-tall">
                         <div class="card-body">
                             <h5 class="card-title text-center">Imagem A</h5>
-                            <div class="card-img-top" id="img-a" style="margin-bottom: 35px;"></div>
-                            <div style="width: 256px; height: 50px;" class="text-center">
+                            <div class="card-img-top img-spacing" id="img-a"></div>
+                            <div class="select-wrapper text-center" style="height: 50px;">
                                 <select class="form-select" aria-label="Selecionar filtro" id="img-a-selector">
                                     <option selected value="0">Lena</option>
                                     <option value="1">Airplane</option>
@@ -49,11 +52,11 @@
                     </div>
                 </div>
                 <div class="col-lg-4 mb-2 align-items-center">
-                    <div class="card  mx-auto" style="width:300px; height: 450px;">
+                    <div class="card mx-auto card-module-tall">
                         <div class="card-body">
                             <h5 class="card-title text-center">Imagem B</h5>
-                            <div class="card-img-top" id="img-b" style="margin-bottom: 35px"></div>
-                            <div style="width: 256px;" class="text-center">
+                            <div class="card-img-top img-spacing" id="img-b"></div>
+                            <div class="select-wrapper text-center">
                                 <select class="form-select" aria-label="Selecionar filtro" id="img-b-selector">
                                     <option value="0">Lena</option>
                                     <option selected value="1">Airplane</option>
@@ -65,16 +68,16 @@
                     </div>
                 </div>
                 <div class="col-lg-4 mb-2 align-items-center">
-                    <div class="card  mx-auto" style="width:300px; height: 470px;">
+                    <div class="card mx-auto" style="width:300px; height: 470px;">
                         <div class="card-body">
                             <h5 class="card-title text-center">Imagem Processada</h5>
-                            <div class="card-img-top" id="processed-img" style="margin-bottom: 0;"></div>
-                            <div class="form-check form-switch" style="margin-bottom: 10px; height: 25px;">
-                                <input class="form-check-input" type="checkbox" id="normalizeSwitch" style="display: none;">
-                                <label class="form-check-label" for="normalizeSwitch" style="display: none;">Normalizar [0-255]</label>
+                            <div class="card-img-top" id="processed-img"></div>
+                            <div class="form-check form-switch switch-spacing-sm">
+                                <input class="form-check-input initially-hidden" type="checkbox" id="normalizeSwitch">
+                                <label class="form-check-label initially-hidden" for="normalizeSwitch">Normalizar [0-255]</label>
                             </div>
 
-                            <div style="width: 256px; margin-bottom: 10px" class="text-center">
+                            <div class="select-wrapper text-center" style="margin-bottom: 10px">
                                 <select class="form-select" aria-label="Selecionar filtro" id="input-filter">
                                     <option selected value="0">Escolher</option>
                                     <option value="1">+</option>
@@ -86,8 +89,7 @@
                                     <option value="7">XOR</option>
                                 </select>
                             </div>
-                            <button type="button" class="btn btn-primary" id="download-btn"
-                                    style="width: 256px; margin-top: 5px; display: none;">
+                            <button type="button" class="btn btn-primary btn-download initially-hidden" id="download-btn">
                                 Baixar
                             </button>
                         </div>
@@ -103,5 +105,15 @@
 <script src="js/src/utils.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/src/composition.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.navbar-links a').forEach(link => {
+        if (link.getAttribute('href') === currentPage) {
+            link.classList.add('active');
+        }
+    });
+});
+</script>
 </body>
 </html>

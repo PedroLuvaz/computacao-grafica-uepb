@@ -7,12 +7,12 @@ original e processada, equalizar o histograma da imagem e fazer o download da im
 // Mapeamento de caminhos das imagens de exemplo
 // ===============================
 const imagesPath = {
-    0: '../assets/lena.pgm',
-    2: '../assets/airplane.pgm',
-    3: '../assets/pedrokid.pgm',
-    4: '../assets/kidnathan.pgm',
-    5: '../assets/pedroadult.pgm',
-    6: '../assets/nathanadult.pgm',
+    0: 'assets/lena.pgm',
+    2: 'assets/airplane.pgm',
+    3: 'assets/pedrokid.pgm',
+    4: 'assets/kidnathan.pgm',
+    5: 'assets/pedroadult.pgm',
+    6: 'assets/nathanadult.pgm',
 };
 
 // ===============================
@@ -37,7 +37,7 @@ const mainCanvas = function (sketch) {
     sketch.setup = function () {
         // Cria o canvas e carrega a imagem padrão
         sketch.createCanvas(256, 256).parent("original-img");
-        readImage('../assets/lena.pgm', sketch, img);
+        readImage('assets/lena.pgm', sketch, img);
     }
 
     // Troca a imagem ao selecionar outra

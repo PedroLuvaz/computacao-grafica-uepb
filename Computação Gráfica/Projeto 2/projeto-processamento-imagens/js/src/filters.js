@@ -89,12 +89,12 @@ const operators = {
 // Caminhos das imagens de exemplo
 // ===============================
 const imagesPath = {
-    0: '../assets/lena.pgm',
-    1: '../assets/lenasalp.pgm',
-    2: '../assets/lenag.pgm',
-    3: '../assets/airplane.pgm',
-    4: "../assets/pedrokid.pgm",
-    5: "../assets/kidnathan.pgm",
+    0: 'assets/lena.pgm',
+    1: 'assets/lenasalp.pgm',
+    2: 'assets/lenag.pgm',
+    3: 'assets/airplane.pgm',
+    4: "assets/pedrokid.pgm",
+    5: "assets/kidnathan.pgm",
 };
 
 // ===============================
@@ -141,7 +141,7 @@ const mainCanvas = function (sketch) {
     sketch.setup = function () {
         sketch.createCanvas(256, 256).parent("original-img");
         // Usa o callback para renderizar a tabela após o carregamento
-        readImage('../assets/lena.pgm', sketch, img, onImageLoaded);
+        readImage('assets/lena.pgm', sketch, img, onImageLoaded);
     }
 
     imgSelector.onchange = _ => readImage(imagesPath[imgSelector.value], sketch, img, onImageLoaded);

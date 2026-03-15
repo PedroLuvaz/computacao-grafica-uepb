@@ -8,26 +8,8 @@
 
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/styles-cg.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <script src="../js/lib/bootstrap.bundle.min.js"></script>
-    <style>
-        /* Estilos para os contêineres das tabelas de pixels */
-        .pixel-table-container {
-            max-height: 500px; /* Define uma altura máxima */
-            overflow: auto;    /* Adiciona barras de rolagem vertical e horizontal quando necessário */
-            border: 1px solid #dee2e6; /* Borda sutil para delimitar a área */
-            padding: 1rem;
-            margin-top: 1rem;
-            background-color: #f8f9fa; /* Cor de fundo leve */
-        }
-        /* Estilo para a célula do pixel destacado */
-        .pixel-highlight {
-            background-color: #ffc107 !important; /* Amarelo Bootstrap (com !important para garantir a sobreposição) */
-            color: black;
-            font-weight: bold;
-        }
-    </style>
 </head>
 
 <body>
@@ -35,7 +17,7 @@
     <div class="wrapper d-flex align-items-stretch">
     <nav id="topbar" class="navbar">
         <div class="navbar-container">
-        <a href="index.html" class="logo" style="margin-right: 10px;">Projeto 2 - Imagens</a>
+        <a href="index.html" class="logo">Projeto 2 - Imagens</a>
         <ul class="navbar-links">
             <li><a href="filtros.html">Filtros</a></li>
             <li><a href="combinacao.html">Combinação</a></li>
@@ -43,21 +25,23 @@
             <li><a href="histograma.html">Histograma</a></li>
             <li><a href="morfologia.html">Morfologia</a></li>
             <li><a href="morphing.html">Morfismo Temporal</a></li>
+            <li><a href="../../Projeto 1/1-Tela Principal/index.html" class="nav-cross">Projeto 1</a></li>
+            <li><a href="../../index.html" class="nav-cross">Início</a></li>
         </ul>
         </div>
     </nav>
-      
+
         <!-- Page Content  -->
         <div id="content" class="p-4 p-md-5 pt-5">
             <main>
                 <div class="container-fluid p-0 m-0 justify-content-center d-grid">
                     <div class="row w-100 p-0 w-0">
                         <div class="col-lg-4 mb-2 align-items-center">
-                            <div class="card  mx-auto align-items-center" style="width:300px; height: 450px;">
+                            <div class="card mx-auto align-items-center card-module-tall">
                                 <div class="card-body">
                                     <h5 class="card-title text-center">Imagem Original</h5>
                                     <div class="card-img-top" id="original-img"></div>
-                                    <div style="width: 256px;" class="text-center mt-2">
+                                    <div class="select-wrapper text-center mt-2">
                                         <select class="form-select" aria-label="Selecionar imagem" id="img-selector">
                                             <option selected value="0">Lena.pgm</option>
                                             <option value="1">Lenasalp.pgm</option>
@@ -68,14 +52,14 @@
                                         </select>
                                     </div>
                                     <div class="form-check form-switch mt-2">
-                                        <input class="form-check-input" type="checkbox" id="normalizeOriginalSwitch" style="display: none;">
-                                        <label class="form-check-label" for="normalizeOriginalSwitch" style="display: none;">Normalizar</label>
+                                        <input class="form-check-input initially-hidden" type="checkbox" id="normalizeOriginalSwitch">
+                                        <label class="form-check-label initially-hidden" for="normalizeOriginalSwitch">Normalizar</label>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4 mb-2">
-                            <div class="card  mx-auto align-items-center" style="width:300px; height: 450px;">
+                            <div class="card mx-auto align-items-center card-module-tall">
                                 <div class="card-body">
                                     <h5 class="card-title text-center">Filtros</h5>
                                     <div style="width: 250px;height: 135px;">
@@ -98,47 +82,47 @@
                                     <div class="container text-center" style="margin: 10px 0 18px">
                                         <form id="input-matrix" class="text-center" role="form">
                                             <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
-                                                   style="width: 65px; text-align:center" readonly>
+                                                   class="matrix-input" readonly>
                                             <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
-                                                   style="width: 65px; text-align:center" readonly>
+                                                   class="matrix-input" readonly>
                                             <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
-                                                   style="width: 65px; text-align:center" readonly>
+                                                   class="matrix-input" readonly>
                                             <br>
                                             <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
-                                                   style="width: 65px; text-align:center" readonly>
+                                                   class="matrix-input" readonly>
                                             <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
-                                                   style="width: 65px; text-align:center" readonly>
+                                                   class="matrix-input" readonly>
                                             <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
-                                                   style="width: 65px; text-align:center" readonly>
+                                                   class="matrix-input" readonly>
                                             <br>
                                             <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
-                                                   style="width: 65px; text-align:center" readonly>
+                                                   class="matrix-input" readonly>
                                             <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
-                                                   style="width: 65px; text-align:center" readonly>
+                                                   class="matrix-input" readonly>
                                             <input type="number" name="array[]" value="0" min="-10" max="10" step="1"
-                                                   style="width: 65px; text-align:center" readonly>
+                                                   class="matrix-input" readonly>
                                                 <br><br> Valor A (High Boost): <br>
                                                 <input type="number" id="ahb" min="1.0" value="1,5"
-                                                    style="width: 65px; text-align:center" disabled step=".1">
+                                                    class="matrix-input" disabled step=".1">
                                         </form>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4 mb-2">
-                            <div class="card  mx-auto align-items-center" style="width:300px; height: 450px;">
+                            <div class="card mx-auto align-items-center card-module-tall">
                                 <div class="card-body">
                                     <h5 class="card-title text-center">Imagem Processada</h5>
                                     <div class="card-img-top" id="processed-img"></div>
-                                    <div class="form-check form-switch" style="margin: 10px 0 10px">
+                                    <div class="form-check form-switch switch-spacing">
                                         <input class="form-check-input" type="checkbox" id="normalizeSwitch">
                                         <label class="form-check-label" for="normalizeSwitch">Normalizar</label>
                                     </div>
                                     <div class="btn-group d-flex" role="group">
-                                        <button type="button" class="btn btn-primary" id="apply-again-btn" style="display:none;">
+                                        <button type="button" class="btn btn-primary initially-hidden" id="apply-again-btn">
                                             Reusar
                                         </button>
-                                        <button type="button" class="btn btn-outline-primary" id="download-btn" style="display:none;">
+                                        <button type="button" class="btn btn-outline-primary initially-hidden" id="download-btn">
                                             Baixar
                                         </button>
                                     </div>
@@ -156,7 +140,7 @@
                                 <p class="text-muted">A tabela de pixels da imagem original será carregada aqui...</p>
                             </div>
                         </div>
-                
+
                         <!-- Coluna para a tabela da imagem processada -->
                         <div class="col-lg-6">
                             <h5>Tabela de Pixels (Processada)</h5>
@@ -170,8 +154,18 @@
         </div>
     </div>
 
-<script src="../js/lib/p5.min.js"></script>
-<script src="../js/src/utils.js"></script>
-<script src="../js/src/filters.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js" integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="js/src/utils.js"></script>
+<script src="js/src/filters.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.navbar-links a').forEach(link => {
+        if (link.getAttribute('href') === currentPage) {
+            link.classList.add('active');
+        }
+    });
+});
+</script>
 </body>
 </html>

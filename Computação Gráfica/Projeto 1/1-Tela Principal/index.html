@@ -3,41 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Computação Gráfica</title>
+    <title>Computação Gráfica - Projeto 1</title>
+    <link rel="stylesheet" href="../common/common.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- Navbar -->
     <nav class="navbar">
+        <a class="navbar-brand" href="index.html">CG Projeto 1</a>
         <ul>
-            <li><a href="../2-Sistemas De Coordenadas/index.html">Sistemas De Coordenadas</a></li>
+            <li><a href="../2-Sistemas De Coordenadas/index.html">Coordenadas</a></li>
             <li><a href="../3-Retas/index.html">Retas</a></li>
             <li><a href="../4-Circunferências/index.html">Circunferências</a></li>
             <li><a href="../5-2D/index.html">2D</a></li>
             <li><a href="../6-3D/index.html">3D</a></li>
             <li><a href="../7- Batimentos/index.html">Batimentos</a></li>
-            <li><a href="../8- Recorte/index.html">Recorte de Cohen-Sutherland</a></li>
+            <li><a href="../8- Recorte/index.html">Recorte</a></li>
+            <li><a href="../../Projeto 2/projeto-processamento-imagens/index.html" class="nav-cross">Projeto 2</a></li>
+            <li><a href="../../index.html" class="nav-cross">Início</a></li>
         </ul>
     </nav>
 
-    <div class="container">
-        <h1>Projeto De Computação Gráfica 2025.1</h1>
-        <p>Professor Robson Pequeno De Sousa</p>
-        <br>
-        <h2>Integrantes:</h2>
-        <p>• Erick Nathan Almeida Do Nascimento</p>
-        <p>• Pedro Lucas Vaz Andrade</p>
-        <br>
-        <h2>Ementa:</h2>
-        <p>• Sistemas De Coordenadas de Mundo, NDC e Dispositivo</p>
-        <p>• Retas por DDA e Ponto Médio</p>
-        <p>• Circunferências por Eq. Explícita, Trigonométrica e Ponto Médio</p>
-        <p>• 2D: Transformações Geométricas Bidimensionais</p>
-        <p>• 3D: Transformações Geométricas Tridimensionais</p>
-        <p>• Batimentos Cardíacos</p>
-        <p>• Recorte de Cohen-Sutherland</p>
-    </div>
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Computação Gráfica</h1>
+            <p class="hero-subtitle">Projeto 2025.1 &mdash; UEPB</p>
+            <p class="hero-prof">Professor Robson Pequeno de Sousa</p>
+            <div class="hero-team">
+                <span>Pedro Lucas Vaz Andrade</span>
+                <span class="separator">&bull;</span>
+                <span>Erick Nathan Almeida do Nascimento</span>
+            </div>
+        </div>
+    </section>
 
+    <section class="modules-section">
+        <h2 class="section-title">Módulos</h2>
+        <div class="modules-grid">
+            <a href="../2-Sistemas De Coordenadas/index.html" class="module-card">
+                <span class="module-number">01</span>
+                <h3>Sistemas de Coordenadas</h3>
+                <p>Mundo, NDC, NDC Centralizado e Dispositivo</p>
+            </a>
+            <a href="../3-Retas/index.html" class="module-card">
+                <span class="module-number">02</span>
+                <h3>Retas</h3>
+                <p>Algoritmos DDA e Ponto Médio (Bresenham)</p>
+            </a>
+            <a href="../4-Circunferências/index.html" class="module-card">
+                <span class="module-number">03</span>
+                <h3>Circunferências</h3>
+                <p>Equação Explícita, Trigonométrica e Ponto Médio</p>
+            </a>
+            <a href="../5-2D/index.html" class="module-card">
+                <span class="module-number">04</span>
+                <h3>Transformações 2D</h3>
+                <p>Translação, Escala, Rotação, Reflexão e Cisalhamento</p>
+            </a>
+            <a href="../6-3D/index.html" class="module-card">
+                <span class="module-number">05</span>
+                <h3>Transformações 3D</h3>
+                <p>Matrizes 4x4, Projeção Isométrica e Câmera</p>
+            </a>
+            <a href="../7- Batimentos/index.html" class="module-card">
+                <span class="module-number">06</span>
+                <h3>Batimentos Cardíacos</h3>
+                <p>Simulação de ECG em tempo real</p>
+            </a>
+            <a href="../8- Recorte/index.html" class="module-card">
+                <span class="module-number">07</span>
+                <h3>Recorte de Cohen-Sutherland</h3>
+                <p>Algoritmo de recorte de linhas</p>
+            </a>
+        </div>
+    </section>
+
+    <script src="../common/common.js"></script>
 </body>
 </html>
