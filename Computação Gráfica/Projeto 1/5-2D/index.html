@@ -4,210 +4,225 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transformações Geométricas</title>
+    <link rel="stylesheet" href="../common/common.css">
     <link rel="stylesheet" href="styles.css">
-    <style>
-#right-bar {
-    overflow-y: auto;
-    max-height: 100vh;
-}
-#left-bar {
-    overflow-y: auto;
-    max-height: 100vh;
-}
-</style>
 </head>
 <body>
-    <div class="sidebar" id="left-bar">
-        <h3 id="title-bar">Transformações Geométricas</h3>
-        <hr>
-        <div id="content-bar">
-            <h3 id="title-h">Translação:</h3>
-            <div class="number-inputs">
-                <div>
-                    <label for="x-translation">X:</label>
-                    <input type="number" id="x-translation" name="x-translation" value="0">
-                </div>
-                <div>
-                    <label for="y-translation">Y:</label>
-                    <input type="number" id="y-translation" name="y-translation" value="0">
-                </div>
-            </div>
-            <button class="type-op">Aplicar Translação</button>
+    <nav class="navbar">
+        <a class="navbar-brand" href="../1-Tela Principal/index.html">CG Projeto 1</a>
+        <ul>
+            <li><a href="../2-Sistemas De Coordenadas/index.html">Coordenadas</a></li>
+            <li><a href="../3-Retas/index.html">Retas</a></li>
+            <li><a href="../4-Circunferências/index.html">Circunferências</a></li>
+            <li><a href="../5-2D/index.html">2D</a></li>
+            <li><a href="../6-3D/index.html">3D</a></li>
+            <li><a href="../7- Batimentos/index.html">Batimentos</a></li>
+            <li><a href="../8- Recorte/index.html">Recorte</a></li>
+            <li><a href="../../Projeto 2/projeto-processamento-imagens/index.html" class="nav-cross">Projeto 2</a></li>
+            <li><a href="../../index.html" class="nav-cross">Início</a></li>
+        </ul>
+    </nav>
+    <div class="page-content">
+        <div class="sidebar" id="left-bar">
+            <h3 id="title-bar">Transformações Geométricas</h3>
             <hr>
-            <h3 id="title-h">Escala:</h3>
-            <div class="number-inputs">
-                <div>
-                    <label for="x-scale">X:</label>
-                    <input type="number" id="x-scale" name="x-scale" value="0">
+            <div id="content-bar">
+                <h3 id="title-h">Translação:</h3>
+                <div class="number-inputs">
+                    <div>
+                        <label for="x-translation">X:</label>
+                        <input type="number" id="x-translation" name="x-translation" value="0">
+                    </div>
+                    <div>
+                        <label for="y-translation">Y:</label>
+                        <input type="number" id="y-translation" name="y-translation" value="0">
+                    </div>
+                </div>
+                <button class="type-op">Aplicar Translação</button>
+                <hr>
+                <h3 id="title-h">Escala:</h3>
+                <div class="number-inputs">
+                    <div>
+                        <label for="x-scale">X:</label>
+                        <input type="number" id="x-scale" name="x-scale" value="0">
+                    </div>
+                    <div>
+                        <label for="y-scale">Y:</label>
+                        <input type="number" id="y-scale" name="y-scale" value="0">
+                    </div>
+                </div>
+                <button class="type-op">Aplicar Escala</button>
+                <hr>
+                <h3 id="title-h">Rotação:</h3>
+                <div class="number-inputs">
+                    <div>
+                        <label for="x-rotation">X:</label>
+                        <input type="number" id="x-rotation" name="x-rotation" value="0">
+                    </div>
+                    <div>
+                        <label for="y-rotation">Y:</label>
+                        <input type="number" id="y-rotation" name="y-rotation" value="0">
+                    </div>
                 </div>
                 <div>
-                    <label for="y-scale">Y:</label>
-                    <input type="number" id="y-scale" name="y-scale" value="0">
+                    <label for="angle">Ângulo:</label>
+                    <input type="number" id="angle" name="angle" value="0">
                 </div>
+                <button class="type-op">Aplicar Rotação</button>
+                <hr>
+                <h3 id="title-h">Reflexão:</h3>
+                <div class="number-inputs">
+                    <div>
+                        <label for="x-ref">
+                            <input type="checkbox" id="x-ref" name="x-ref" value="0" class="check"> Em X
+                        </label>
+                    </div>
+                    <div>
+                        <label for="y-ref">
+                            <input type="checkbox" id="y-ref" name="y-ref" value="0" class="check"> Em Y
+                        </label>
+                    </div>
+                </div>
+                <button class="type-op">Aplicar Reflexão</button>
+                <hr>
+                <h3 id="title-h">Cisalhamento:</h3>
+                <div class="number-inputs">
+                    <div>
+                        <label for="x-cis">X:</label>
+                        <input type="number" id="x-cis" name="x-cis" value="0">
+                    </div>
+                    <div>
+                        <label for="y-cis">Y:</label>
+                        <input type="number" id="y-cis" name="y-cis" value="0">
+                    </div>
+                </div>
+                <button class="type-op">Aplicar Cisalhamento</button>
+                <hr>
+                <div class="square-config">
+                    <h3 id="title-h">Configurar Quadrado:</h3>
+                    <div class="config-row">
+                        <label for="square-size" class="config-label">Tamanho:</label>
+                        <input type="number" id="square-size" class="config-input" value="50" min="1">
+                    </div>
+                    <div class="config-row">
+                        <label for="square-x" class="config-label">Posição X:</label>
+                        <input type="number" id="square-x" class="config-input" value="0">
+                    </div>
+                    <div class="config-row">
+                        <label for="square-y" class="config-label">Posição Y:</label>
+                        <input type="number" id="square-y" class="config-input" value="0">
+                        <button id="draw-square-btn" class="generate-btn">Gerar Quadrado</button>
+                    </div>
+                </div>
+                <hr>
             </div>
-            <button class="type-op">Aplicar Escala</button>
+        </div>
+        <div class="main">
+            <canvas id="canvas" width="500" height="500"></canvas>
+            <div id="viewport-window" style="display:none;">
+                <div class="viewport-window-header">
+                    <span>Janela de Visualização (Viewport)</span>
+                    <div class="lousa-size-controls">
+                        <label>L: <input type="number" id="lousa-width" value="300" min="50" max="800"></label>
+                        <label>A: <input type="number" id="lousa-height" value="300" min="50" max="800"></label>
+                    </div>
+                </div>
+                <canvas id="lousa-canvas" width="300" height="300"></canvas>
+            </div>
+        </div>
+        <div class="sidebar" id="right-bar">
+            <h3>Informações do Objeto</h3>
             <hr>
-            <h3 id="title-h">Rotação:</h3>
-            <div class="number-inputs">
-                <div>
-                    <label for="x-rotation">X:</label>
-                    <input type="number" id="x-rotation" name="x-rotation" value="0">
+            <div id="object-info">
+                <h4>Vértices:</h4>
+                <div id="vertices-list" class="info-box">Nenhum objeto gerado.</div>
+                <h4>Centro:</h4>
+                <div id="center-position" class="info-box">Nenhum objeto gerado.</div>
+            </div>
+            <button id="clear-canvas-btn">Limpar</button>
+            <div class="control-group">
+                <h3>Histórico de Transformações</h3>
+                <div id="transformation-history" class="info-box">Nenhuma transformação aplicada.</div>
+            </div>
+            <div class="control-group">
+                <h3>Sequência de Transformações</h3>
+                <div class="input-row">
+                    <label>Transformação:</label>
+                    <select id="sequence-transformation-type">
+                        <option value="translation">Translação</option>
+                        <option value="rotation">Rotação</option>
+                        <option value="scale">Escala</option>
+                        <option value="shear">Cisalhamento</option>
+                        <option value="reflection">Reflexão</option>
+                    </select>
                 </div>
-                <div>
-                    <label for="y-rotation">Y:</label>
-                    <input type="number" id="y-rotation" name="y-rotation" value="0">
+                <div id="sequence-parameters">
+                    <!-- Os parâmetros específicos da transformação serão gerados dinamicamente -->
                 </div>
+                <button id="add-to-sequence-btn">Adicionar à Sequência</button>
+                <button id="apply-sequence-btn">Aplicar Sequência</button>
             </div>
             <div>
-                <label for="angle">Ângulo:</label>
-                <input type="number" id="angle" name="angle" value="0" id="angle">
+                <div id="pgm-section">
+                    <input type="file" id="pgm-upload" accept=".pgm">
+                    <div style="display:flex;gap:6px;">
+                        <button id="render-pgm-btn" style="flex:1">Carregar</button>
+                        <button id="img-reset-btn" style="flex:1">Resetar</button>
+                    </div>
+                    <div class="pgm-transform-group">
+                        <h4>Translação</h4>
+                        <label for="img-translate-x">X:</label>
+                        <input type="number" id="img-translate-x" value="0">
+                        <label for="img-translate-y">Y:</label>
+                        <input type="number" id="img-translate-y" value="0">
+                        <button id="img-translate-btn">Aplicar</button>
+                    </div>
+                    <div class="pgm-transform-group">
+                        <h4>Escala</h4>
+                        <label for="img-scale-x">X:</label>
+                        <input type="number" id="img-scale-x" value="1" step="0.1">
+                        <label for="img-scale-y">Y:</label>
+                        <input type="number" id="img-scale-y" value="1" step="0.1">
+                        <button id="img-scale-btn">Aplicar</button>
+                    </div>
+                    <div class="pgm-transform-group">
+                        <h4>Rotação</h4>
+                        <label for="img-rotate-angle">Ângulo (°):</label>
+                        <input type="number" id="img-rotate-angle" value="0">
+                        <button id="img-rotate-btn">Aplicar</button>
+                    </div>
+                    <div class="pgm-transform-group">
+                        <h4>Reflexão</h4>
+                        <label><input type="checkbox" id="img-reflect-x"> Em X</label>
+                        <label><input type="checkbox" id="img-reflect-y"> Em Y</label>
+                        <button id="img-reflect-btn">Aplicar</button>
+                    </div>
+                    <div class="pgm-transform-group">
+                        <h4>Cisalhamento</h4>
+                        <label for="img-shear-x">X:</label>
+                        <input type="number" id="img-shear-x" value="0" step="0.1">
+                        <label for="img-shear-y">Y:</label>
+                        <input type="number" id="img-shear-y" value="0" step="0.1">
+                        <button id="img-shear-btn">Aplicar</button>
+                    </div>
+                </div>
             </div>
-            <button class="type-op">Aplicar Rotação</button>
-            <hr>
-            <h3 id="title-h">Reflexão:</h3>
-            <div class="number-inputs">
-                <div>
-                    <label for="x-ref">
-                        <input type="checkbox" id="x-ref" name="x-ref" value="0" class="check"> Em X
-                    </label>
-                </div>
-                <div>
-                    <label for="y-ref">
-                        <input type="checkbox" id="y-ref" name="y-ref" value="0" class="check"> Em Y
-                    </label>
+            <div class="control-group">
+                <h3>Viewport</h3>
+                <label>
+                    <input type="checkbox" id="viewport-active"> Ativar Viewport
+                </label>
+                <div id="viewport-config" style="display:none;">
+                    <label>Xmin: <input type="number" id="viewport-xmin" value="-100"></label>
+                    <label>Ymin: <input type="number" id="viewport-ymin" value="-100"></label>
+                    <label>Xmax: <input type="number" id="viewport-xmax" value="100"></label>
+                    <label>Ymax: <input type="number" id="viewport-ymax" value="100"></label>
                 </div>
             </div>
-            <button class="type-op">Aplicar Reflexão</button>
-            <hr>
-            <h3 id="title-h">Cisalhamento:</h3>
-            <div class="number-inputs">
-                <div>
-                    <label for="x-cis">X:</label>
-                    <input type="number" id="x-cis" name="x-cis" value="0">
-                </div>
-                <div>
-                    <label for="y-cis">Y:</label>
-                    <input type="number" id="y-cis" name="y-cis" value="0">
-                </div>
-            </div>
-            <button class="type-op">Aplicar Cisalhamento</button>
-            <hr>
-            <div class="square-config">
-                <h3 id="title-h">Configurar Quadrado:</h3>
-                <div class="config-row">
-                    <label for="square-size" class="config-label">Tamanho:</label>
-                    <input type="number" id="square-size" class="config-input" value="50" min="1">
-                </div>
-                <div class="config-row">
-                    <label for="square-x" class="config-label">Posição X:</label>
-                    <input type="number" id="square-x" class="config-input" value="0">
-                </div>
-                <div class="config-row">
-                    <label for="square-y" class="config-label">Posição Y:</label>
-                    <input type="number" id="square-y" class="config-input" value="0">
-                    <button id="draw-square-btn" class="generate-btn">Gerar Quadrado</button>
-                    
-                </div>
-                
-            </div>
-            <hr>
         </div>
     </div>
-    </div>
-    <div class="main">
-        <canvas id="canvas" width="600" height="400"></canvas>
-        <p id="credits1">Implementado por: Erick Nathan, Pedro Lucas</p>
-        <p id="credits2">Computação Gráfica - Prof. Robson Pequeno de Sousa</p>
-        <a id="back" href="../1-Tela Principal/index.html">Voltar ao Início</a>
-    </div>
-    <div class="sidebar" id="right-bar">
-        <h3>Informações do Objeto</h3>
-        <hr>
-        <div id="object-info">
-            <h4>Vértices:</h4>
-            <div id="vertices-list" class="info-box">Nenhum objeto gerado.</div>
-            <h4>Centro:</h4>
-            <div id="center-position" class="info-box">Nenhum objeto gerado.</div>
-        </div>
-        <button id="clear-canvas-btn">Limpar</button>
-        <div class="control-group">
-            <h3>Histórico de Transformações</h3>
-            <div id="transformation-history" class="info-box">Nenhuma transformação aplicada.</div>
-        </div>
-        <div class="control-group">
-            <h3>Sequência de Transformações</h3>
-            <div class="input-row">
-                <label>Transformação:</label>
-                <select id="sequence-transformation-type" style="width: 80px;">
-                    <option value="translation">Translação</option>
-                    <option value="rotation">Rotação</option>
-                    <option value="scale">Escala</option>
-                    <option value="shear">Cisalhamento</option>
-                    <option value="reflection">Reflexão</option>
-                </select>
-            </div>
-            <div id="sequence-parameters">
-                <!-- Os parâmetros específicos da transformação serão gerados dinamicamente -->
-            </div>
-            <button id="add-to-sequence-btn">Adicionar à Sequência</button>
-            <button id="apply-sequence-btn">Aplicar Sequência</button>
-        </div>
-        <div>
-            <div id="pgm-section">
-            <input type="file" id="pgm-upload" accept=".pgm" style="width: 125px;">
-            <button id="render-pgm-btn">Carregar Imagem</button>
-            <div class="pgm-transform-group">
-                <h4>Translação</h4>
-                <label for="img-translate-x">X:</label>
-                <input type="number" id="img-translate-x" value="0" style="width:50px;">
-                <label for="img-translate-y">Y:</label>
-                <input type="number" id="img-translate-y" value="0" style="width:50px;">
-                <button id="img-translate-btn">Aplicar</button>
-            </div>
-            <div class="pgm-transform-group">
-                <h4>Escala</h4>
-                <label for="img-scale-x">X:</label>
-                <input type="number" id="img-scale-x" value="1" step="0.1" style="width:50px;">
-                <label for="img-scale-y">Y:</label>
-                <input type="number" id="img-scale-y" value="1" step="0.1" style="width:50px;">
-                <button id="img-scale-btn">Aplicar</button>
-            </div>
-            <div class="pgm-transform-group">
-                <h4>Rotação</h4>
-                <label for="img-rotate-angle">Ângulo (°):</label>
-                <input type="number" id="img-rotate-angle" value="0" style="width:50px;">
-                <button id="img-rotate-btn">Aplicar</button>
-            </div>
-            <div class="pgm-transform-group">
-                <h4>Reflexão</h4>
-                <label><input type="checkbox" id="img-reflect-x"> Em X</label>
-                <label><input type="checkbox" id="img-reflect-y"> Em Y</label>
-                <button id="img-reflect-btn">Aplicar</button>
-            </div>
-            <div class="pgm-transform-group">
-                <h4>Cisalhamento</h4>
-                <label for="img-shear-x">X:</label>
-                <input type="number" id="img-shear-x" value="0" step="0.1" style="width:50px;">
-                <label for="img-shear-y">Y:</label>
-                <input type="number" id="img-shear-y" value="0" step="0.1" style="width:50px;">
-                <button id="img-shear-btn">Aplicar</button>
-            </div>
-            </div>
-        </div>
-        <div class="control-group">
-    <h3>Viewport</h3>
-    <label>
-        <input type="checkbox" id="viewport-active"> Ativar Viewport
-    </label>
-    <div id="viewport-config" style="display:none;">
-        <label>Xmin: <input type="number" id="viewport-xmin" value="-100" style="width:60px;"></label>
-        <label>Ymin: <input type="number" id="viewport-ymin" value="-100" style="width:60px;"></label>
-        <label>Xmax: <input type="number" id="viewport-xmax" value="100" style="width:60px;"></label>
-        <label>Ymax: <input type="number" id="viewport-ymax" value="100" style="width:60px;"></label>
-    </div>
-</div>
-    </div>
-    
+
+    <script src="../common/common.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

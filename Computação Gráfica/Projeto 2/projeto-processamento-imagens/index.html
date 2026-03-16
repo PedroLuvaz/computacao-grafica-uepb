@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-  <title>Projeto Processamento de imagens</title>
+  <title>Processamento de Imagens - Projeto 2</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -9,13 +9,148 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/styles-cg.css">
+  <style>
+    /* ===== LANDING PAGE OVERRIDES ===== */
+    #content {
+      padding: 0 !important;
+    }
+
+    .landing-hero {
+      padding: 60px 30px 45px;
+      text-align: center;
+      background: linear-gradient(160deg, #e8f5e9 0%, #f0f7f0 40%, #f5f5f8 100%);
+      border-bottom: 1px solid rgba(69,160,73,0.15);
+    }
+
+    .landing-hero h1 {
+      font-size: 36px;
+      font-weight: 700;
+      color: #1a2a1a;
+      margin-bottom: 6px;
+    }
+
+    .landing-hero .subtitle {
+      font-size: 15px;
+      color: #45a049;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .landing-hero .prof {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 18px;
+    }
+
+    .landing-hero .team {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .landing-hero .team span {
+      font-size: 13px;
+      color: #2c4a2c;
+      background: rgba(69,160,73,0.08);
+      border: 1px solid rgba(69,160,73,0.2);
+      padding: 5px 16px;
+      border-radius: 30px;
+    }
+
+    /* MODULES SECTION */
+    .landing-modules {
+      padding: 40px 30px 60px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .modules-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #2c2c3a;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .modules-title::after {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 3px;
+      background: #45a049;
+      margin: 8px auto 30px;
+      border-radius: 2px;
+    }
+
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .module-card-p2 {
+      background: #ffffff;
+      border: 1px solid #dde0e8;
+      border-radius: 12px;
+      padding: 24px 20px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .module-card-p2::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #45a049, transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .module-card-p2:hover {
+      transform: translateY(-4px);
+      border-color: rgba(69,160,73,0.3);
+      box-shadow: 0 8px 25px rgba(69,160,73,0.1), 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    .module-card-p2:hover::before {
+      opacity: 1;
+    }
+
+    .module-card-p2 .card-icon {
+      font-size: 26px;
+      color: #45a049;
+      margin-bottom: 12px;
+      opacity: 0.85;
+    }
+
+    .module-card-p2 h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2c2c3a;
+      margin-bottom: 7px;
+    }
+
+    .module-card-p2 p {
+      font-size: 12px;
+      color: #5a5a72;
+      line-height: 1.55;
+      margin: 0;
+    }
+  </style>
 </head>
 <body>
 
-  <div class="wrapper d-flex align-items-stretch">
+<div class="wrapper d-flex align-items-stretch">
   <nav id="topbar" class="navbar">
     <div class="navbar-container">
-      <a href="index.html" class="logo" style="margin-right: 10px;">Projeto 2 - Imagens</a>
+      <a href="index.html" class="logo">Projeto 2 - Imagens</a>
       <ul class="navbar-links">
         <li><a href="filtros.html">Filtros</a></li>
         <li><a href="combinacao.html">Combinação</a></li>
@@ -23,37 +158,80 @@
         <li><a href="histograma.html">Histograma</a></li>
         <li><a href="morfologia.html">Morfologia</a></li>
         <li><a href="morphing.html">Morfismo Temporal</a></li>
+        <li><a href="../../Projeto 1/1-Tela Principal/index.html" class="nav-cross">Projeto 1</a></li>
+        <li><a href="../../index.html" class="nav-cross">Início</a></li>
       </ul>
     </div>
   </nav>
 
-  <!-- Page Content  -->
-  <div id="content" class="p-4 p-md-5 pt-5">
-    <h2 class="mb-4">Projeto de Processamento de Imagem 2025.1</h2>
-    <h5>Professor: Robson Pequeno de Sousa</h5>
-    
-    <h5>Integrantes:
-      <ul>
-        <li>Pedro Lucas Vaz Andrade</li>
-        <li>Erick Nathan Almeida do Nascimento</li>
-      </ul>
-    </h5>
+  <div id="content">
 
-    <h5>
-      Ementa:
-      <ul>
-        <li>Filtros de Imagem</li>
-        <li>Combinação de Imagens</li>
-        <li>Transformações Geométricas</li>
-        <li>Histograma de Imagem</li>
-        <li>Morfologia Matemática</li>
-        <li>Morfismo Temporal</li>
-      </ul>
-    </h5>
+    <div class="landing-hero">
+      <h1>Processamento de Imagens</h1>
+      <p class="subtitle">Projeto 2 &mdash; 2025.1 &mdash; UEPB</p>
+      <p class="prof">Professor Robson Pequeno de Sousa</p>
+      <div class="team">
+        <span>Pedro Lucas Vaz Andrade</span>
+        <span>Erick Nathan Almeida do Nascimento</span>
+      </div>
+    </div>
+
+    <div class="landing-modules">
+      <h2 class="modules-title">Módulos</h2>
+      <div class="modules-grid">
+
+        <a href="filtros.html" class="module-card-p2">
+          <div class="card-icon"><i class="fas fa-filter"></i></div>
+          <h3>Filtros</h3>
+          <p>Filtros espaciais por convolução: Média, Mediana, Passa Alta, Roberts, Prewitt, Sobel, Alto Reforço.</p>
+        </a>
+
+        <a href="combinacao.html" class="module-card-p2">
+          <div class="card-icon"><i class="fas fa-layer-group"></i></div>
+          <h3>Combinação de Imagens</h3>
+          <p>Operações aritméticas (soma, subtração, multiplicação, divisão) e lógicas (OR, AND, XOR) entre imagens.</p>
+        </a>
+
+        <a href="transformacoes.html" class="module-card-p2">
+          <div class="card-icon"><i class="fas fa-sliders-h"></i></div>
+          <h3>Transformações de Intensidade</h3>
+          <p>Negativo, Gama, Logarítmica, Sigmoide, Faixa Dinâmica e Transformação Linear.</p>
+        </a>
+
+        <a href="histograma.html" class="module-card-p2">
+          <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
+          <h3>Histograma</h3>
+          <p>Cálculo e visualização do histograma de intensidades. Equalização pelo método da CDF acumulada.</p>
+        </a>
+
+        <a href="morfologia.html" class="module-card-p2">
+          <div class="card-icon"><i class="fas fa-shapes"></i></div>
+          <h3>Morfologia Matemática</h3>
+          <p>Operações binárias e em escala de cinza: erosão, dilatação, abertura, fechamento, contorno e gradiente.</p>
+        </a>
+
+        <a href="morphing.html" class="module-card-p2">
+          <div class="card-icon"><i class="fas fa-film"></i></div>
+          <h3>Morfismo Temporal</h3>
+          <p>Interpolação linear entre imagens (cross-dissolve) com animação de 60 frames e exportação para GIF.</p>
+        </a>
+
+      </div>
+    </div>
+
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js" integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="js/bootstrap.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.navbar-links a').forEach(link => {
+        if (link.getAttribute('href') === currentPage) {
+            link.classList.add('active');
+        }
+    });
+});
+</script>
 </body>
 </html>

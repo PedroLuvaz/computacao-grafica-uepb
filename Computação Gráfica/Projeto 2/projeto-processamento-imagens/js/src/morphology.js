@@ -93,17 +93,17 @@ const operators = {
 imagesPath: Mapeia índices para caminhos dos arquivos de imagem.
 */
 const imagesPath = {
-    0: '../assets/fingerprint.pbm',
-    1: '../assets/holes.pbm',
-    2: '../assets/text.pbm',
-    3: '../assets/map.pbm',
-    4: '../assets/lena.pgm',
-    5: '../assets/airplane.pgm',
-    6: '../assets/cameraman.pgm',
-    7: '../assets/supernova.pgm',
-    8: '../assets/sea.pgm',
-    9: '../assets/tomography.pgm',
-    10: '../assets/particles.pgm',
+    0: 'assets/fingerprint.pbm',
+    1: 'assets/holes.pbm',
+    2: 'assets/text.pbm',
+    3: 'assets/map.pbm',
+    4: 'assets/lena.pgm',
+    5: 'assets/airplane.pgm',
+    6: 'assets/cameraman.pgm',
+    7: 'assets/supernova.pgm',
+    8: 'assets/sea.pgm',
+    9: 'assets/tomography.pgm',
+    10: 'assets/particles.pgm',
 };
 
 // kernelList: Kernel padrão 3x3 para operações morfológicas
@@ -137,7 +137,7 @@ mainCanvas: Função para configurar o canvas da imagem original.
 const mainCanvas = function (sketch) {
     sketch.setup = function () {
         sketch.createCanvas(256, 256).parent("original-img");
-        readImage('../assets/fingerprint.pbm', sketch, img);
+        readImage('assets/fingerprint.pbm', sketch, img);
     }
 
     imgSelector.onchange = _ => readImage(imagesPath[imgSelector.value], sketch, img);

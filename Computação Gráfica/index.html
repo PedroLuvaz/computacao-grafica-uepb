@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computação Gráfica - UEPB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #45a049;
+            --accent-hover: #4aba4f;
+            --bg: #f0f2f5;
+            --bg-card: #ffffff;
+            --border: #dde0e8;
+            --border-accent: rgba(69,160,73,0.3);
+            --text: #2c2c3a;
+            --text-muted: #5a5a72;
+            --font: 'Poppins', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* HERO */
+        .hero {
+            padding: 90px 20px 60px;
+            text-align: center;
+            background: linear-gradient(160deg, #e8f5e9 0%, #f0f7f0 35%, #f5f5f8 100%);
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 50% 50%, rgba(69,160,73,0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(69,160,73,0.12);
+            border: 1px solid rgba(69,160,73,0.3);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 6px 18px;
+            border-radius: 30px;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-size: 52px;
+            font-weight: 700;
+            color: #1a2a1a;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+            line-height: 1.15;
+        }
+
+        .hero h1 span {
+            color: var(--accent);
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+            color: #4a6a4a;
+            margin-bottom: 6px;
+        }
+
+        .hero-prof {
+            font-size: 14px;
+            color: #7a8a7a;
+            margin-bottom: 28px;
+        }
+
+        .hero-team {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .hero-team-member {
+            background: rgba(69,160,73,0.08);
+            border: 1px solid rgba(69,160,73,0.2);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            color: #2c4a2c;
+        }
+
+        /* PROJECTS SECTION */
+        .projects-section {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 30px 80px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            text-align: center;
+            color: var(--text);
+            margin-bottom: 40px;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 45px;
+            height: 3px;
+            background: var(--accent);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .project-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 36px 32px;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.35s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--border-accent);
+            box-shadow: 0 12px 40px rgba(69,160,73,0.12), 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        .project-card:hover::before {
+            opacity: 1;
+        }
+
+        .project-number {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 12px;
+            opacity: 0.7;
+        }
+
+        .project-card h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a2a1a;
+            margin-bottom: 10px;
+        }
+
+        .project-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .project-modules {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 24px;
+        }
+
+        .project-modules li {
+            font-size: 12px;
+            color: #7a7a8a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .project-modules li::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            background: var(--accent);
+            border-radius: 50%;
+            flex-shrink: 0;
+            opacity: 0.6;
+        }
+
+        .project-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--accent) 0%, #3a8c40 100%);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 10px 22px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover .project-cta {
+            box-shadow: 0 4px 15px rgba(69,160,73,0.35);
+        }
+
+        .project-cta-arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover .project-cta-arrow {
+            transform: translateX(4px);
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 24px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: #9a9aaa;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 680px) {
+            .hero h1 { font-size: 34px; }
+            .projects-grid { grid-template-columns: 1fr; }
+            .projects-section { padding: 40px 20px 60px; }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="hero">
+        <div class="hero-badge">UEPB &mdash; 2025.1</div>
+        <h1>Computação <span>Gráfica</span></h1>
+        <p class="hero-subtitle">Projeto de Computação Gráfica 2025.1</p>
+        <p class="hero-prof">Professor Robson Pequeno de Sousa</p>
+        <div class="hero-team">
+            <span class="hero-team-member">Pedro Lucas Vaz Andrade</span>
+            <span class="hero-team-member">Erick Nathan Almeida do Nascimento</span>
+        </div>
+    </section>
+
+    <div class="projects-section">
+        <h2 class="section-title">Projetos</h2>
+        <div class="projects-grid">
+            <a href="Projeto 1/1-Tela Principal/index.html" class="project-card">
+                <p class="project-number">Projeto 01</p>
+                <h2>Fundamentos de CG</h2>
+                <p>Rasterização, transformações geométricas e algoritmos fundamentais de computação gráfica.</p>
+                <ul class="project-modules">
+                    <li>Sistemas de Coordenadas</li>
+                    <li>Retas: DDA e Ponto Médio</li>
+                    <li>Circunferências</li>
+                    <li>Transformações 2D e 3D</li>
+                    <li>Batimentos Cardíacos (ECG)</li>
+                    <li>Recorte de Cohen-Sutherland</li>
+                </ul>
+                <span class="project-cta">
+                    Acessar Projeto 1
+                    <span class="project-cta-arrow">&#8594;</span>
+                </span>
+            </a>
+
+            <a href="Projeto 2/projeto-processamento-imagens/index.html" class="project-card">
+                <p class="project-number">Projeto 02</p>
+                <h2>Processamento de Imagens</h2>
+                <p>Operações sobre imagens PGM: filtragem, transformações de intensidade, morfologia e morfismo.</p>
+                <ul class="project-modules">
+                    <li>Filtros Espaciais (Sobel, Prewitt, etc.)</li>
+                    <li>Combinação de Imagens</li>
+                    <li>Transformações de Intensidade</li>
+                    <li>Histograma e Equalização</li>
+                    <li>Morfologia Matemática</li>
+                    <li>Morfismo Temporal</li>
+                </ul>
+                <span class="project-cta">
+                    Acessar Projeto 2
+                    <span class="project-cta-arrow">&#8594;</span>
+                </span>
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        Computação Gráfica &mdash; UEPB 2025.1 &mdash; Prof. Robson Pequeno de Sousa
+    </footer>
+
+</body>
+</html>

@@ -360,6 +360,8 @@ function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     desenharQuadrantes();
     quadradoAtual = [];
+    pgmImage = null;
+    imgTransformMatrix = [[1,0,0],[0,1,0],[0,0,1]];
     document.getElementById("vertices-list").innerHTML = "Nenhum objeto gerado.";
     document.getElementById("center-position").innerHTML = "Nenhum objeto gerado.";
     transformationHistory2D = [];
@@ -603,9 +605,46 @@ document.getElementById('apply-sequence-btn').addEventListener('click', () => {
 // PGM IMAGE HANDLING
 // ===============================
 
-// Armazena os pontos do objeto da imagem carregada
+// Armazena os pontos do objeto da imagem carregada (legado)
 let imagemObjetoPontos = [];
 let imagemCentro = { x: 0, y: 0 };
+
+// ===============================
+// PGM: dados brutos + matriz acumulada para mapeamento inverso
+// ===============================
+let pgmImage = null;  // { width, height, pixels, maxVal, background }
+let imgTransformMatrix = [[1,0,0],[0,1,0],[0,0,1]];
+
+// Inverte uma matriz 3x3 (para mapeamento inverso)
+function invertMatrix3x3(m) {
+    const det = m[0][0]*(m[1][1]*m[2][2]-m[1][2]*m[2][1])
+              - m[0][1]*(m[1][0]*m[2][2]-m[1][2]*m[2][0])
+              + m[0][2]*(m[1][0]*m[2][1]-m[1][1]*m[2][0]);
+    if (Math.abs(det) < 1e-10) return null;
+    return [
+        [(m[1][1]*m[2][2]-m[1][2]*m[2][1])/det, (m[0][2]*m[2][1]-m[0][1]*m[2][2])/det, (m[0][1]*m[1][2]-m[0][2]*m[1][1])/det],
+        [(m[1][2]*m[2][0]-m[1][0]*m[2][2])/det, (m[0][0]*m[2][2]-m[0][2]*m[2][0])/det, (m[0][2]*m[1][0]-m[0][0]*m[1][2])/det],
+        [(m[1][0]*m[2][1]-m[1][1]*m[2][0])/det, (m[0][1]*m[2][0]-m[0][0]*m[2][1])/det, (m[0][0]*m[1][1]-m[0][1]*m[1][0])/det]
+    ];
+}
+
+// Interpolação bilinear em coordenadas de pixel da imagem
+function bilinearSample(image, u, v) {
+    const x0 = Math.floor(u), y0 = Math.floor(v);
+    const tx = u - x0, ty = v - y0;
+    function get(x, y) {
+        if (x < 0 || x >= image.width || y < 0 || y >= image.height) return image.background;
+        return image.pixels[y * image.width + x];
+    }
+    return get(x0,   y0)*(1-tx)*(1-ty) + get(x0+1, y0)*tx*(1-ty)
+         + get(x0, y0+1)*(1-tx)*ty     + get(x0+1, y0+1)*tx*ty;
+}
+
+// Acumula uma nova transformação sobre a matriz atual e re-renderiza
+function acumularTransformImagem(mat) {
+    imgTransformMatrix = multiplicarMatrizes(mat, imgTransformMatrix);
+    renderImagemObjeto();
+}
 
 // Função para ler arquivo PGM (P2 ou P5) e extrair pontos do objeto
 function parsePGM(arrayBuffer) {
@@ -677,25 +716,7 @@ function parsePGM(arrayBuffer) {
     for (const px of pixels) freq[px] = (freq[px] || 0) + 1;
     const bg = parseInt(Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0]);
 
-    // Extrai pontos do objeto (não fundo)
-    const pontos = [];
-    let sumX = 0, sumY = 0, count = 0;
-    for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-            const val = pixels[y * width + x];
-            if (val !== bg) {
-                // Centraliza no canvas (0,0 no centro)
-                const px = x - width / 2;
-                const py = height / 2 - y;
-                pontos.push({ x: px, y: py });
-                sumX += px;
-                sumY += py;
-                count++;
-            }
-        }
-    }
-    const imagemCentro = { x: sumX / count, y: sumY / count };
-    return { pontos, imagemCentro };
+    return { width, height, pixels, maxVal, background: bg };
 }
 
 // Renderiza os pontos da imagem no canvas
@@ -789,9 +810,9 @@ document.getElementById("render-pgm-btn").addEventListener("click", () => {
         try {
             const result = parsePGM(e.target.result);
             if (!result) return;
-            imagemObjetoPontos = result.pontos;
-            imagemCentro = result.imagemCentro;
-            renderImagemObjeto(imagemObjetoPontos);
+            pgmImage = result;
+            imgTransformMatrix = [[1,0,0],[0,1,0],[0,0,1]];
+            renderImagemObjeto();
         } catch (err) {
             alert("Erro ao ler PGM: " + err.message);
         }
@@ -799,61 +820,55 @@ document.getElementById("render-pgm-btn").addEventListener("click", () => {
     reader.readAsArrayBuffer(fileInput.files[0]);
 });
 
-// Botões para aplicar transformações na imagem
+document.getElementById('img-reset-btn').addEventListener('click', function() {
+    if (!pgmImage) { alert("Carregue uma imagem PGM primeiro!"); return; }
+    imgTransformMatrix = [[1,0,0],[0,1,0],[0,0,1]];
+    renderImagemObjeto();
+});
+
+// Botões para aplicar transformações na imagem (mapeamento inverso acumulado)
 document.getElementById('img-translate-btn').addEventListener('click', function() {
-    const dx = parseFloat(document.getElementById('img-translate-x').value);
-    const dy = parseFloat(document.getElementById('img-translate-y').value);
-    // Aplica translação na imagem
-    const matriz = criarMatrizTranslacao(dx, dy);
-    aplicarTransformacaoImagem(matriz);
+    if (!pgmImage) { alert("Carregue uma imagem PGM primeiro!"); return; }
+    const dx = parseFloat(document.getElementById('img-translate-x').value) || 0;
+    const dy = parseFloat(document.getElementById('img-translate-y').value) || 0;
+    acumularTransformImagem(criarMatrizTranslacao(dx, dy));
 });
 
 document.getElementById('img-scale-btn').addEventListener('click', function() {
-    const sx = parseFloat(document.getElementById('img-scale-x').value);
-    const sy = parseFloat(document.getElementById('img-scale-y').value);
-    // Escala em torno do centro da imagem
-    atualizarCentroImagem();
-    const t1 = criarMatrizTranslacao(-imagemCentro.x, -imagemCentro.y);
-    const escala = criarMatrizEscala(sx, sy);
-    const t2 = criarMatrizTranslacao(imagemCentro.x, imagemCentro.y);
-    const matriz = multiplicarMatrizes(t2, multiplicarMatrizes(escala, t1));
-    aplicarTransformacaoImagem(matriz);
+    if (!pgmImage) { alert("Carregue uma imagem PGM primeiro!"); return; }
+    const sx = parseFloat(document.getElementById('img-scale-x').value) || 1;
+    const sy = parseFloat(document.getElementById('img-scale-y').value) || 1;
+    // Escala em torno do centro atual da imagem (T*[0,0,1] = coluna de translação)
+    const cx = imgTransformMatrix[0][2];
+    const cy = imgTransformMatrix[1][2];
+    const mat = multiplicarMatrizes(
+        criarMatrizTranslacao(cx, cy),
+        multiplicarMatrizes(criarMatrizEscala(sx, sy), criarMatrizTranslacao(-cx, -cy))
+    );
+    acumularTransformImagem(mat);
 });
 
 document.getElementById('img-rotate-btn').addEventListener('click', function() {
-    const angle = parseFloat(document.getElementById('img-rotate-angle').value);
-    atualizarCentroImagem();
-    const matriz = criarMatrizRotacao(angle, imagemCentro.x, imagemCentro.y);
-    aplicarTransformacaoImagem(matriz);
+    if (!pgmImage) { alert("Carregue uma imagem PGM primeiro!"); return; }
+    const angle = parseFloat(document.getElementById('img-rotate-angle').value) || 0;
+    const cx = imgTransformMatrix[0][2];
+    const cy = imgTransformMatrix[1][2];
+    acumularTransformImagem(criarMatrizRotacao(angle, cx, cy));
 });
 
 document.getElementById('img-reflect-btn').addEventListener('click', function() {
+    if (!pgmImage) { alert("Carregue uma imagem PGM primeiro!"); return; }
     const reflectX = document.getElementById('img-reflect-x').checked;
     const reflectY = document.getElementById('img-reflect-y').checked;
-    const matriz = criarMatrizReflexao(reflectX, reflectY);
-    aplicarTransformacaoImagem(matriz);
+    acumularTransformImagem(criarMatrizReflexao(reflectX, reflectY));
 });
 
 document.getElementById('img-shear-btn').addEventListener('click', function() {
-    const shx = parseFloat(document.getElementById('img-shear-x').value);
-    const shy = parseFloat(document.getElementById('img-shear-y').value);
-    const matriz = criarMatrizCisalhamento(shx, shy);
-    aplicarTransformacaoImagem(matriz);
+    if (!pgmImage) { alert("Carregue uma imagem PGM primeiro!"); return; }
+    const shx = parseFloat(document.getElementById('img-shear-x').value) || 0;
+    const shy = parseFloat(document.getElementById('img-shear-y').value) || 0;
+    acumularTransformImagem(criarMatrizCisalhamento(shx, shy));
 });
-
-// Garante que o plano cartesiano seja desenhado após a imagem ser plotada
-function renderImagemObjeto(pontos) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // Fundo branco
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    desenharQuadrantes(); // Desenha os eixos APÓS o fundo
-    // Desenha pontos do objeto
-    ctx.fillStyle = "black";
-    for (const p of pontos) {
-        setPixel(Math.round(p.x), Math.round(p.y));
-    }
-}
 
 // ===============================
 // VIEWPORT (Recorte de Tela)
@@ -867,6 +882,7 @@ const viewportConfigDiv = document.getElementById('viewport-config');
 viewportActiveCheckbox.addEventListener('change', function() {
     viewportActive = this.checked;
     viewportConfigDiv.style.display = viewportActive ? 'block' : 'none';
+    document.getElementById('viewport-window').style.display = viewportActive ? 'flex' : 'none';
     updateViewportFromInputs();
     redrawAll();
 });
@@ -1008,33 +1024,53 @@ function redesenharQuadrado(pontos) {
     drawViewportRect();
 }
 
-// Redefina renderImagemObjeto para recortar pixels fora da viewport e pintar vermelho
-function renderImagemObjeto(pontos) {
+// Renderiza imagem PGM usando mapeamento inverso + interpolação bilinear
+function renderImagemObjeto() {
+    if (!pgmImage) return;
+    const inv = invertMatrix3x3(imgTransformMatrix);
+    if (!inv) return;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    desenharQuadrantes();
-    for (const p of pontos) {
-        if (viewportActive) {
-            if (
-                p.x < viewport.xmin || p.x > viewport.xmax ||
-                p.y < viewport.ymin || p.y > viewport.ymax
-            ) {
-                setPixelColor(Math.round(p.x), Math.round(p.y), "red");
-            } else {
-                setPixelColor(Math.round(p.x), Math.round(p.y), "black");
-            }
-        } else {
-            setPixelColor(Math.round(p.x), Math.round(p.y), "black");
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+    const halfW = canvas.width / 2, halfH = canvas.height / 2;
+    const halfImgW = pgmImage.width / 2, halfImgH = pgmImage.height / 2;
+
+    for (let cy = 0; cy < canvas.height; cy++) {
+        for (let cx = 0; cx < canvas.width; cx++) {
+            // pixel do canvas → coordenadas do mundo
+            const wx = cx - halfW;
+            const wy = halfH - cy;
+            // mapeamento inverso: mundo → espaço original da imagem
+            const swx = inv[0][0]*wx + inv[0][1]*wy + inv[0][2];
+            const swy = inv[1][0]*wx + inv[1][1]*wy + inv[1][2];
+            // coordenadas do mundo → pixel da imagem original
+            const imgX = swx + halfImgW;
+            const imgY = halfImgH - swy;
+            const val = bilinearSample(pgmImage, imgX, imgY);
+            const gray = Math.round(val * 255 / pgmImage.maxVal);
+            const idx = (cy * canvas.width + cx) * 4;
+            // fora da viewport: tinge de vermelho (canal R = 255, G/B = gray)
+            const fora = viewportActive && (wx < viewport.xmin || wx > viewport.xmax || wy < viewport.ymin || wy > viewport.ymax);
+            data[idx]   = fora ? 255 : gray;
+            data[idx+1] = gray;
+            data[idx+2] = gray;
+            data[idx+3] = 255;
         }
     }
+    ctx.putImageData(imageData, 0, 0);
+    desenharQuadrantes();
     drawViewportRect();
+    desenharNaLousa();
 }
 
 // Redesenha tudo (quadrado e imagem) ao mudar viewport
 function redrawAll() {
     if (quadradoAtual.length > 0) redesenharQuadrado(quadradoAtual);
-    if (imagemObjetoPontos.length > 0) renderImagemObjeto(imagemObjetoPontos);
+    if (pgmImage) renderImagemObjeto();
 }
 
 // ===============================
@@ -1110,15 +1146,15 @@ function cohenSutherlandClipLousa(x1, y1, x2, y2, vp) {
     else return null;
 }
 
-// Desenha o objeto atual na lousa, usando recorte
+// Desenha o objeto atual na lousa, usando recorte e mapeamento inverso para imagens
 function desenharNaLousa() {
     lousaCtx.clearRect(0, 0, lousaCanvas.width, lousaCanvas.height);
-    if (quadradoAtual.length === 0) return;
+
+    // Quadrado: recorte Cohen-Sutherland + mapeamento mundo→lousa
     for (let i = 0; i < quadradoAtual.length; i++) {
         const proximo = (i + 1) % quadradoAtual.length;
         const v1 = quadradoAtual[i];
         const v2 = quadradoAtual[proximo];
-        // Recorte na viewport
         const clipped = cohenSutherlandClipLousa(v1.x, v1.y, v2.x, v2.y, viewport);
         if (clipped) {
             const p0 = worldToLousa(clipped[0], clipped[1]);
@@ -1130,18 +1166,37 @@ function desenharNaLousa() {
             lousaCtx.stroke();
         }
     }
-    // Também desenha pontos da imagem PGM na lousa
-    if (imagemObjetoPontos && imagemObjetoPontos.length > 0) {
-        for (const p of imagemObjetoPontos) {
-            if (
-                p.x >= viewport.xmin && p.x <= viewport.xmax &&
-                p.y >= viewport.ymin && p.y <= viewport.ymax
-            ) {
-                const lp = worldToLousa(p.x, p.y);
-                lousaCtx.fillStyle = "#111";
-                lousaCtx.fillRect(lp.x, lp.y, 1, 1);
+
+    // Imagem PGM: mapeamento inverso + interpolação bilinear pixel a pixel na lousa
+    if (pgmImage) {
+        const inv = invertMatrix3x3(imgTransformMatrix);
+        if (!inv) return;
+        const lW = lousaCanvas.width, lH = lousaCanvas.height;
+        const halfImgW = pgmImage.width / 2, halfImgH = pgmImage.height / 2;
+        const vp = viewport;
+        const vpW = vp.xmax - vp.xmin, vpH = vp.ymax - vp.ymin;
+
+        const imageData = lousaCtx.createImageData(lW, lH);
+        const data = imageData.data;
+
+        for (let ly = 0; ly < lH; ly++) {
+            for (let lx = 0; lx < lW; lx++) {
+                // lousa pixel → coordenadas do mundo via mapeamento da viewport
+                const wx = vp.xmin + (lx / lW) * vpW;
+                const wy = vp.ymax - (ly / lH) * vpH;
+                // mapeamento inverso da transformação da imagem
+                const swx = inv[0][0]*wx + inv[0][1]*wy + inv[0][2];
+                const swy = inv[1][0]*wx + inv[1][1]*wy + inv[1][2];
+                // mundo → pixel original da imagem
+                const imgX = swx + halfImgW;
+                const imgY = halfImgH - swy;
+                const val = bilinearSample(pgmImage, imgX, imgY);
+                const gray = Math.round(val * 255 / pgmImage.maxVal);
+                const idx = (ly * lW + lx) * 4;
+                data[idx] = gray; data[idx+1] = gray; data[idx+2] = gray; data[idx+3] = 255;
             }
         }
+        lousaCtx.putImageData(imageData, 0, 0);
     }
 }
 

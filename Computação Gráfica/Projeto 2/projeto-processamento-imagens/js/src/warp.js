@@ -50,7 +50,7 @@ function drawTriangles(sketch, points, triangles) {
 const startCanvas = sketch => {
     sketch.setup = () => {
         sketch.createCanvas(400, 400).parent('start-img');
-        readImage('../assets/start.pgm', sketch, startImg);
+        readImage('assets/start.pgm', sketch, startImg);
     };
 
     document.getElementById("start-img").addEventListener("mousedown", () => {
@@ -69,7 +69,7 @@ const startCanvas = sketch => {
 const endCanvas = sketch => {
     sketch.setup = () => {
         sketch.createCanvas(300, 300).parent("end-img");
-        readImage('../assets/end.pgm', sketch, endImg);
+        readImage('assets/end.pgm', sketch, endImg);
     };
 
     document.getElementById("end-img").addEventListener("mousedown", () => {

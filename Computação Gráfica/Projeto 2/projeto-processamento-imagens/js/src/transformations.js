@@ -82,8 +82,8 @@ const operators = {
 
 // Caminhos das imagens disponíveis para seleção
 const imagesPath = {
-    0: '../assets/lena.pgm',
-    2: '../assets/airplane.pgm',
+    0: 'assets/lena.pgm',
+    2: 'assets/airplane.pgm',
 };
 
 let kernelList = []; // Lista de kernels (não utilizada neste trecho)
@@ -127,7 +127,7 @@ let processedImg = new Image();
 const mainCanvas = function (sketch) {
     sketch.setup = function () {
         sketch.createCanvas(256, 256).parent("original-img"); // Cria o canvas e adiciona ao elemento HTML
-        readImage('../assets/lena.pgm', sketch, img);         // Lê a imagem padrão (Lena)
+        readImage('assets/lena.pgm', sketch, img);         // Lê a imagem padrão (Lena)
     }
 
     // Callback para mudança de imagem selecionada

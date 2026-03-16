@@ -27,10 +27,10 @@ const operators = {
 let selectedOperator = null;
 
 const imagesPath = {
-    0: '../assets/lena.pgm',
-    1: '../assets/airplane.pgm',
-    2: '../assets/pedrokid.pgm',
-    3: '../assets/kidnathan.pgm'
+    0: 'assets/lena.pgm',
+    1: 'assets/airplane.pgm',
+    2: 'assets/pedrokid.pgm',
+    3: 'assets/kidnathan.pgm'
 };
 
 const filterSelector = document.getElementById('input-filter');
@@ -49,7 +49,7 @@ let processedImg = new Image();
 const mainCanvas = function (sketch) {
     sketch.setup = function () {
         sketch.createCanvas(256, 256).parent("img-a");
-        readImage('../assets/lena.pgm', sketch, imgA);
+        readImage('assets/lena.pgm', sketch, imgA);
     }
 
     imgASelector.onchange = _ => readImage(imagesPath[imgASelector.value], sketch, imgA);
@@ -59,7 +59,7 @@ const mainCanvas = function (sketch) {
 const secondaryCanvas = function (sketch) {
     sketch.setup = function () {
         sketch.createCanvas(256, 256).parent("img-b");
-        readImage('../assets/airplane.pgm', sketch, imgB);
+        readImage('assets/airplane.pgm', sketch, imgB);
     }
 
     imgBSelector.onchange = _ => readImage(imagesPath[imgBSelector.value], sketch, imgB);
