@@ -177,6 +177,7 @@
     margin-right: 5px;
 }
 
+<<<<<<< HEAD
 /* Override para permitir scroll quando a lousa é exibida */
 .main {
     justify-content: flex-start;
@@ -234,3 +235,14 @@
     background: white;
     display: block;
 }
+=======
+/* Viewport config inputs */
+#viewport-config label {
+    display: block;
+    margin-bottom: 4px;
+}
+
+#viewport-config input[type="number"] {
+    width: 60px;
+}
+>>>>>>> 0e741dd8a4bc47dd16312592e431ce2f1a06cf31
