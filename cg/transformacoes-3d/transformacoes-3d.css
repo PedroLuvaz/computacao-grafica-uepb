@@ -1,0 +1,13 @@
+/* Transformações 3D — ajustes específicos do módulo */
+
+/* Abas com cinco opções: duas linhas equilibradas */
+#left-sidebar .tab-button { flex-basis: calc(33% - 4px); }
+.tab-content > * + * { margin-top: 12px; }
+
+/* Legenda das cores dos eixos (vermelho X, verde Y, azul Z — iguais ao canvas) */
+.axis-legend { display: inline-flex; gap: 10px; font-family: var(--font-mono); font-size: 11.5px; font-weight: 600; }
+.axis-legend i { font-style: normal; display: inline-flex; align-items: center; gap: 5px; }
+.axis-legend i::before { content: ''; width: 14px; height: 2px; border-radius: 2px; background: currentColor; }
+
+/* Vértices gerados pelo script */
+.vertex-info { color: var(--text-2); }

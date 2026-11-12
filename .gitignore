@@ -1,0 +1,10 @@
+# Editores e sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Python (pi/ferramentas)
+__pycache__/
+*.pyc
+.venv/

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histograma e Equalização · CG·UEPB</title>
+    <link rel="icon" href="../../shared/img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../shared/css/app.css">
+    <script src="../../shared/js/site.js"></script>
+    <style>
+        .page.wide { max-width: 1320px; }
+        .pipeline.hist { grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1.5fr) 28px minmax(0, 1fr); }
+        @media (max-width: 1000px) { .pipeline.hist { grid-template-columns: 1fr; } }
+        .hist-block + .hist-block { margin-top: 6px; }
+        .hist-block .btn { margin-bottom: 10px; }
+    </style>
+</head>
+<body data-project="pi" data-module="histograma">
+    <main class="page wide pi-page">
+        <div data-stage-head="page" data-hint="Clique em “Equalizar” e depois gere os histogramas para comparar as distribuições."></div>
+
+        <div class="pipeline hist">
+            <section class="card">
+                <header class="card-head"><h2><span class="step">1</span>Imagem original</h2></header>
+                <div class="card-body">
+                    <div class="image-frame" id="original-img"></div>
+                    <div class="field">
+                        <label for="img-selector">Imagem</label>
+                        <select id="img-selector">
+                            <option selected value="0">Lena</option>
+                            <option value="2">Airplane</option>
+                            <option value="3">Pedro Lucas (criança)</option>
+                            <option value="4">Erick Nathan (criança)</option>
+                            <option value="5">Pedro Lucas (adulto)</option>
+                            <option value="6">Erick Nathan (adulto)</option>
+                        </select>
+                    </div>
+                </div>
+                <footer class="card-foot">
+                    <button type="button" class="btn btn-primary btn-block" id="equalize-btn"><span data-icon="chart"></span>Equalizar histograma</button>
+                </footer>
+            </section>
+
+            <div class="pipeline-arrow"><span data-icon="arrow"></span></div>
+
+            <section class="card">
+                <header class="card-head"><h2><span class="step">2</span>Histogramas</h2></header>
+                <div class="card-body">
+                    <div class="hist-block">
+                        <button type="button" class="btn btn-soft btn-block" id="show-original-hist"><span data-icon="eye"></span>Mostrar histograma original</button>
+                        <div class="image-frame image-frame--hist" id="original-hist"></div>
+                    </div>
+                    <div class="hist-block">
+                        <button type="button" class="btn btn-soft btn-block" id="show-processed-hist"><span data-icon="eye"></span>Mostrar histograma equalizado</button>
+                        <div class="image-frame image-frame--hist" id="processed-hist"></div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="pipeline-arrow"><span data-icon="arrow"></span></div>
+
+            <section class="card">
+                <header class="card-head"><h2><span class="step">3</span>Imagem equalizada</h2></header>
+                <div class="card-body">
+                    <div class="image-frame" id="processed-img"></div>
+                    <p class="muted" style="font-size:12.5px">s<sub>k</sub> = 255 · Σ p(r<sub>j</sub>), j = 0…k — a função de distribuição acumulada espalha os níveis de cinza por toda a faixa.</p>
+                </div>
+                <footer class="card-foot">
+                    <button type="button" class="btn btn-block" id="download-btn"><span data-icon="download"></span>Baixar PGM</button>
+                </footer>
+            </section>
+        </div>
+    </main>
+
+    <footer data-footer></footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js" integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../core/pgm.js"></script>
+    <script src="histograma.js"></script>
+</body>
+</html>

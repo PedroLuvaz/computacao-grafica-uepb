@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combinação de Imagens · CG·UEPB</title>
+    <link rel="icon" href="../../shared/img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../shared/css/app.css">
+    <script src="../../shared/js/site.js"></script>
+    <style>
+        .op-btn { height: 42px; font-family: var(--font-mono); font-size: 18px; }
+        .op-btn.logic { font-size: 12px; letter-spacing: .04em; }
+        .op-btn[aria-pressed="true"] { --btn-bg: var(--accent); --btn-fg: var(--accent-text); --btn-bd: transparent; box-shadow: 0 0 0 4px var(--accent-ring); }
+        .op-group + .op-group { margin-top: 14px; }
+        .formula { font-family: var(--font-mono); font-size: 13px; text-align: center; padding: 12px; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); }
+    </style>
+</head>
+<body data-project="pi" data-module="combinacao">
+    <main class="page pi-page">
+        <div data-stage-head="page" data-hint="As imagens são combinadas pixel a pixel. Escolha A, B e a operação."></div>
+
+        <div class="pipeline">
+            <section class="card">
+                <header class="card-head"><h2><span class="step">A</span>Imagem A</h2></header>
+                <div class="card-body">
+                    <div class="image-frame" id="img-a"></div>
+                    <div class="field">
+                        <label for="img-a-selector">Imagem</label>
+                        <select id="img-a-selector">
+                            <option selected value="0">Lena</option>
+                            <option value="1">Airplane</option>
+                            <option value="2">Pedro Lucas (criança)</option>
+                            <option value="3">Erick Nathan (criança)</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <div class="pipeline-arrow"><span data-icon="plus"></span></div>
+
+            <section class="card">
+                <header class="card-head"><h2><span class="step">B</span>Imagem B</h2></header>
+                <div class="card-body">
+                    <div class="image-frame" id="img-b"></div>
+                    <div class="field">
+                        <label for="img-b-selector">Imagem</label>
+                        <select id="img-b-selector">
+                            <option value="0">Lena</option>
+                            <option selected value="1">Airplane</option>
+                            <option value="2">Pedro Lucas (criança)</option>
+                            <option value="3">Erick Nathan (criança)</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <div class="pipeline-arrow"><span data-icon="arrow"></span></div>
+
+            <section class="card">
+                <header class="card-head"><h2><span class="step">=</span>Resultado</h2></header>
+                <div class="card-body">
+                    <div class="image-frame" id="processed-img"></div>
+                    <p class="formula" id="op-formula">Escolha uma operação</p>
+                    <!-- O script lê este select; os botões abaixo apenas o controlam -->
+                    <select id="input-filter" class="sr-only" tabindex="-1" aria-hidden="true">
+                        <option selected value="0">Escolher</option>
+                        <option value="1">+</option>
+                        <option value="2">-</option>
+                        <option value="3">*</option>
+                        <option value="4">/</option>
+                        <option value="5">OR</option>
+                        <option value="6">AND</option>
+                        <option value="7">XOR</option>
+                    </select>
+                    <div class="op-group">
+                        <p class="field-label" style="margin-bottom:8px">Aritméticas</p>
+                        <div class="op-grid">
+                            <button type="button" class="btn op-btn" data-op="1" data-formula="A + B" aria-pressed="false" title="Soma">+</button>
+                            <button type="button" class="btn op-btn" data-op="2" data-formula="A − B" aria-pressed="false" title="Subtração">−</button>
+                            <button type="button" class="btn op-btn" data-op="3" data-formula="A × B" aria-pressed="false" title="Multiplicação">×</button>
+                            <button type="button" class="btn op-btn" data-op="4" data-formula="A ÷ B" aria-pressed="false" title="Divisão">÷</button>
+                        </div>
+                    </div>
+                    <div class="op-group">
+                        <p class="field-label" style="margin-bottom:8px">Lógicas (bit a bit)</p>
+                        <div class="op-grid" style="grid-template-columns: repeat(3, 1fr)">
+                            <button type="button" class="btn op-btn logic" data-op="5" data-formula="A OR B" aria-pressed="false">OR</button>
+                            <button type="button" class="btn op-btn logic" data-op="6" data-formula="A AND B" aria-pressed="false">AND</button>
+                            <button type="button" class="btn op-btn logic" data-op="7" data-formula="A XOR B" aria-pressed="false">XOR</button>
+                        </div>
+                    </div>
+
+                </div>
+                <footer class="card-foot">
+                    <label class="switch"><input type="checkbox" id="normalizeSwitch" checked><span>Normalizar para [0, 255]<small>vale para a próxima operação</small></span></label>
+                    <button type="button" class="btn btn-primary btn-block" id="download-btn"><span data-icon="download"></span>Baixar PGM</button>
+                </footer>
+            </section>
+        </div>
+
+    </main>
+
+    <footer data-footer></footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js" integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../core/pgm.js"></script>
+    <script src="combinacao.js"></script>
+    <script>
+        // Botões de operação → select lido por combinacao.js
+        const opSelect = document.getElementById('input-filter');
+        const opFormula = document.getElementById('op-formula');
+        document.querySelectorAll('.op-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.op-btn').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+                opFormula.textContent = btn.dataset.formula;
+                opSelect.value = btn.dataset.op;
+                opSelect.dispatchEvent(new Event('change'));
+            });
+        });
+    </script>
+</body>
+</html>

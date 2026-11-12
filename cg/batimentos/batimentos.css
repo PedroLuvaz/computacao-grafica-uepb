@@ -1,0 +1,24 @@
+/* Batimentos Cardíacos — ajustes específicos do módulo
+   (as cores vermelhas vêm de data-accent="ecg" no design system) */
+
+.live-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    vertical-align: 1px;
+    animation: heartbeat 1s var(--ease) infinite;
+}
+
+.batimento-btn:active .icon { animation: heartbeat .4s var(--ease); }
+
+#historyBox { max-height: 280px; overflow-y: auto; }
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.35); }
+    30% { transform: scale(.95); }
+    45% { transform: scale(1.15); }
+}

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morfologia Matemática · CG·UEPB</title>
+    <link rel="icon" href="../../shared/img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../shared/css/app.css">
+    <script src="../../shared/js/site.js"></script>
+    <style>
+        .kernel.se input { cursor: pointer; caret-color: transparent; transition: background .18s, color .18s, border-color .18s; }
+        .kernel.se input.on { color: var(--accent-text); background: var(--accent); border-color: transparent; }
+        .kernel.se input:not(.on) { color: var(--text-3); }
+    </style>
+</head>
+<body data-project="pi" data-module="morfologia">
+    <main class="page pi-page">
+        <div data-stage-head="page" data-hint="Clique nas células do elemento estruturante para ligá-las ou desligá-las; o resultado é recalculado na hora."></div>
+
+        <div class="pipeline">
+            <section class="card">
+                <header class="card-head"><h2><span class="step">1</span>Imagem original</h2></header>
+                <div class="card-body">
+                    <div class="image-frame" id="original-img"></div>
+                    <div class="field">
+                        <label for="img-selector">Imagem</label>
+                        <select id="img-selector">
+                            <optgroup label="Binárias (PBM)">
+                                <option selected value="0">Impressão digital</option>
+                                <option value="2">Texto</option>
+                                <option value="3">Mapa</option>
+                            </optgroup>
+                            <optgroup label="Níveis de cinza (PGM)">
+                                <option value="4">Lena</option>
+                                <option value="5">Airplane</option>
+                                <option value="9">Tomografia</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <div class="pipeline-arrow"><span data-icon="arrow"></span></div>
+
+            <section class="card">
+                <header class="card-head"><h2><span class="step">2</span>Operador</h2></header>
+                <div class="card-body">
+                    <div class="field">
+                        <label for="input-filter">Operação morfológica</label>
+                        <select id="input-filter">
+                            <option selected value="0">Original (identidade)</option>
+                            <optgroup label="Binários">
+                                <option value="1">Complemento</option>
+                                <option value="2">Erosão</option>
+                                <option value="3">Dilatação</option>
+                                <option value="4">Abertura</option>
+                                <option value="5">Fechamento</option>
+                                <option value="6">Contorno externo</option>
+                                <option value="7">Contorno interno</option>
+                                <option value="8">Gradiente</option>
+                            </optgroup>
+                            <optgroup label="Níveis de cinza">
+                                <option value="10">Erosão</option>
+                                <option value="11">Dilatação</option>
+                                <option value="12">Abertura</option>
+                                <option value="13">Fechamento</option>
+                                <option value="14">Gradiente</option>
+                                <option value="15">Top-hat</option>
+                                <option value="16">Bottom-hat</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <span class="field-label">Elemento estruturante 3×3</span>
+                        <form id="input-matrix" class="kernel se" role="group" aria-label="Elemento estruturante" onsubmit="return false">
+                            <input type="number" name="array[]" value="0" min="0" max="1" step="1" readonly>
+                            <input type="number" name="array[]" value="1" min="0" max="1" step="1" readonly>
+                            <input type="number" name="array[]" value="0" min="0" max="1" step="1" readonly>
+                            <input type="number" name="array[]" value="1" min="0" max="1" step="1" readonly>
+                            <input type="number" name="array[]" value="1" min="0" max="1" step="1" readonly>
+                            <input type="number" name="array[]" value="1" min="0" max="1" step="1" readonly>
+                            <input type="number" name="array[]" value="0" min="0" max="1" step="1" readonly>
+                            <input type="number" name="array[]" value="1" min="0" max="1" step="1" readonly>
+                            <input type="number" name="array[]" value="0" min="0" max="1" step="1" readonly>
+                        </form>
+                    </div>
+                    <div class="btn-row">
+                        <button type="button" class="btn btn-ghost" data-se="0,1,0,1,1,1,0,1,0">Cruz</button>
+                        <button type="button" class="btn btn-ghost" data-se="1,1,1,1,1,1,1,1,1">Quadrado</button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="pipeline-arrow"><span data-icon="arrow"></span></div>
+
+            <section class="card">
+                <header class="card-head"><h2><span class="step">3</span>Resultado</h2></header>
+                <div class="card-body">
+                    <div class="image-frame" id="processed-img"></div>
+                </div>
+                <footer class="card-foot">
+                    <div class="btn-row">
+                        <button type="button" class="btn" id="apply-again-btn" title="Usa o resultado como nova imagem de entrada"><span data-icon="refresh"></span>Reusar</button>
+                        <button type="button" class="btn btn-primary" id="download-btn"><span data-icon="download"></span>Baixar</button>
+                    </div>
+                </footer>
+            </section>
+        </div>
+    </main>
+
+    <footer data-footer></footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js" integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../core/pgm.js"></script>
+    <script src="morfologia.js"></script>
+    <script>
+        // Elemento estruturante clicável: alterna 0/1 e avisa morfologia.js (form.onchange)
+        const seForm = document.getElementById('input-matrix');
+        const seCells = [...seForm.querySelectorAll('input')];
+        const paint = () => seCells.forEach((c) => c.classList.toggle('on', c.value === '1'));
+        const notify = () => { paint(); seForm.dispatchEvent(new Event('change')); };
+
+        seCells.forEach((cell) => cell.addEventListener('click', () => {
+            cell.value = cell.value === '1' ? '0' : '1';
+            notify();
+        }));
+        document.querySelectorAll('[data-se]').forEach((btn) => btn.addEventListener('click', () => {
+            btn.dataset.se.split(',').forEach((v, i) => { seCells[i].value = v; });
+            notify();
+        }));
+        paint();
+    </script>
+</body>
+</html>

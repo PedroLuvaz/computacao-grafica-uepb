@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rasterização de Retas · CG·UEPB</title>
+    <link rel="icon" href="../../shared/img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../shared/css/app.css">
+    <script src="../../shared/js/site.js"></script>
+</head>
+<body data-project="cg" data-module="retas">
+    <div class="workspace">
+
+        <aside class="panel panel--left" aria-label="Controles">
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="code"></span>Algoritmo</h2>
+                <select id="algorithm-select" aria-label="Algoritmo de rasterização">
+                    <option value="dda">DDA — Digital Differential Analyzer</option>
+                    <option value="ponto-medio">Ponto Médio (Bresenham)</option>
+                </select>
+            </section>
+
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="line"></span>Pontos da reta</h2>
+                <p class="section-sub">Ponto inicial</p>
+                <div class="fields cols-2">
+                    <div class="field"><label for="x1">X₁</label><input type="number" id="x1" name="x1" value="0"></div>
+                    <div class="field"><label for="y1">Y₁</label><input type="number" id="y1" name="y1" value="0"></div>
+                </div>
+                <p class="section-sub">Ponto final</p>
+                <div class="fields cols-2">
+                    <div class="field"><label for="x2">X₂</label><input type="number" id="x2" name="x2" value="0"></div>
+                    <div class="field"><label for="y2">Y₂</label><input type="number" id="y2" name="y2" value="0"></div>
+                </div>
+                <button class="btn btn-primary btn-block" id="draw-line-btn" type="button"><span data-icon="play"></span>Desenhar reta</button>
+            </section>
+
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="cursor"></span>Cursor<span class="badge">ao vivo</span></h2>
+                <div class="readout" id="live-coords"></div>
+            </section>
+        </aside>
+
+        <main class="stage">
+            <div data-stage-head data-hint="Clique em dois pontos do plano para traçar uma reta. A origem fica no centro."></div>
+            <div class="stage-body">
+                <div class="canvas-frame">
+                    <div class="canvas-frame-head">
+                        <strong>Plano cartesiano</strong>
+                        <span class="mono">500 × 500 px · origem central</span>
+                    </div>
+                    <div class="canvas-paper"><canvas id="canvas" width="500" height="500"></canvas></div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="panel panel--right" aria-label="Resultado">
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="info"></span>Reta atual</h2>
+                <p class="empty" id="no-line-message">Nenhuma reta desenhada ainda.</p>
+                <div id="clicked-coords" style="display: none;">
+                    <div class="coord-row">
+                        <strong>X₁</strong> <span id="x-initial"></span>
+                        <strong>Y₁</strong> <span id="y-initial"></span>
+                    </div>
+                    <div class="coord-row" style="margin-top: 6px">
+                        <strong>X₂</strong> <span id="x-final"></span>
+                        <strong>Y₂</strong> <span id="y-final"></span>
+                    </div>
+                    <p class="info-label" style="margin: 14px 0 8px">Pixels gerados</p>
+                    <div class="scroll-container"></div>
+                </div>
+            </section>
+            <section class="panel-section">
+                <button class="btn btn-danger btn-block" id="clear-btn" type="button"><span data-icon="trash"></span>Limpar plano</button>
+            </section>
+        </aside>
+    </div>
+
+    <script src="retas.js"></script>
+</body>
+</html>

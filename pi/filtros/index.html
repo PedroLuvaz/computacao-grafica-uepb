@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filtros Espaciais · CG·UEPB</title>
+    <link rel="icon" href="../../shared/img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../shared/css/app.css">
+    <script src="../../shared/js/site.js"></script>
+</head>
+<body data-project="pi" data-module="filtros">
+    <main class="page pi-page">
+        <div data-stage-head="page" data-hint="Escolha a imagem e o filtro. O kernel 3×3 aplicado aparece no centro."></div>
+
+        <div class="pipeline">
+            <!-- 1. Entrada -->
+            <section class="card">
+                <header class="card-head"><h2><span class="step">1</span>Imagem original</h2></header>
+                <div class="card-body">
+                    <div class="image-frame" id="original-img"></div>
+                    <div class="field">
+                        <label for="img-selector">Imagem</label>
+                        <select id="img-selector">
+                            <option selected value="0">Lena</option>
+                            <option value="1">Lena · ruído sal e pimenta</option>
+                            <option value="2">Lena · ruído gaussiano</option>
+                            <option value="3">Airplane</option>
+                            <option value="4">Pedro Lucas (criança)</option>
+                            <option value="5">Erick Nathan (criança)</option>
+                        </select>
+                    </div>
+                    <label class="switch"><input type="checkbox" id="normalizeOriginalSwitch">Normalizar tabela de pixels</label>
+                </div>
+            </section>
+
+            <div class="pipeline-arrow"><span data-icon="arrow"></span></div>
+
+            <!-- 2. Operação -->
+            <section class="card">
+                <header class="card-head"><h2><span class="step">2</span>Filtro</h2></header>
+                <div class="card-body">
+                    <div class="field">
+                        <label for="input-filter">Filtro espacial</label>
+                        <select id="input-filter">
+                            <option selected value="0">Original (identidade)</option>
+                            <optgroup label="Suavização">
+                                <option value="9">Média</option>
+                                <option value="23">Mediana</option>
+                            </optgroup>
+                            <optgroup label="Realce e bordas">
+                                <option value="2">Passa-alta</option>
+                                <option value="11">Roberts em X</option>
+                                <option value="12">Roberts em Y</option>
+                                <option value="13">Roberts cruzado em X</option>
+                                <option value="14">Roberts cruzado em Y</option>
+                                <option value="7">Prewitt em X</option>
+                                <option value="8">Prewitt em Y</option>
+                                <option value="5">Sobel em X</option>
+                                <option value="6">Sobel em Y</option>
+                                <option value="24">Alto reforço (high-boost)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <span class="field-label">Kernel 3×3</span>
+                        <form id="input-matrix" class="kernel" role="group" aria-label="Kernel do filtro" onsubmit="return false">
+                            <input type="number" name="array[]" value="0" readonly aria-label="k(1,1)">
+                            <input type="number" name="array[]" value="0" readonly aria-label="k(1,2)">
+                            <input type="number" name="array[]" value="0" readonly aria-label="k(1,3)">
+                            <input type="number" name="array[]" value="0" readonly aria-label="k(2,1)">
+                            <input type="number" name="array[]" value="0" readonly aria-label="k(2,2)">
+                            <input type="number" name="array[]" value="0" readonly aria-label="k(2,3)">
+                            <input type="number" name="array[]" value="0" readonly aria-label="k(3,1)">
+                            <input type="number" name="array[]" value="0" readonly aria-label="k(3,2)">
+                            <input type="number" name="array[]" value="0" readonly aria-label="k(3,3)">
+                        </form>
+                    </div>
+
+                    <div class="param">
+                        <label for="ahb">Fator A do alto reforço</label>
+                        <input type="number" id="ahb" min="1" value="1.5" step="0.1" disabled>
+                    </div>
+                    <p class="muted" style="font-size:12px">Mediana e alto reforço não usam um kernel linear; os valores ficam com o último kernel exibido.</p>
+                </div>
+            </section>
+
+            <div class="pipeline-arrow"><span data-icon="arrow"></span></div>
+
+            <!-- 3. Saída -->
+            <section class="card">
+                <header class="card-head"><h2><span class="step">3</span>Resultado</h2></header>
+                <div class="card-body">
+                    <div class="image-frame" id="processed-img"></div>
+                    <label class="switch"><input type="checkbox" id="normalizeSwitch">Normalizar para [0, 255]</label>
+                </div>
+                <footer class="card-foot">
+                    <div class="btn-row">
+                        <button type="button" class="btn" id="apply-again-btn" title="Usa o resultado como nova imagem de entrada"><span data-icon="refresh"></span>Reusar</button>
+                        <button type="button" class="btn btn-primary" id="download-btn"><span data-icon="download"></span>Baixar PGM</button>
+                    </div>
+                </footer>
+            </section>
+        </div>
+
+        <!-- Tabelas de pixels -->
+        <div class="pixel-tables">
+            <section class="card">
+                <header class="card-head"><h2><span data-icon="grid"></span>Pixels · original</h2></header>
+                <div class="card-body">
+                    <div id="original-pixels-table" class="pixel-table-container">
+                        <p>Carregando a tabela de pixels da imagem original…</p>
+                    </div>
+                </div>
+            </section>
+            <section class="card">
+                <header class="card-head"><h2><span data-icon="grid"></span>Pixels · resultado</h2></header>
+                <div class="card-body">
+                    <div id="processed-pixels-table" class="pixel-table-container">
+                        <p>Selecione um filtro para gerar a tabela de pixels do resultado.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer data-footer></footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js" integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../core/pgm.js"></script>
+    <script src="filtros.js"></script>
+</body>
+</html>

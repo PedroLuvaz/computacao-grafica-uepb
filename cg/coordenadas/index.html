@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistemas de Coordenadas · CG·UEPB</title>
+    <link rel="icon" href="../../shared/img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../shared/css/app.css">
+    <script src="../../shared/js/site.js"></script>
+</head>
+<body data-project="cg" data-module="coordenadas">
+    <div class="workspace">
+
+        <aside class="panel panel--left" aria-label="Controles">
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="frame"></span>Janela do mundo</h2>
+                <div class="fields cols-2">
+                    <div class="field"><label for="input-xmin">X mín.</label><input type="number" id="input-xmin" value="10.5" step="any"></div>
+                    <div class="field"><label for="input-xmax">X máx.</label><input type="number" id="input-xmax" value="100.3" step="any"></div>
+                    <div class="field"><label for="input-ymin">Y mín.</label><input type="number" id="input-ymin" value="15.2" step="any"></div>
+                    <div class="field"><label for="input-ymax">Y máx.</label><input type="number" id="input-ymax" value="100.4" step="any"></div>
+                </div>
+                <button class="btn btn-primary btn-block" id="set-coordinates-btn" type="button">Definir janela</button>
+            </section>
+
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="target"></span>Ativar pixel pelo mundo</h2>
+                <div class="fields cols-2">
+                    <div class="field"><label for="input-x">X</label><input type="number" id="input-x" step="any" placeholder="ex.: 50"></div>
+                    <div class="field"><label for="input-y">Y</label><input type="number" id="input-y" step="any" placeholder="ex.: 40"></div>
+                </div>
+                <button class="btn btn-soft btn-block" id="set-world-btn" type="button">Ativar pixel</button>
+            </section>
+        </aside>
+
+        <main class="stage">
+            <div data-stage-head data-hint="Mova o cursor para ver as conversões em tempo real e clique para ativar um pixel."></div>
+            <div class="stage-body">
+                <div class="canvas-frame">
+                    <div class="canvas-frame-head">
+                        <div class="chips" id="bounds-info">
+                            <span class="chip"><span class="k">X mín.</span><span id="xmin"></span></span>
+                            <span class="chip"><span class="k">X máx.</span><span id="xmax"></span></span>
+                            <span class="chip"><span class="k">Y mín.</span><span id="ymin"></span></span>
+                            <span class="chip"><span class="k">Y máx.</span><span id="ymax"></span></span>
+                        </div>
+                        <span class="mono">600 × 400 px</span>
+                    </div>
+                    <div class="canvas-paper">
+                        <canvas id="canvas" width="600" height="400"></canvas>
+                        <span class="pixel-marker" id="pixel-marker"></span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="panel panel--right" aria-label="Leituras">
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="cursor"></span>Cursor<span class="badge">ao vivo</span></h2>
+                <div class="readout" id="live-coords"></div>
+            </section>
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="target"></span>Pixel ativado</h2>
+                <div class="readout" id="clicked-coords">Nenhum pixel selecionado.</div>
+            </section>
+        </aside>
+    </div>
+
+    <script src="coordenadas.js"></script>
+</body>
+</html>

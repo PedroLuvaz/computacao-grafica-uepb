@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batimentos Cardíacos · CG·UEPB</title>
+    <link rel="icon" href="../../shared/img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../shared/css/app.css">
+    <link rel="stylesheet" href="batimentos.css">
+    <script src="../../shared/js/site.js"></script>
+</head>
+<body data-project="cg" data-module="batimentos" data-accent="ecg">
+    <div class="workspace">
+
+        <aside class="panel panel--left" id="left-sidebar" aria-label="Controles">
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="pulse"></span>Modo de simulação</h2>
+                <select id="ecg-mode" aria-label="Modo de simulação">
+                    <option value="rest">Repouso · ~60 BPM</option>
+                    <option value="run">Corrida · ~140 BPM</option>
+                    <option value="stress">Estresse · ~110 BPM</option>
+                    <option value="sleep">Sono · ~45 BPM</option>
+                </select>
+            </section>
+
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="sliders"></span>Velocidade</h2>
+                <div class="slider-container">
+                    <label for="speedRange">Ritmo</label>
+                    <input type="range" id="speedRange" min="1" max="10" value="5">
+                    <span id="speedValue">5</span>
+                </div>
+            </section>
+
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="heart"></span>Registro manual</h2>
+                <p class="muted" style="font-size:12.5px">Adiciona um batimento extra e atualiza o histórico imediatamente.</p>
+                <button class="btn btn-primary btn-lg btn-block batimento-btn" data-tab="cardio" type="button">
+                    <span data-icon="heart"></span>Registrar batimento
+                </button>
+            </section>
+
+            <section class="panel-section">
+                <button class="btn btn-block" id="reset-btn" type="button"><span data-icon="refresh"></span>Reiniciar simulação</button>
+            </section>
+        </aside>
+
+        <main class="stage">
+            <div data-stage-head data-hint="Os picos R são detectados automaticamente e o BPM estimado entra no histórico a cada 10 segundos."></div>
+            <div class="stage-body">
+                <div class="canvas-frame">
+                    <div class="canvas-frame-head">
+                        <strong><span class="live-dot"></span>Monitor ECG</strong>
+                        <span class="mono">600 × 300 px</span>
+                    </div>
+                    <div class="canvas-paper"><canvas id="cardioCanvas" width="600" height="300"></canvas></div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="panel panel--right" id="right-sidebar" aria-label="Histórico">
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="history"></span>Histórico de BPM</h2>
+                <div id="historyBox" class="info-box">Nenhum batimento registrado.</div>
+                <button class="btn btn-danger btn-block" id="clear-btn" type="button"><span data-icon="trash"></span>Limpar histórico</button>
+            </section>
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="info"></span>Sobre a simulação</h2>
+                <p class="muted" style="font-size:13px; line-height:1.6">
+                    O traçado é gerado pela soma das ondas P, complexo QRS e onda T, com ruído
+                    proporcional ao modo escolhido, e rasterizado com o algoritmo DDA.
+                </p>
+            </section>
+        </aside>
+    </div>
+
+    <script src="batimentos.js"></script>
+</body>
+</html>

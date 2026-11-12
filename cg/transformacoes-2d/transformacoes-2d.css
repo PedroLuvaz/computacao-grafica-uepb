@@ -1,0 +1,13 @@
+/* Transformações 2D — ajustes específicos do módulo */
+
+/* Controles de tamanho da lousa (viewport) */
+.lousa-size-controls { display: flex; gap: 8px; }
+.lousa-size-controls label { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-3); }
+.lousa-size-controls input { width: 70px; height: 28px; }
+
+/* Lousa com borda de destaque, indicando a área recortada */
+#lousa-canvas { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* Links de imagens de exemplo */
+#pgm-section a { color: var(--accent); font-weight: 600; text-decoration: none; }
+#pgm-section a:hover { text-decoration: underline; }

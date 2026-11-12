@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rasterização de Circunferências · CG·UEPB</title>
+    <link rel="icon" href="../../shared/img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../shared/css/app.css">
+    <script src="../../shared/js/site.js"></script>
+</head>
+<body data-project="cg" data-module="circunferencias">
+    <div class="workspace">
+
+        <aside class="panel panel--left" aria-label="Controles">
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="code"></span>Algoritmo</h2>
+                <select id="algorithm-select" aria-label="Algoritmo de rasterização">
+                    <option value="eqex">Equação Explícita</option>
+                    <option value="trigo">Trigonométrico</option>
+                    <option value="ponto-medio">Ponto Médio</option>
+                </select>
+            </section>
+
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="circle"></span>Circunferência</h2>
+                <div class="fields cols-2">
+                    <div class="field"><label for="x">Centro X</label><input type="number" id="x" name="x" value="0"></div>
+                    <div class="field"><label for="y">Centro Y</label><input type="number" id="y" name="y" value="0"></div>
+                    <div class="field span-all"><label for="r">Raio</label><input type="number" id="r" name="r" value="0" min="0"></div>
+                </div>
+                <button class="btn btn-primary btn-block" id="draw-line-btn" type="button"><span data-icon="play"></span>Desenhar circunferência</button>
+            </section>
+
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="cursor"></span>Cursor<span class="badge">ao vivo</span></h2>
+                <div class="readout" id="live-coords"></div>
+            </section>
+        </aside>
+
+        <main class="stage">
+            <div data-stage-head data-hint="Clique no centro e depois em um ponto da borda para definir o raio."></div>
+            <div class="stage-body">
+                <div class="canvas-frame">
+                    <div class="canvas-frame-head">
+                        <strong>Plano cartesiano</strong>
+                        <span class="mono">500 × 500 px · origem central</span>
+                    </div>
+                    <div class="canvas-paper"><canvas id="canvas" width="500" height="500"></canvas></div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="panel panel--right" aria-label="Resultado">
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="info"></span>Circunferência atual</h2>
+                <p class="empty" id="no-line-message">Nenhuma circunferência desenhada ainda.</p>
+                <div id="clicked-coords" style="display: none;">
+                    <dl class="kv">
+                        <dt>Centro X</dt><dd id="x-ponto"></dd>
+                        <dt>Centro Y</dt><dd id="y-ponto"></dd>
+                        <dt>Raio</dt><dd id="raio"></dd>
+                    </dl>
+                    <p class="info-label" style="margin: 14px 0 8px">Pixels gerados</p>
+                    <div class="scroll-container"></div>
+                </div>
+            </section>
+            <section class="panel-section">
+                <button class="btn btn-danger btn-block" id="clear-btn" type="button"><span data-icon="trash"></span>Limpar plano</button>
+            </section>
+        </aside>
+    </div>
+
+    <script src="circunferencias.js"></script>
+</body>
+</html>

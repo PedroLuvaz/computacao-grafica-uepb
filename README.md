@@ -1,113 +1,99 @@
-# 🚀 Projeto de Computação Gráfica e Processamento de Imagens
+# CG·UEPB — Computação Gráfica e Processamento de Imagens
 
-## 📌 Descrição Geral
+Laboratório interativo com os algoritmos fundamentais de **Computação Gráfica** e
+**Processamento Digital de Imagens**, implementados do zero em HTML, CSS e JavaScript.
 
-Este projeto tem como objetivo a implementação de algoritmos fundamentais das áreas de **Computação Gráfica (CG)** e **Processamento Digital de Imagens (PI)** usando tecnologias web: **HTML, CSS e JavaScript**. A estrutura é dividida em dois módulos complementares:
-
-- 🖼️ **Projeto 1 – Computação Gráfica (CG)**: Focado na manipulação de pixels, rasterização de primitivas, transformações 2D e 3D, recortes e simulações gráficas.
-- 🧪 **Projeto 2 – Processamento de Imagens (PI)**: Direcionado para a análise, filtragem e transformação de imagens digitais, com suporte a imagens coloridas e binárias.
-
----
-
-## 🛠 Tecnologias Utilizadas
-
-- 🖥 **HTML5**: Estrutura da interface e elementos gráficos.
-- 🎨 **CSS3**: Design visual e responsividade.
-- ✨ **JavaScript**: Núcleo da lógica e algoritmos de computação gráfica e imagem.
+> UEPB · 2025.1 · Prof. Robson Pequeno de Sousa
+> Pedro Lucas Vaz Andrade · Erick Nathan Almeida do Nascimento
 
 ---
 
-## 🎯 Funcionalidades
+## Como executar
 
-### ✅ Projeto 1 – Computação Gráfica (CG)
+Não há etapa de build. Como as páginas do Projeto 2 carregam imagens com `fetch`,
+sirva a pasta por HTTP (abrir o arquivo direto com `file://` bloqueia essas requisições):
 
-#### 1️⃣ Ativação de Pixel (SetPixel)
-- Controle direto de pixels em um grid para simular o acesso ao framebuffer.
+```bash
+python -m http.server 5500
+```
 
-#### 2️⃣ Rasterização de Primitivas
-
-**Retas:**
-- 🔹 DDA (Digital Differential Analyzer)
-- 🔹 Algoritmo do Ponto Médio
-
-**Circunferências:**
-- 🟠 Equação Explícita
-- 🟠 Algoritmo Trigonométrico
-- 🟠 Algoritmo do Ponto Médio
-
-#### 3️⃣ Transformações 2D
-
-- 🔄 Rotação
-- ✂️ Cisalhamento
-- ➡️ Translação
-- 📏 Escala
-- 🔃 Reflexão
-- 🖼️ **ViewPort 2D**: Mapeamento de coordenadas lógicas para coordenadas físicas.
-
-#### 4️⃣ Transformações 3D
-
-- 📦 Projeção Ortográfica
-- 🔄 Rotação nos eixos X, Y e Z
-- ✂️ Cisalhamento e Escala
-- 📏 Translação
-- 🖼️ **ViewPort 3D**
-
-#### 5️⃣ Recorte de Tela (Clipping)
-
-- ✂️ **Algoritmo de Cohen-Sutherland**: Recorte eficiente de segmentos de reta com base em regiões codificadas.
-
-#### 6️⃣ Simulador de Batimentos Cardíacos (ECG)
-
-- ❤️ Simulação gráfica de um eletrocardiograma com ondas P, Q, R, S, T animadas dinamicamente.
-- ⏱️ Botão de batimento com histórico de picos registrado a cada 10 segundos.
+Depois acesse <http://localhost:5500>. A extensão **Live Server** do VS Code também funciona,
+e o site pode ser publicado como está no **GitHub Pages** (os caminhos são todos relativos).
 
 ---
 
-### ✅ Projeto 2 – Processamento de Imagens (PI)
+## Estrutura
 
-#### 🎨 Filtros
+```
+.
+├── index.html                  # Página inicial (escolha do projeto)
+├── shared/                     # Recursos compartilhados por todas as páginas
+│   ├── css/app.css             # Design system: tokens, temas claro/escuro, componentes e layouts
+│   ├── js/site.js              # Manifesto de módulos, navegação, tema, toasts e animação do hero
+│   └── img/favicon.svg
+├── cg/                         # Projeto 1 — Computação Gráfica
+│   ├── index.html
+│   ├── coordenadas/            # Mundo ↔ NDC ↔ NDC centralizado ↔ dispositivo
+│   ├── retas/                  # DDA e Ponto Médio (Bresenham)
+│   ├── circunferencias/        # Equação explícita, trigonométrico e Ponto Médio
+│   ├── transformacoes-2d/      # Matrizes 3×3, imagem PGM e viewport (exemplos/ tem PGMs de teste)
+│   ├── transformacoes-3d/      # Matrizes 4×4, projeção isométrica e viewport 3D
+│   ├── batimentos/             # Simulação de ECG
+│   └── recorte/                # Cohen-Sutherland
+└── pi/                         # Projeto 2 — Processamento de Imagens
+    ├── index.html
+    ├── core/pgm.js             # Leitura/escrita PGM e PBM, convolução, normalização
+    ├── imagens/                # Imagens de exemplo (.pgm / .pbm)
+    ├── ferramentas/            # Conversor de imagens para PGM (Python + Pillow)
+    ├── filtros/
+    ├── combinacao/
+    ├── transformacoes/         # Transformações de intensidade
+    ├── histograma/
+    ├── morfologia/
+    └── morfismo/
+```
 
-- 🔸 Média
-- 🔸 Mediana
-- 🔸 Gaussiano
-- 🔸 Laplaciano
-- 🔸 Sobel (detecção de bordas)
+Cada módulo fica em sua própria pasta com `index.html`, o script `<modulo>.js` e, quando
+precisa de estilos próprios, `<modulo>.css`.
 
-#### ➕ Combinação de Imagens
+### Adicionando um módulo
 
-- Operações:
-  - Soma / Subtração
-  - Lógicas: AND, OR, XOR
+1. Crie `cg/<id>/index.html` (ou `pi/<id>/`) usando um módulo existente como modelo.
+2. Marque o `<body>` com `data-project="cg|pi"` e `data-module="<id>"`.
+3. Registre o módulo no manifesto `SITE.projects` em `shared/js/site.js`.
 
-#### 🔁 Transformações
-
-- 📐 Geométricas:
-  - Rotação, Translação, Redimensionamento, Espelhamento
-- 🌗 Conversão: Tons de cinza, binarização
-- 🧾 **Transformações em Imagens Binárias**:
-  - Redução, expansão e movimentação de objetos binarizados
-
-#### 📊 Histograma
-
-- Cálculo do histograma de intensidades
-- Equalização para realce de contraste
-
-#### 🧬 Morfologia Matemática
-
-- 🧼 Erosão
-- 🔁 Dilatação
-- 🔄 Abertura
-- 🔃 Fechamento
-
-#### ⏳ Morfismo Temporal
-
-- Detecção de movimento entre quadros
-- Subtração temporal
-- Simulação de movimento em sequências de imagens
+A barra de navegação, os breadcrumbs, o título da página e os cards das páginas iniciais
+são gerados a partir desse manifesto, então nada mais precisa ser editado.
 
 ---
 
-## 📸 Interface
+## Projeto 1 — Computação Gráfica
 
-A interface é organizada por categorias com botões para cada funcionalidade:
+| Módulo | O que mostra |
+| --- | --- |
+| **Sistemas de Coordenadas** | Conversão entre coordenadas de mundo, NDC, NDC centralizado e dispositivo, em tempo real. |
+| **Retas** | DDA e Ponto Médio nos 8 oitantes, com a lista de pixels gerados. |
+| **Circunferências** | Equação explícita, método trigonométrico e Ponto Médio com simetria de oito vias. |
+| **Transformações 2D** | Translação, escala, rotação, reflexão, cisalhamento e sequências compostas, em um quadrado ou em uma imagem PGM, com recorte pela viewport. |
+| **Transformações 3D** | Matrizes homogêneas 4×4, projeção isométrica, câmera orbital e viewport 3D. |
+| **Batimentos Cardíacos** | ECG com ondas P-QRS-T em modos repouso, corrida, estresse e sono, e estimativa de BPM. |
+| **Recorte** | Cohen-Sutherland com códigos de região e o passo a passo de cada segmento. |
 
+## Projeto 2 — Processamento de Imagens
+
+| Módulo | O que mostra |
+| --- | --- |
+| **Filtros** | Média, mediana, passa-alta, Roberts, Roberts cruzado, Prewitt, Sobel e alto reforço, com o kernel 3×3 e a tabela de pixels. |
+| **Combinação** | Soma, subtração, multiplicação, divisão, OR, AND e XOR entre duas imagens. |
+| **Intensidade** | Negativo, gama, logarítmica, sigmoide, faixa dinâmica e transferência linear. |
+| **Histograma** | Histograma de intensidades e equalização pela distribuição acumulada. |
+| **Morfologia** | Erosão, dilatação, abertura, fechamento, contornos, gradiente, top-hat e bottom-hat, com elemento estruturante editável. |
+| **Morfismo Temporal** | Interpolação linear (cross-dissolve) entre duas imagens em 60 quadros. |
+
+---
+
+## Tecnologias
+
+- **HTML5, CSS3 e JavaScript** sem frameworks; os pixels são acesos manualmente.
+- **[p5.js](https://p5js.org/)** (via CDN) apenas como framebuffer no Projeto 2.
+- Fontes **Inter**, **Space Grotesk** e **JetBrains Mono** (Google Fonts).

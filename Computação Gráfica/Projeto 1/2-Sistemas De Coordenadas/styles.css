@@ -1,7 +1,0 @@
-/* Module 2 - Sistemas De Coordenadas: module-specific overrides */
-
-/* Coordinate inputs need more width for decimal values */
-#input-xmax, #input-xmin, #input-ymax, #input-ymin,
-#input-x, #input-y {
-    width: 120px;
-}

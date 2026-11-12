@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformações de Intensidade · CG·UEPB</title>
+    <link rel="icon" href="../../shared/img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../shared/css/app.css">
+    <script src="../../shared/js/site.js"></script>
+    <style>
+        .formula { font-family: var(--font-mono); font-size: 13px; text-align: center; padding: 12px; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); }
+    </style>
+</head>
+<body data-project="pi" data-module="transformacoes">
+    <main class="page pi-page">
+        <div data-stage-head="page" data-hint="Selecione a transformação; apenas os parâmetros dela ficam editáveis. Alterar um valor reaplica na hora."></div>
+
+        <div class="pipeline">
+            <section class="card">
+                <header class="card-head"><h2><span class="step">1</span>Imagem original</h2></header>
+                <div class="card-body">
+                    <div class="image-frame" id="original-img"></div>
+                    <div class="field">
+                        <label for="img-selector">Imagem</label>
+                        <select id="img-selector">
+                            <option selected value="0">Lena</option>
+                            <option value="2">Airplane</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <div class="pipeline-arrow"><span data-icon="arrow"></span></div>
+
+            <section class="card">
+                <header class="card-head"><h2><span class="step">2</span>Transformação</h2></header>
+                <div class="card-body">
+                    <div class="field">
+                        <label for="input-filter">Função de transferência</label>
+                        <select id="input-filter">
+                            <option selected value="0">Original (identidade)</option>
+                            <option value="1">Negativo</option>
+                            <option value="2">Gama</option>
+                            <option value="3">Logarítmica</option>
+                            <option value="6">Intensidade geral (sigmoide)</option>
+                            <option value="5">Faixa dinâmica</option>
+                            <option value="4">Transferência linear</option>
+                        </select>
+                    </div>
+                    <p class="formula" id="tf-formula">s = r</p>
+
+                    <!-- A ordem dos campos importa: transformacoes.js lê array[] por índice -->
+                    <form id="input-matrix" class="params" onsubmit="return false">
+                        <label class="param">Gama (γ)
+                            <input type="number" name="array[]" value="1" min="0" max="5" step="0.1" id="gamma" disabled>
+                        </label>
+                        <label class="param">Constante logarítmica (a)
+                            <input type="number" name="array[]" value="1" min="0" max="10" step="0.1" id="log" disabled>
+                        </label>
+                        <label class="param two">Sigmoide: centro (w) · largura (σ)
+                            <input type="number" name="array[]" value="127" step="1" id="intg1" disabled aria-label="Centro w">
+                            <input type="number" name="array[]" value="25" step="1" id="intg2" disabled aria-label="Largura sigma">
+                        </label>
+                        <label class="param">Faixa dinâmica (alvo)
+                            <input type="number" name="array[]" value="255" step="1" id="dyn" disabled>
+                        </label>
+                        <label class="param two">Linear: ganho (a) · deslocamento (b)
+                            <input type="number" name="array[]" value="1" step="1" id="lin1" disabled aria-label="Ganho a">
+                            <input type="number" name="array[]" value="1" step="1" id="lin2" disabled aria-label="Deslocamento b">
+                        </label>
+                    </form>
+                </div>
+            </section>
+
+            <div class="pipeline-arrow"><span data-icon="arrow"></span></div>
+
+            <section class="card">
+                <header class="card-head"><h2><span class="step">3</span>Resultado</h2></header>
+                <div class="card-body">
+                    <div class="image-frame" id="processed-img"></div>
+                    <label class="switch"><input type="checkbox" id="normalizeSwitch"><span>Normalizar para [0, 255]<small>vale para a próxima operação</small></span></label>
+                </div>
+                <footer class="card-foot">
+                    <div class="btn-row">
+                        <button type="button" class="btn" id="apply-again-btn" title="Usa o resultado como nova imagem de entrada"><span data-icon="refresh"></span>Reusar</button>
+                        <button type="button" class="btn btn-primary" id="download-btn"><span data-icon="download"></span>Baixar PGM</button>
+                    </div>
+                </footer>
+            </section>
+        </div>
+    </main>
+
+    <footer data-footer></footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js" integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../core/pgm.js"></script>
+    <script src="transformacoes.js"></script>
+    <script>
+        // Mostra a fórmula da transformação escolhida
+        const formulas = {
+            0: 's = r',
+            1: 's = 255 − r',
+            2: 's = 255 · (r / 255)^(1/γ)',
+            3: 's = a · c · log(1 + r),  c = 255 / log 256',
+            4: 's = a · r + b  (limitado a [0, 255])',
+            5: 's = (r / 255) · alvo',
+            6: 's = 255 / (1 + e^(−(r − w) / σ))'
+        };
+        const tfSelect = document.getElementById('input-filter');
+        tfSelect.addEventListener('change', () => {
+            document.getElementById('tf-formula').textContent = formulas[tfSelect.value] || '';
+        });
+    </script>
+</body>
+</html>

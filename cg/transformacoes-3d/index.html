@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformações 3D · CG·UEPB</title>
+    <link rel="icon" href="../../shared/img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../shared/css/app.css">
+    <link rel="stylesheet" href="transformacoes-3d.css">
+    <script src="../../shared/js/site.js"></script>
+</head>
+<body data-project="cg" data-module="transformacoes-3d">
+    <div class="workspace">
+
+        <!-- ============ Controles ============ -->
+        <aside class="panel panel--left" id="left-sidebar" aria-label="Controles">
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="cube"></span>Objeto 3D</h2>
+                <div class="fields cols-2">
+                    <div class="field">
+                        <label for="object-type-select">Forma</label>
+                        <select id="object-type-select"><option value="cube">Cubo</option></select>
+                    </div>
+                    <div class="field"><label for="object-size">Tamanho</label><input type="number" id="object-size" value="40" min="1"></div>
+                </div>
+                <button class="btn btn-primary btn-block" id="generate-object-btn" type="button"><span data-icon="play"></span>Gerar objeto</button>
+            </section>
+
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="move"></span>Transformação</h2>
+                <div class="tab-buttons" role="tablist">
+                    <button class="tab-button active" data-tab="translation" type="button">Translação</button>
+                    <button class="tab-button" data-tab="rotation" type="button">Rotação</button>
+                    <button class="tab-button" data-tab="scale" type="button">Escala</button>
+                    <button class="tab-button" data-tab="shear" type="button">Cisalh.</button>
+                    <button class="tab-button" data-tab="reflection" type="button">Reflexão</button>
+                </div>
+
+                <div class="tab-content active" id="translation-tab">
+                    <div class="fields cols-3">
+                        <div class="field"><label for="tx" class="axis-x">Tx</label><input type="number" id="tx" value="0"></div>
+                        <div class="field"><label for="ty" class="axis-y">Ty</label><input type="number" id="ty" value="0"></div>
+                        <div class="field"><label for="tz" class="axis-z">Tz</label><input type="number" id="tz" value="0"></div>
+                    </div>
+                    <button class="btn btn-soft btn-block tab-apply" id="apply-translation" type="button">Aplicar translação</button>
+                </div>
+
+                <div class="tab-content" id="rotation-tab">
+                    <div class="fields cols-2">
+                        <div class="field">
+                            <label for="rotation-axis">Eixo</label>
+                            <select id="rotation-axis"><option value="x">X</option><option value="y">Y</option><option value="z">Z</option></select>
+                        </div>
+                        <div class="field"><label for="rotation-angle">Ângulo (°)</label><input type="number" id="rotation-angle" value="0"></div>
+                    </div>
+                    <button class="btn btn-soft btn-block tab-apply" id="apply-rotation" type="button">Aplicar rotação</button>
+                </div>
+
+                <div class="tab-content" id="scale-tab">
+                    <div class="fields cols-3">
+                        <div class="field"><label for="sx" class="axis-x">Sx</label><input type="number" id="sx" value="1" step="0.1"></div>
+                        <div class="field"><label for="sy" class="axis-y">Sy</label><input type="number" id="sy" value="1" step="0.1"></div>
+                        <div class="field"><label for="sz" class="axis-z">Sz</label><input type="number" id="sz" value="1" step="0.1"></div>
+                    </div>
+                    <button class="btn btn-soft btn-block tab-apply" id="apply-scale" type="button">Aplicar escala</button>
+                </div>
+
+                <div class="tab-content" id="shear-tab">
+                    <div class="fields cols-3">
+                        <div class="field"><label for="sh-xy">XY</label><input type="number" id="sh-xy" value="0" step="0.1"></div>
+                        <div class="field"><label for="sh-xz">XZ</label><input type="number" id="sh-xz" value="0" step="0.1"></div>
+                        <div class="field"><label for="sh-yz">YZ</label><input type="number" id="sh-yz" value="0" step="0.1"></div>
+                    </div>
+                    <button class="btn btn-soft btn-block tab-apply" id="apply-shear" type="button">Aplicar cisalhamento</button>
+                </div>
+
+                <div class="tab-content" id="reflection-tab">
+                    <div class="field">
+                        <label for="reflection-axis">Plano de reflexão</label>
+                        <select id="reflection-axis"><option value="xy">XY</option><option value="xz">XZ</option><option value="yz">YZ</option></select>
+                    </div>
+                    <button class="btn btn-soft btn-block tab-apply" id="apply-reflection" type="button">Aplicar reflexão</button>
+                </div>
+            </section>
+
+            <details class="panel-section">
+                <summary class="section-title">Sequência composta</summary>
+                <div class="field">
+                    <label for="sequence-transformation-type">Transformação</label>
+                    <select id="sequence-transformation-type">
+                        <option value="translation">Translação</option>
+                        <option value="rotation">Rotação</option>
+                        <option value="scale">Escala</option>
+                        <option value="shear">Cisalhamento</option>
+                        <option value="reflection">Reflexão</option>
+                    </select>
+                </div>
+                <div id="sequence-parameters" class="subgroup"></div>
+                <div class="btn-row">
+                    <button class="btn" id="add-to-sequence-btn" type="button"><span data-icon="plus"></span>Adicionar</button>
+                    <button class="btn btn-primary" id="apply-sequence-btn" type="button"><span data-icon="play"></span>Aplicar</button>
+                </div>
+            </details>
+
+            <section class="panel-section">
+                <button class="btn btn-danger btn-block" id="clear-btn" type="button"><span data-icon="trash"></span>Limpar tudo</button>
+            </section>
+        </aside>
+
+        <!-- ============ Palco ============ -->
+        <main class="stage">
+            <div data-stage-head data-hint="Gere um cubo, aplique transformações e gire a câmera pelos controles de visualização."></div>
+            <div class="stage-body">
+                <div class="canvas-frame">
+                    <div class="canvas-frame-head">
+                        <strong>Projeção isométrica</strong>
+                        <span class="axis-legend"><i class="axis-x">X</i><i class="axis-y">Y</i><i class="axis-z">Z</i></span>
+                    </div>
+                    <div class="canvas-paper"><canvas id="canvas3d" width="600" height="600"></canvas></div>
+                </div>
+                <div class="canvas-frame">
+                    <div class="canvas-frame-head">
+                        <strong>Viewport</strong>
+                        <span class="mono">300 × 300 px</span>
+                    </div>
+                    <div class="canvas-paper"><canvas id="world-window" width="300" height="300"></canvas></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- ============ Câmera, viewport e informações ============ -->
+        <aside class="panel panel--right" id="right-sidebar" aria-label="Informações">
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="eye"></span>Câmera</h2>
+                <div>
+                    <div class="slider-container">
+                        <label id="color-x" class="axis-x" for="view-rot-x">X</label>
+                        <input type="range" id="view-rot-x" min="-180" max="180" value="0">
+                        <span id="view-rot-x-value">0°</span>
+                    </div>
+                    <div class="slider-container">
+                        <label id="color-y" class="axis-y" for="view-rot-y">Y</label>
+                        <input type="range" id="view-rot-y" min="-180" max="180" value="0">
+                        <span id="view-rot-y-value">0°</span>
+                    </div>
+                    <div class="slider-container">
+                        <label id="color-z" class="axis-z" for="view-rot-z">Z</label>
+                        <input type="range" id="view-rot-z" min="-180" max="180" value="0">
+                        <span id="view-rot-z-value">0°</span>
+                    </div>
+                    <div class="slider-container">
+                        <label id="zoom" for="view-zoom">Zoom</label>
+                        <input type="range" id="view-zoom" min="50" max="200" value="100">
+                        <span id="view-zoom-value">100%</span>
+                    </div>
+                </div>
+                <button class="btn btn-block" id="reset-view-btn" type="button"><span data-icon="refresh"></span>Resetar câmera</button>
+            </section>
+
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="frame"></span>Viewport 3D</h2>
+                <label class="switch"><input type="checkbox" id="viewport-active">Ativar viewport</label>
+                <div class="fields cols-2">
+                    <div class="field"><label for="viewport-xmin">X mín.</label><input type="number" class="vp3d" id="viewport-xmin" value="-50"></div>
+                    <div class="field"><label for="viewport-xmax">X máx.</label><input type="number" class="vp3d" id="viewport-xmax" value="50"></div>
+                    <div class="field"><label for="viewport-ymin">Y mín.</label><input type="number" class="vp3d" id="viewport-ymin" value="-50"></div>
+                    <div class="field"><label for="viewport-ymax">Y máx.</label><input type="number" class="vp3d" id="viewport-ymax" value="50"></div>
+                </div>
+            </section>
+
+            <section class="panel-section" id="object-info">
+                <h2 class="section-title"><span data-icon="info"></span>Objeto</h2>
+                <p class="info-label">Vértices</p>
+                <div id="vertices-info" class="info-box">Nenhum objeto gerado.</div>
+                <p class="info-label">Centro geométrico</p>
+                <div id="center-info" class="info-box">Nenhum objeto gerado.</div>
+                <p class="info-label">Dimensões</p>
+                <div id="dimensions-info" class="info-box">Nenhum objeto gerado.</div>
+                <p class="info-label">Octante</p>
+                <div id="octant-info" class="info-box">Nenhum objeto gerado.</div>
+            </section>
+
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="history"></span>Histórico</h2>
+                <div id="transformation-history" class="info-box">Nenhuma transformação aplicada.</div>
+            </section>
+        </aside>
+    </div>
+
+    <script src="transformacoes-3d.js"></script>
+</body>
+</html>

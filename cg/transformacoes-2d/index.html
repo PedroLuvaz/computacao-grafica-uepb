@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformações 2D · CG·UEPB</title>
+    <link rel="icon" href="../../shared/img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../shared/css/app.css">
+    <link rel="stylesheet" href="transformacoes-2d.css">
+    <script src="../../shared/js/site.js"></script>
+</head>
+<body data-project="cg" data-module="transformacoes-2d">
+    <div class="workspace">
+
+        <!-- ============ Controles do objeto ============ -->
+        <aside class="panel panel--left" id="left-bar" aria-label="Controles">
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="plus"></span>Quadrado</h2>
+                <div class="fields cols-3">
+                    <div class="field"><label for="square-size">Lado</label><input type="number" id="square-size" value="50" min="1"></div>
+                    <div class="field"><label for="square-x">X</label><input type="number" id="square-x" value="0"></div>
+                    <div class="field"><label for="square-y">Y</label><input type="number" id="square-y" value="0"></div>
+                </div>
+                <button class="btn btn-primary btn-block" id="draw-square-btn" type="button"><span data-icon="play"></span>Gerar quadrado</button>
+            </section>
+
+            <details class="panel-section" open>
+                <summary class="section-title">Translação</summary>
+                <div class="fields cols-2">
+                    <div class="field"><label for="x-translation">Δx</label><input type="number" id="x-translation" name="x-translation" value="0"></div>
+                    <div class="field"><label for="y-translation">Δy</label><input type="number" id="y-translation" name="y-translation" value="0"></div>
+                </div>
+                <button class="btn btn-soft btn-block type-op" type="button">Aplicar translação</button>
+            </details>
+
+            <details class="panel-section">
+                <summary class="section-title">Escala</summary>
+                <div class="fields cols-2">
+                    <div class="field"><label for="x-scale">Sx</label><input type="number" id="x-scale" name="x-scale" value="1" step="0.1"></div>
+                    <div class="field"><label for="y-scale">Sy</label><input type="number" id="y-scale" name="y-scale" value="1" step="0.1"></div>
+                </div>
+                <button class="btn btn-soft btn-block type-op" type="button">Aplicar escala</button>
+            </details>
+
+            <details class="panel-section">
+                <summary class="section-title">Rotação</summary>
+                <div class="fields cols-2">
+                    <div class="field span-all"><label for="angle">Ângulo (°)</label><input type="number" id="angle" name="angle" value="0"></div>
+                    <div class="field"><label for="x-rotation">Pivô X</label><input type="number" id="x-rotation" name="x-rotation" value="0"></div>
+                    <div class="field"><label for="y-rotation">Pivô Y</label><input type="number" id="y-rotation" name="y-rotation" value="0"></div>
+                </div>
+                <button class="btn btn-soft btn-block type-op" type="button">Aplicar rotação</button>
+            </details>
+
+            <details class="panel-section">
+                <summary class="section-title">Reflexão</summary>
+                <div class="check-row">
+                    <label class="check" for="x-ref"><input type="checkbox" id="x-ref" name="x-ref">Em relação a X</label>
+                    <label class="check" for="y-ref"><input type="checkbox" id="y-ref" name="y-ref">Em relação a Y</label>
+                </div>
+                <button class="btn btn-soft btn-block type-op" type="button">Aplicar reflexão</button>
+            </details>
+
+            <details class="panel-section">
+                <summary class="section-title">Cisalhamento</summary>
+                <div class="fields cols-2">
+                    <div class="field"><label for="x-cis">Shx</label><input type="number" id="x-cis" name="x-cis" value="0" step="0.1"></div>
+                    <div class="field"><label for="y-cis">Shy</label><input type="number" id="y-cis" name="y-cis" value="0" step="0.1"></div>
+                </div>
+                <button class="btn btn-soft btn-block type-op" type="button">Aplicar cisalhamento</button>
+            </details>
+
+            <details class="panel-section">
+                <summary class="section-title">Sequência composta</summary>
+                <div class="field">
+                    <label for="sequence-transformation-type">Transformação</label>
+                    <select id="sequence-transformation-type"></select>
+                </div>
+                <div id="sequence-parameters" class="subgroup"></div>
+                <div class="btn-row">
+                    <button class="btn" id="add-to-sequence-btn" type="button"><span data-icon="plus"></span>Adicionar</button>
+                    <button class="btn btn-primary" id="apply-sequence-btn" type="button"><span data-icon="play"></span>Aplicar</button>
+                </div>
+            </details>
+
+            <section class="panel-section">
+                <button class="btn btn-danger btn-block" id="clear-canvas-btn" type="button"><span data-icon="trash"></span>Limpar tudo</button>
+            </section>
+        </aside>
+
+        <!-- ============ Palco ============ -->
+        <main class="stage">
+            <div data-stage-head data-hint="Gere um quadrado ou carregue uma imagem PGM e aplique as transformações. Os valores do painel são reaproveitados pela imagem."></div>
+            <div class="stage-body">
+                <div class="canvas-frame">
+                    <div class="canvas-frame-head">
+                        <strong>Plano do mundo</strong>
+                        <span class="mono">500 × 500 px · origem central</span>
+                    </div>
+                    <div class="canvas-paper"><canvas id="canvas" width="500" height="500"></canvas></div>
+                </div>
+
+                <div class="canvas-frame" id="viewport-window" style="display:none;">
+                    <div class="canvas-frame-head">
+                        <strong>Viewport (lousa)</strong>
+                        <div class="lousa-size-controls">
+                            <label>L <input type="number" id="lousa-width" value="300" min="50" max="800"></label>
+                            <label>A <input type="number" id="lousa-height" value="300" min="50" max="800"></label>
+                        </div>
+                    </div>
+                    <div class="canvas-paper"><canvas id="lousa-canvas" width="300" height="300"></canvas></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- ============ Informações, imagem e viewport ============ -->
+        <aside class="panel panel--right" id="right-bar" aria-label="Informações">
+            <section class="panel-section" id="object-info">
+                <h2 class="section-title"><span data-icon="info"></span>Objeto</h2>
+                <p class="info-label">Vértices</p>
+                <div id="vertices-list" class="info-box">Nenhum objeto gerado.</div>
+                <p class="info-label">Centro</p>
+                <div id="center-position" class="info-box">Nenhum objeto gerado.</div>
+            </section>
+
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="history"></span>Histórico</h2>
+                <div id="transformation-history" class="info-box">Nenhuma transformação aplicada.</div>
+            </section>
+
+            <details class="panel-section" id="pgm-section">
+                <summary class="section-title">Imagem PGM</summary>
+                <input type="file" id="pgm-upload" accept=".pgm">
+                <p class="muted" style="font-size:12px">
+                    Exemplos: <a href="#" data-example="exemplos/lena.pgm">lena.pgm</a> ·
+                    <a href="#" data-example="exemplos/t.pgm">t.pgm</a>
+                </p>
+                <div class="btn-row">
+                    <button class="btn btn-primary" id="render-pgm-btn" type="button"><span data-icon="upload"></span>Carregar</button>
+                    <button class="btn" id="img-reset-btn" type="button"><span data-icon="refresh"></span>Resetar</button>
+                </div>
+
+                <div class="subgroup">
+                    <p class="subgroup-title">Translação</p>
+                    <div class="fields cols-2">
+                        <div class="field"><label for="img-translate-x">Δx</label><input type="number" id="img-translate-x" value="0"></div>
+                        <div class="field"><label for="img-translate-y">Δy</label><input type="number" id="img-translate-y" value="0"></div>
+                    </div>
+                    <button class="btn btn-soft btn-block" id="img-translate-btn" type="button">Aplicar</button>
+                </div>
+                <div class="subgroup">
+                    <p class="subgroup-title">Escala</p>
+                    <div class="fields cols-2">
+                        <div class="field"><label for="img-scale-x">Sx</label><input type="number" id="img-scale-x" value="1" step="0.1"></div>
+                        <div class="field"><label for="img-scale-y">Sy</label><input type="number" id="img-scale-y" value="1" step="0.1"></div>
+                    </div>
+                    <button class="btn btn-soft btn-block" id="img-scale-btn" type="button">Aplicar</button>
+                </div>
+                <div class="subgroup">
+                    <p class="subgroup-title">Rotação</p>
+                    <div class="field"><label for="img-rotate-angle">Ângulo (°)</label><input type="number" id="img-rotate-angle" value="0"></div>
+                    <button class="btn btn-soft btn-block" id="img-rotate-btn" type="button">Aplicar</button>
+                </div>
+                <div class="subgroup">
+                    <p class="subgroup-title">Reflexão</p>
+                    <div class="check-row">
+                        <label class="check"><input type="checkbox" id="img-reflect-x">Em X</label>
+                        <label class="check"><input type="checkbox" id="img-reflect-y">Em Y</label>
+                    </div>
+                    <button class="btn btn-soft btn-block" id="img-reflect-btn" type="button">Aplicar</button>
+                </div>
+                <div class="subgroup">
+                    <p class="subgroup-title">Cisalhamento</p>
+                    <div class="fields cols-2">
+                        <div class="field"><label for="img-shear-x">Shx</label><input type="number" id="img-shear-x" value="0" step="0.1"></div>
+                        <div class="field"><label for="img-shear-y">Shy</label><input type="number" id="img-shear-y" value="0" step="0.1"></div>
+                    </div>
+                    <button class="btn btn-soft btn-block" id="img-shear-btn" type="button">Aplicar</button>
+                </div>
+            </details>
+
+            <section class="panel-section">
+                <h2 class="section-title"><span data-icon="frame"></span>Viewport</h2>
+                <label class="switch"><input type="checkbox" id="viewport-active">Ativar recorte pela viewport</label>
+                <div id="viewport-config" style="display:none;">
+                    <div class="fields cols-2">
+                        <div class="field"><label for="viewport-xmin">X mín.</label><input type="number" id="viewport-xmin" value="-100"></div>
+                        <div class="field"><label for="viewport-xmax">X máx.</label><input type="number" id="viewport-xmax" value="100"></div>
+                        <div class="field"><label for="viewport-ymin">Y mín.</label><input type="number" id="viewport-ymin" value="-100"></div>
+                        <div class="field"><label for="viewport-ymax">Y máx.</label><input type="number" id="viewport-ymax" value="100"></div>
+                    </div>
+                </div>
+            </section>
+        </aside>
+    </div>
+
+    <script src="transformacoes-2d.js"></script>
+    <script>
+        // Carrega uma imagem de exemplo no seletor de arquivo e a renderiza
+        document.querySelectorAll('[data-example]').forEach((link) => {
+            link.addEventListener('click', async (event) => {
+                event.preventDefault();
+                try {
+                    const buffer = await (await fetch(link.dataset.example)).arrayBuffer();
+                    const transfer = new DataTransfer();
+                    transfer.items.add(new File([buffer], link.dataset.example.split('/').pop()));
+                    document.getElementById('pgm-upload').files = transfer.files;
+                    document.getElementById('render-pgm-btn').click();
+                } catch (err) {
+                    alert('Não foi possível carregar o exemplo: ' + err.message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
