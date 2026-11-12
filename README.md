@@ -17,7 +17,8 @@ sirva a pasta por HTTP (abrir o arquivo direto com `file://` bloqueia essas requ
 python -m http.server 5500
 ```
 
-Depois acesse <http://localhost:5500>. A extensão **Live Server** do VS Code também funciona,
+Depois acesse <http://localhost:5500>, ou use a versão publicada em
+<https://pedroluvaz.github.io/computacao-grafica-uepb/>. A extensão **Live Server** do VS Code também funciona,
 e o site pode ser publicado como está no **GitHub Pages** (os caminhos são todos relativos).
 
 ---

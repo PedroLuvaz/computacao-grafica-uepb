@@ -47,7 +47,7 @@
         semester: '2025.1',
         professor: 'Robson Pequeno de Sousa',
         team: ['Pedro Lucas Vaz Andrade', 'Erick Nathan Almeida do Nascimento'],
-        repo: 'https://github.com/PedroLuvaz/CG-UEPB',
+        repo: 'https://github.com/PedroLuvaz/computacao-grafica-uepb',
         projects: [
             {
                 id: 'cg', num: '01', icon: 'pen',
